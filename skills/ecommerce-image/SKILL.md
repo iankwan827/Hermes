@@ -1,7 +1,7 @@
 ---
 name: ecommerce-image
 description: 电商产品图生成流程。接收客户参考图，询问平台需求，生成符合要求的产品图。使用MiniMax image-01模型。
-version: 2.0.0
+version: 2.1.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -20,19 +20,146 @@ metadata:
 
 ## 核心原则（铁律）
 
-1. **绝对不用 subject_ref** — 生成的产品一定会变形，用户明确说过"我不需要生成那个假葫芦"
+1. **绝对不用 subject_ref** — MiniMax 的 subject_ref 一定会变形产品
 2. **绝对不用 vision_analyze** — Xiaomi Token Plan 上有 api-key header 丢失的已知问题
-3. **抠图必须裁掉透明区域** — 不裁会导致产品"悬浮"
-4. **背景不要桌面/家具** — 用纯背景（渐变、纯色、抽象），产品放上去就是主体，不存在悬浮问题
+3. **优先用 Gemini 方案** — 一步到位，主体100%不变，不需要抠图合成
+4. **MiniMax 方案必须裁透明区域** — 不裁会导致产品"悬浮"
+5. **MiniMax 方案背景不要桌面/家具** — 用纯背景（渐变、纯色、抽象），产品放上去就是主体
+5. **优先用 Gemini "banana" 原生图编辑** — 传入原图+prompt，一步换背景，主体不变，效果远超抠图合成
 
-## 正确工作流（唯一做法）
+## 工作流（按优先级）
+
+### 方案 A：Gemini 原生图编辑（首选！）
+
+一步到位，传入原图 + prompt，Gemini 保持产品主体不变，只换背景。
+
+```python
+import requests, json, os, base64, urllib3
+urllib3.disable_warnings()
+
+# 读原图
+with open('产品原图.jpg', 'rb') as f:
+    img_b64 = base64.b64encode(f.read()).decode()
+
+# Gemini 端点（PackyAPI）
+url = "https://www.packyapi.com/v1beta/models/gemini-3-pro-image-preview:generateContent"
+api_key = os.environ.get('OPENAI_API_KEY')
+
+payload = {
+    "contents": [{
+        "parts": [
+            {"text": "Keep the product exactly as it is, only change the background to <描述>. Do not modify the product at all."},
+            {"inlineData": {"mimeType": "image/jpeg", "data": img_b64}}
+        ]
+    }],
+    "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+}
+
+r = requests.post(url, json=payload,
+                 headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+                 verify=False, timeout=120)
+result = r.json()
+
+# 提取图片
+for c in result.get("candidates", []):
+    for p in c.get("content", {}).get("parts", []):
+        if "inlineData" in p:
+            img_bytes = base64.b64decode(p["inlineData"]["data"])
+            with open("output.jpg", "wb") as f:
+                f.write(img_bytes)
+```
+
+**prompt 要点：**
+- 明确说 "Keep the product exactly as it is"
+- 说 "Do not modify the product at all"
+- 描述想要的背景
+
+**可用模型（PackyAPI）：**
+- `gemini-3-pro-image-preview` — 高质量，文字渲染好（推荐）
+- `gemini-2.5-flash-image` — 快速，大批量
+
+**优势：** 一步完成，不需要抠图/裁剪/合成/加阴影，主体保真度高
+
+### 方案 B：抠图+纯背景合成（备选）
+
+## 正确工作流（二选一）
+
+收到用户图片后，先问用哪个方案：
+
+### 方案A：Google Gemini（推荐，一步到位）
+
+直接传原图给 Gemini，只换背景，主体不变。不需要抠图、合成。
+
+```bash
+PYTHON="E:/Users/Administrator/AppData/Roaming/uv/python/cpython-3.11-windows-x86_64-none/python.exe"
+"$PYTHON" -c "
+import requests, json, os, base64, urllib3
+urllib3.disable_warnings()
+env_path = os.path.expanduser('~/AppData/Local/hermes/.env')
+with open(env_path) as f:
+    for line in f:
+        line = line.strip()
+        if line and not line.startswith('#') and '=' in line:
+            k, v = line.split('=', 1)
+            os.environ[k.strip()] = v.strip()
+api_key = os.environ.get('OPENAI_API_KEY', '')
+base_url = os.environ.get('OPENAI_BASE_URL', 'https://www.packyapi.com/v1')
+
+# 读原图
+with open('<原图路径>', 'rb') as f:
+    img_b64 = base64.b64encode(f.read()).decode()
+
+# Gemini 端点
+root = base_url.rstrip('/')
+if root.endswith('/v1'): root = root[:-3]
+url = f'{root}/v1beta/models/gemini-3-pro-image-preview:generateContent'
+
+payload = {
+    'contents': [{'parts': [
+        {'text': 'Keep the product exactly as it is, only change the background to <背景描述>. Do not modify the product at all.'},
+        {'inlineData': {'mimeType': 'image/png', 'data': img_b64}}
+    ]}],
+    'generationConfig': {'responseModalities': ['TEXT', 'IMAGE']}
+}
+
+r = requests.post(url, json=payload,
+    headers={'Content-Type': 'application/json', 'x-goog-api-key': api_key},
+    verify=False, timeout=120)
+result = r.json()
+for c in result.get('candidates', []):
+    for p in c.get('content', {}).get('parts', []):
+        if 'inlineData' in p:
+            img_bytes = base64.b64decode(p['inlineData']['data'])
+            with open('<输出路径>', 'wb') as f:
+                f.write(img_bytes)
+            print(f'完成: {<输出路径>} ({len(img_bytes)} bytes)')
+"
+```
+
+**优势：** 一步到位，主体100%不变，光影融合自然
+**劣势：** 需要 PackyAPI Key + 网络能访问 www.packyapi.com
+**可用模型：** `gemini-3-pro-image-preview`（高质量）、`gemini-2.5-flash-image`（快速）
+
+### 方案B：MiniMax 抠图合成（备选，网络不通时用）
 
 ```
-1. MiniMax 纯文生图 → 纯背景（渐变/纯色/抽象，不要桌面家具）
+1. MiniMax 纯文生图 → 纯背景（渐变/纯色，不要桌面家具）
 2. rembg 抠原图 → 产品透明底图
 3. 裁掉透明区域 → 必须！否则悬浮
 4. PIL 合成 → 原图产品居中放在纯背景上
 ```
+
+**优势：** 不依赖 PackyAPI，MiniMax 直连
+**劣势：** 步骤多，产品边缘可能不自然，需要调阴影/调色
+
+### 选择建议
+
+| 场景 | 推荐方案 |
+|------|---------|
+| 网络能访问 packyapi.com | 方案A（Gemini） |
+| 网络不通 / 需要批量生成纯背景 | 方案B（MiniMax） |
+| 要求主体100%不变 | 方案A（Gemini） |
+| 要求文字渲染精确 | 方案A（Gemini） |
 
 ## 详细步骤
 
@@ -170,27 +297,89 @@ scenes = [
 
 | 问题 | 原因 | 解决 |
 |------|------|------|
-| 产品看起来"浮空" | 背景有桌面等参照物 | 换成渐变/纯色等无参照物的背景 |
-| 产品变形 | 用了 subject_ref | 绝对不用 subject_ref |
-| 产品太突兀 | 色调不匹配 | 调亮度0.90+饱和度1.05匹配背景光 |
+| 产品变形 | 用了 subject_ref | 用 Gemini banana 原生编辑，或抠图合成 |
+| 产品看起来"浮空" | 背景有桌面等参照物 | 用 Gemini 换背景，或换纯色/渐变背景 |
+| 产品太突兀 | 色调不匹配 | Gemini 自动匹配；抠图方案调亮度0.95+饱和度1.05 |
 | vision_analyze 报错 | api-key header 丢失 | 用 analyze-image skill 的 Python 脚本 |
+| PackyAPI SSL 错误 | Clash fake IP 拦截 | 用 www.packyapi.com（不是 api.packyapi.com） |
+| Gemini 返回 no image | 模型不在当前分组 | 登录 PackyAPI 控制台切换分组 |
 
 ## 技术细节
 
-- MiniMax API 端点: `https://api.minimaxi.com/v1/image_generation`
+### PackyAPI 配置（Gemini 生图）
+- **正确端点：** `https://www.packyapi.com/v1`（不是 api.packyapi.com）
+- **Gemini 原生端点：** `https://www.packyapi.com/v1beta/models/{model}:generateContent`
+- **认证：** `x-goog-api-key: <key>`（不是 Authorization: Bearer）
+- **环境变量：** `OPENAI_API_KEY` + `OPENAI_BASE_URL=https://www.packyapi.com/v1`
+- **插件：** `image_gen/openai` 已改造支持双端点（OpenAI + Gemini）
+- **默认模型：** `gemini-3-pro-image-preview`
+
+### MiniMax API（备选）
+- 端点: `https://api.minimaxi.com/v1/image_generation`
 - 模型: image-01
 - 图片 URL 24小时过期，脚本自动下载到本地
-- 脚本位于: `minimax-image/scripts/` 目录（minimax_image.py, remove_bg.py, ecommerce_image.py）
-- rembg 已安装，模型在 `~/.u2net/`
+- 脚本位于: `minimax-image/scripts/` 目录
+
+### rembg 抠图
+- 已安装，模型在 `~/.u2net/`
 - Python 路径: `E:/Users/Administrator/AppData/Roaming/uv/python/cpython-3.11-windows-x86_64-none/python.exe`
+
+### 替代方案：PackyAPI 接入
+
+PackyAPI 是 OpenAI 兼容的 API 网关（56 个模型），可直接用现有 `image_gen/openai` 插件接入：
+
+```bash
+# 设置环境变量
+hermes config set env.OPENAI_BASE_URL "https://api.packyapi.com/v1"
+hermes config set env.OPENAI_API_KEY "PackyAPI密钥"
+
+# 可用模型：gpt-image-2, gemini-3-pro-image 等
+```
+
+**⚠️ Gemini 模型端点差异（重要）：**
+
+| 模型 | 端点 | 认证方式 |
+|------|------|----------|
+| gpt-image-2 | `/v1/images/generations` | `Authorization: Bearer <key>` |
+| gemini-*-image | `/v1beta/models/{model}:generateContent` | `x-goog-api-key: <key>` |
+
+Gemini 模型走 Google 原生端点，请求格式不同：
+```json
+{
+  "contents": [{"parts": [{"text": "prompt"}]}],
+  "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+}
+```
+返回 base64 图片在 `inlineData` 字段里。
+
+OpenAI 插件已更新支持 Gemini 模型（v1.1.0），但 PackyAPI 的 Gemini 端点需要确认是否走 OpenAI 兼容格式还是 Google 原生格式。
+
+优势：
+- 一个密钥用多个模型（GPT、Gemini、Claude 等）
+- gemini-3-pro-image 文字渲染质量可能更好
+- 不用写新插件，改 URL 即可
+
+已知问题：
+- 代理软件（Clash fake IP 模式）会拦截 `api.packyapi.com` 的 SSL 连接，需加直连规则
 
 ## 飞书图片交付
 
 用 `MEDIA:<绝对路径>` 内嵌在回复文本中，gateway 自动上传为原生图片附件。
 
+## 经验教训
+
+- **2026-06-01**: subject_ref 一定会变形产品，不能用于电商图最终交付
+- **2026-06-01**: 纯背景（渐变/纯色）比场景图更适合产品展示，不存在悬浮问题
+- **2026-06-01**: rembg 输出底部有大量透明区域，必须裁剪
+- **2026-06-01**: MiniMax API 不支持 inpainting（局部重绘），无法替换变形区域
+- **2026-06-01**: vision_analyze 在 Xiaomi Token Plan 上不可用，必须用 analyze-image skill 的 Python 脚本
+- **2026-06-01**: **Gemini "banana" 是最佳方案** — 传入原图+prompt换背景，主体100%不变，一步到位，不需要抠图合成
+- **2026-06-01**: PackyAPI Gemini 端点是 `/v1beta/models/{model}:generateContent`，不是 OpenAI 的 `/v1/images/generations`
+- **2026-06-01**: PackyAPI base URL 是 `www.packyapi.com` 不是 `api.packyapi.com`
+
 ## 相关文件
 
-- `references/minimax_api.md` - MiniMax API 详细文档
+- `references/packyapi-gemini-integration.md` — PackyAPI Gemini 端点、认证、请求格式完整参考
+- `references/minimax_api.md` — MiniMax API 详细文档
 - 脚本位置: `minimax-image/scripts/minimax_image.py`（背景生成）
-- 脚本位置: `minimax-image/scripts/remove_bg.py`（抠图）
-- 脚本位置: `minimax-image/scripts/ecommerce_image.py`（旧版一键生成，不推荐）
+- 脚本位置: `minimax-image/scripts/remove_bg.py`（抠图）/scripts/remove_bg.py`（抠图）
