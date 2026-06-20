@@ -1,3 +1,175 @@
+## 2026-06-20
+
+### 踩坑记录
+
+- [session] Agent之前错误声称"Ollama转录不了"导致用户一直没试Gemma4转录 → 事实是Ollama+Gemma4可以用`images`参数（不是`audio`）+`think:false`转录，只是精度不如Whisper。不要在没有验证的情况下给用户断言性结论
+- [audio-transcribe] 录音skill重构：从单一20KB SKILL.md拆分为核心流程(3.2KB)+references/setup.md+scripts/ → 按skill-creator标准，核心流程≤5k词，详细内容拆到references/，代码放scripts/
+- [llm-comparison] llama.cpp vs LM Studio vs Ollama对比：底层都是llama.cpp；LM Studio有GUI适合调参；Ollama最省事一键下模型；性能差异不大 → 转录用Whisper更准，Gemma4作为备选
+
+### 新发现
+
+- [audio-transcribe] 录音脚本统一到 `~/Pictures/录音/record.py`，支持指定输出目录、分段时长、分段数
+- [audio-transcribe] 转录脚本 `~/Pictures/录音/transcribe.py` 支持 `-l zh`(普通话) 和 `-l yue`(粤语)
+- [skill-creator] 拆分skill结构：核心流程在SKILL.md，详细配置在references/，代码在scripts/ → 当前录音skill已按此结构重构
+- [session] 用户指出Agent给的错误信息会影响用户决策 → 给结论前必须验证，不要凭印象断言
+
+### 用户偏好更新
+
+- 转录方案：Whisper和Ollama+Gemma4都可以用，看哪个方便
+- 不要给未验证的断言性结论 → 之前说"Ollama转录不了"导致用户错过Gemma4方案
+
+### Skill 更新
+
+- 新增 `audio-transcribe` 录音skill重构：SKILL.md从20KB精简到3.2KB，新增references/setup.md和scripts/
+
+---
+
+## 2026-06-19
+
+### 踩坑记录
+
+- [feishu-docx-to-native] Callout块（block_type=19）语法高亮无法修改（code_style只能创建时设置一次） → 创建前就确定好高亮语言
+- [feishu-docx-to-native] 代码块不支持"plaintext"语言（language=1报错） → 需用34=PlainText
+- [feishu-docx-to-native] 原生表格（block_type=20）无法通过API创建 → 不要浪费时间尝试，用Markdown表格或其他方案
+- [feishu-docx-to-native] Callout不能内联内容 → 必须先创建空容器再用create_child_block添加子block
+- [feishu-docx-to-native] 每批最多添加10-20个blocks → 不指定index参数让API自动追加
+- [feishu-courseware-upload] Shell引号与markdown解析冲突：`***`会被解析为粗斜体导致Authorization header截断 → 写脚本到文件再执行，不要内联
+- [teams-meeting-pipeline] Graph subscriptions在72小时后过期且不自动续期 → 3天后通知静默停止，必须设置`maintain-subscriptions`自动续期
+- [teams-meeting-pipeline] Transcript not available yet → Teams会议结束后需2-5分钟生成transcript，不要立即查询
+- [audio-transcribe] Whisper领域特定听错表（八字/命理同音字）：鬼害→癸亥、鬼水→癸水、人鬼水→壬癸水、官鬼→官杀等 → 转录后必须人工校对八字术语
+- [bazi-sales] 排盘数据源必须用JS脚本 → 绝对禁止用Python手算或AI直接推算天干地支，容易出错
+- [bazi-sales-validator] 自写天干地支计算脚本容易出错（月柱算错、大运算错） → 必须用cnlunar验证，cnlunar只在uv python环境中可用
+- [touchdesigner-mcp] 绝对不要猜测参数名 → 调用`td_get_par_info`先确认参数是否存在
+- [touchdesigner-mcp] Split cleanup and creation into SEPARATE MCP calls → 合并在一个脚本中会导致"Invalid OP object"
+- [comfyui] API format required → editor格式JSON不直接可执行，需转换为API格式
+- [comfyui] Model names exact且case-sensitive → 大小写不匹配导致"class_type not found"
+- [kanban-worker] Task state可变：dispatch和startup之间可能被blocked/reassigned/archived → 先kanban_show确认状态
+- [kanban-orchestrator] Inventing profile names → dispatcher静默失败，card永远卡在ready
+- [hermes-config] 配置变更必须用 `hermes config set` → 永远不要直接编辑config.yaml，直接改文件可能不生效
+
+### 新发现
+
+- [audio-transcribe] Gemma4替代Whisper方案：用`images`参数传音频（不是`audio`参数），需要`think: false` → 在某些场景下识别质量更好
+- [audio-transcribe] 长音频（>30分钟）建议后台运行 → CPU转录93分钟音频约需30-50分钟
+- [touchdesigner-mcp] Non-Commercial TD caps resolution at 1280×1280
+- [touchdesigner-mcp] H.264/H.265/AV1需要Commercial license → macOS用prores替代
+- [touchdesigner-mcp] Audio-reactive场景：TimeSlice必须ON；Lag CHOP会把256 samples扩展到2400+导致数据归零
+- [songwriting] 动态ARC描述比列genre更重要 → 强vocal persona描述比任何单个metatag影响更大
+- [bazi-sales] 知识库.md优先于.json → JSON可能有错误
+- [bazi-sales] 五行归类要按易学体系（易学本体属水/传播属火） → 不要凭直觉归类
+
+### 用户偏好更新
+
+- 不要给不切实际的乐观时间估算 → 实际耗时多少就如实说，宁可说"还要差不多同样时间"
+- 视频内容工作流：选身边小事引发共鸣，不选时事新闻；必须走完整4阶段不能跳步
+- 抖音热搜最佳查看时间：下午4-6点抓正在涨的话题，晚上7-10点高峰期发
+- 文案修改偏好：简洁，删掉排比句和重复金句；台词要口语化；节奏快，每句话推进故事
+- 写完文案必须自动跑video-content-audit审核 → 不等用户提醒（用户原话"你没跑skill啊"）
+- 电商图工作流：首选Gemini原生图编辑（传原图+prompt，一步换背景，主体不变）
+- 小红书访问笔记详情必须用/search_result/链接（带xsec_token） → /explore/链接会触发扫码限制
+- 八字排盘：23:00-23:59算第二天子时（日期+1，hour=0）
+- 用户改完文案就是终版 → 不要自作主张加回删掉的内容
+
+### Skill 更新
+
+- 更新 `feishu-docx-to-native`：新增Callout/代码块/表格API限制踩坑记录
+- 更新 `feishu-courseware-upload`：Shell引号与markdown解析冲突解决方案
+- 更新 `teams-meeting-pipeline`：Graph subscription 72小时过期 + Transcript延迟可用
+- 更新 `audio-transcribe`：Whisper听错表（八字术语） + Gemma4替代方案 + 长音频处理
+- 更新 `bazi-sales`：排盘数据源强制JS脚本 + 断语引用必须完整 + 知识库优先级
+- 更新 `bazi-sales-validator`：cnlunar验证替代自写脚本
+- 更新 `touchdesigner-mcp`：参数查询规则 + 分离操作 + 许可证限制 + Audio-reactive配置
+- 更新 `kanban-worker`：任务状态可变 + 不要用clarify（会超时）
+- 更新 `kanban-orchestrator`：不要发明profile名称
+
+---
+
+## 2026-06-18
+
+### 踩坑记录
+
+- [macos-audio-recording] Mac Mini默认输出是内置扬声器而非HDMI → 创建多输出设备时必须用 `system_profiler SPAudioDataType` 确认当前Default Output，不能假设是HDMI
+- [macos-audio-recording] 删除聚合设备(HermesMO)后，系统可能将默认输出重定向到无效ID → 每次操作后必须重新查询设备列表并重设默认输出，不要硬编码设备ID
+- [macos-audio-recording] ffmpeg avfoundation + BlackHole录制不稳定，指定60秒只录到5-17秒 → 用 `sounddevice`（Python PortAudio）替代ffmpeg，按名称查找BlackHole不受索引变化影响
+- [macos-audio-recording] avfoundation设备索引在创建/删除聚合设备后重新排列 → 每次录制前用 `-list_devices true` 确认编号，优先用sounddevice
+- [feishu] Python heredoc处理可能丢失字符 → 上传脚本中 `Authorization: Bearer` 头被截断为 `Authorization:` → 用 `patch` 工具修复而非重写heredoc
+- [feishu-oauth] Refresh token有效期30天（expires_in=2592000） → 过期后需重新走完整授权流程（启动8765服务器→用户点击授权→拿code换token）
+- [cron-job-patterns] `github-sync.sh` 脚本在 `~/.hermes/profiles/main/scripts/` 路径不存在 → 实际路径在 `~/.hermes/scripts/github-sync.sh`，cron job配置的脚本路径需要验证
+
+### 新发现
+
+- [macos-audio-recording] HermesMO多输出设备（BlackHole + Mac mini扬声器）验证成功 → sounddevice录制15秒，最大振幅0.5484，Whisper转录确认中文内容100%
+- [macos-audio-recording] 持续录制脚本 `record_live.py` 每5分钟自动保存一个WAV文件 → 支持长时间直播录制
+- [macos-audio-recording] Whisper medium模型首次运行需下载~1.5GB → 后台进程跑着不受 `/reset` 影响
+- [feishu] 浏览器工具已升级为 agent-browser 0.28.0 + Chrome 150 → config指向Chrome，CAMOFOX_URL已注释，cloud_provider=local，`/reset` 后生效
+- [feishu] 飞书文档分享设置：组织内「获得链接的人可阅读」→ 同组织成员点链接直接看，无需邀请
+- [bazi] 直播录音工作流：录1分钟→停止→转录验证→有内容则开始连续录制 → 避免无效录制浪费存储
+
+### 用户偏好更新
+
+- 直播录音流程：先录1分钟测试→转录验证→确认录到才开始正式录制，不要反复测试
+- 飞书文档分享：用户倾向「组织内获得链接的人可阅读」而非「所有人可访问」
+- Mac Mini音频输出：用户使用内置扬声器（非HDMI），配置多输出设备时需确认
+
+### Skill 更新
+
+- 更新 `macos-audio-recording`：新增「关键坑：ffmpeg avfoundation不稳定」章节，记录sounddevice替代方案和设备索引变化问题
+- 更新 `macos-audio-recording`：新增「用户可能用Mac mini扬声器而非HDMI」的坑点，补充 `system_profiler` 确认方法
+- 更新 `macos-audio-recording`：新增 HermesMO 删除后设备ID失效的解决方案
+- 更新 `feishu-oauth`：补充 refresh token 过期时间和重授权流程说明
+
+---
+
+## 2026-06-17
+
+### 踩坑记录
+
+- [cron-job-patterns] `execute_code` 在 cron 环境中被禁用 → 必须用 `write_file` + `terminal` 两步操作替代
+- [cron-job-patterns] `clarify` 在 cron 中不可用 → 所有决策必须自主完成，无用户交互
+- [cron-job-patterns] `~/.git-credentials` 可能为 0 字节 → git push 前用 `wc -c` 检查
+- [cron-job-patterns] `skill_view` 大载荷（48KB+）→ 用 `file_path` 参数读取特定引用文件，避免加载完整 SKILL.md
+- [himalaya] v1.2.0 文件夹别名语法变更：`folder.alias`（单数）被静默忽略，必须用 `folder.aliases.X`（复数）→ 旧语法导致 Gmail 保存到已发送文件夹失败，产生重复邮件
+- [airtable] `filterByFormula` 必须 URL 编码 → 不能手动转义，用 `urllib.parse.quote`
+- [airtable] 空字段在响应中被省略 → 缺少 key ≠ 缺少字段，先查 schema
+- [airtable] 批量端点限制 10 条/请求 → 大量插入需循环 + sleep
+- [comfyui] 工作流 JSON 等同任意代码 → 自定义节点运行 Python，不受信任的工作流等同 `eval`
+- [python-debugpy] pdb 在 pytest-xdist 下静默无效 → 始终用 `-p no:xdist` 或 `-n 0`
+- [python-debugpy] `breakpoint()` 在 CI/非 TTY 环境会挂起进程 → 永远不要提交到代码库
+- [python-debugpy] `debugpy.listen` 无 `wait_for_client()` → 执行继续，首个断点在客户端连接前触发
+- [kanban-worker] 永远不要调用 `clarify` → 在无头模式下会静默超时约 120 秒，任务卡在 running 状态
+- [kanban-worker] 不要自称未捕获的 ID → phantom IDs 会被永久拒绝
+- [systematic-debugging] 铁律：不做根因调查就不要修复 → 症状修复即失败
+- [systematic-debugging] 3+ 次修复失败 → 停下来质疑架构，这是架构问题而非假设错误
+
+### 新发现
+
+- [hermes-agent-skill-authoring] `skill_manage(action='create')` 用于仓库内 skill 是错误的 → 它写入 `~/.hermes/skills/` 而非仓库树，仓库内应用 `write_file`
+- [hermes-agent-skill-authoring] `---` 前不能有前导空格 → 必须从字节 0 开始
+- [hermes-agent-skill-authoring] 新 skill 创建后当前会话不会看到 → loader 在会话启动时缓存
+- [test-driven-development] 测试后写的测试立即通过，什么也证明不了 → 你从未见过它捕获 bug
+- [comfyui] 视频/音频工作流默认超时 300 秒 → 重型工作流需提升至 900 秒以上
+- [github-pr-workflow] 自动修复 CI 循环限制：最多重试 3 次，然后询问用户
+
+### 用户偏好更新
+
+- 直接执行："你做一下"意味着立即开始，不要确认性提问
+- 不要乐观时间估计：说诚实的时长，不要为了安慰而低估
+- 不要部分交付：必须 100% 完成后才能交付，不要"我待会儿做完"
+- 简洁输出：不要长解释，不要排比句，快节奏
+- 内容风格："身边小事"引起共鸣，不要时事；争议性开头；粤语对话（阿强角色）
+- 不要修改终审文本：用户编辑的副本是最终版，不要重新添加已删除内容
+- Mac → GitHub 需要 SOCKS5 代理 `socks5h://127.0.0.1:7897`（Clash）
+- 配置变更必须用 `hermes config set`，永远不要直接编辑 `config.yaml`
+
+### Skill 更新
+
+- 新增 cron-job-patterns 陷阱：`execute_code` 禁用、凭证空检查、大载荷处理
+- 更新 kanban-worker：强调不要调用 `clarify`、不要用 phantom IDs
+- 更新 himalaya：v1.2.0 文件夹别名语法变更，旧语法导致重复邮件
+- 新增 systematic-debugging：铁律和规则三原则
+
+---
+
 # Hermes 使用经验日志
 
 ## 2026-06-06
