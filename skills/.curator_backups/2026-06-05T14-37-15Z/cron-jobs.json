@@ -1,0 +1,119 @@
+{
+  "jobs": [
+    {
+      "id": "53825450e24c",
+      "name": "hermes\u7ecf\u9a8c\u540c\u6b65\u5230GitHub",
+      "prompt": "\u4f60\u662f Hermes \u7ecf\u9a8c\u603b\u7ed3 Agent\u3002\u4efb\u52a1\uff1a\u628a\u6700\u8fd1\u7684\u4f7f\u7528\u7ecf\u9a8c\u6574\u7406\u6210\u6587\u6863\uff0c\u63a8\u9001\u5230 GitHub \u4ed3\u5e93\u3002\n\n## \u6267\u884c\u6b65\u9aa4\n\n1. \u8bfb\u53d6\u5f53\u524d skills \u76ee\u5f55\u4e0b\u7684\u6240\u6709 SKILL.md\uff0c\u63d0\u53d6\"\u7ecf\u9a8c\u6559\u8bad\"\u90e8\u5206\n2. \u8bfb\u53d6 memory\uff08\u7528\u6237\u504f\u597d\u3001\u8e29\u5751\u8bb0\u5f55\uff09\n3. \u7528 session_search \u641c\u7d22\u6700\u8fd1 3 \u5929\u7684\u4f1a\u8bdd\uff0c\u627e\u8e29\u5751/\u7ea0\u9519/\u65b0\u53d1\u73b0\u7684\u5185\u5bb9\n4. \u6574\u7406\u6210\u4e00\u4efd markdown \u6587\u6863\uff0c\u683c\u5f0f\u5982\u4e0b\uff1a\n\n```markdown\n# Hermes \u4f7f\u7528\u7ecf\u9a8c\u65e5\u5fd7\n\n## YYYY-MM-DD\n\n### \u8e29\u5751\u8bb0\u5f55\n- [\u6765\u6e90] \u95ee\u9898\u63cf\u8ff0 \u2192 \u89e3\u51b3\u65b9\u6848\n\n### \u65b0\u53d1\u73b0\n- [\u6765\u6e90] \u53d1\u73b0\u5185\u5bb9\n\n### \u7528\u6237\u504f\u597d\u66f4\u65b0\n- \u504f\u597d\u5185\u5bb9\n\n### Skill \u66f4\u65b0\n- \u66f4\u65b0\u4e86\u4ec0\u4e48\uff0c\u4e3a\u4ec0\u4e48\n```\n\n5. \u4fdd\u5b58\u5230 /tmp/hermes-experience-log.md\n6. \u5982\u679c\u6709\u5185\u5bb9\u66f4\u65b0\uff0c\u63a8\u9001\u5230 https://github.com/iankwan827/Hermes\uff1a\n   - \u5148 clone\uff08\u7528 git credential\uff09\n   - \u590d\u5236\u6587\u6863\u5230 repo\n   - commit + push\n\nGitHub \u4ed3\u5e93\uff1ahttps://github.com/iankwan827/Hermes.git\n\u6587\u6863\u4fdd\u5b58\u8def\u5f84\uff1adocs/experience-log.md\uff08\u5728 repo \u5185\uff09\n\n\u6ce8\u610f\uff1a\n- git clone \u65f6\u9700\u8981\u8ba4\u8bc1\uff0c\u7528 git credential helper \u6216 token\n- \u53ea\u5728\u6709\u65b0\u5185\u5bb9\u65f6\u624d push\uff0c\u6ca1\u6709\u53d8\u5316\u5c31\u8df3\u8fc7\n- \u6587\u6863\u7528\u4e2d\u6587\u5199",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 22 * * *",
+        "display": "0 22 * * *"
+      },
+      "schedule_display": "0 22 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 5
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-01T16:16:27.049963+08:00",
+      "next_run_at": "2026-06-06T22:00:00+08:00",
+      "last_run_at": "2026-06-05T22:03:14.743228+08:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "337377998c4d",
+      "name": "\u6296\u97f3\u6570\u636e-\u4e0a\u5348",
+      "prompt": "\u4f60\u662f\u6296\u97f3\u6570\u636e\u5206\u6790\u5e08\u3002\u6267\u884c\u4ee5\u4e0b\u64cd\u4f5c\uff1a\n\n1. \u7528OpenCLI\u6253\u5f00\u6296\u97f3\u521b\u4f5c\u8005\u4e2d\u5fc3\uff0c\u67e5\u770b\u6240\u6709\u89c6\u9891\u7684\u6700\u65b0\u6570\u636e\n   - \u547d\u4ee4\uff1aopencli browser douyin open \"https://creator.douyin.com/creator-micro/content-manage/video\"\n   - \u622a\u56fe\uff1aopencli browser douyin screenshot \"D:/hermes-agent/douyin_check_am.png\"\n   - \u7528vision_analyze\u5206\u6790\u622a\u56fe\n\n2. \u5bf9\u6bcf\u4e2a\u89c6\u9891\u5224\u65ad\uff1a\n   - \u5982\u679c\u662f\u4eca\u5929\u53d1\u5e03\u7684\u89c6\u9891 \u2192 \u8fd9\u662f18\u5c0f\u65f6\u68c0\u67e5\uff0c\u8bb0\u5f55\u6570\u636e\n   - \u5982\u679c\u662f\u6628\u5929\u53d1\u5e03\u7684\u89c6\u9891 \u2192 \u8fd9\u662f24\u5c0f\u65f6\u68c0\u67e5\uff08\u6700\u540e\u4e00\u6b21\uff09\uff0c\u8bb0\u5f55\u6570\u636e\u540e\u6807\u8bb0\u4e3a\"\u5df2\u5b8c\u6210\"\n   - \u5982\u679c\u662f\u66f4\u65e9\u7684\u89c6\u9891 \u2192 \u8df3\u8fc7\uff0c\u4e0d\u518d\u68c0\u67e5\n\n3. \u66f4\u65b0\u53d1\u5c55\u65e5\u5fd7\uff08references/\u53d1\u5c55\u65e5\u5fd7.md\uff09\u4e2d\u7684\u89c6\u9891\u6570\u636e\u8bb0\u5f55\u8868\n\n4. \u5982\u679c\u53d1\u73b0\u6570\u636e\u5f02\u5e38\uff08\u5982\u5b8c\u64ad\u7387<10%\u3001\u64ad\u653e\u91cf\u505c\u6ede\uff09\uff0c\u7ed9\u51fa\u4f18\u5316\u5efa\u8bae\n\n\u6ce8\u610f\uff1a\u7528OpenCLI session\u540d\"douyin\"\uff0cChrome\u5df2\u767b\u5f55\u521b\u4f5c\u8005\u4e2d\u5fc3\u3002",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 11 * * *",
+        "display": "0 11 * * *"
+      },
+      "schedule_display": "0 11 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 3
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-04T00:25:42.898647+08:00",
+      "next_run_at": "2026-06-06T11:00:00+08:00",
+      "last_run_at": "2026-06-05T11:05:00.415503+08:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "6faeb88c6d7e",
+      "name": "\u6296\u97f3\u6570\u636e-\u665a\u4e0a",
+      "prompt": "\u4f60\u662f\u6296\u97f3\u6570\u636e\u5206\u6790\u5e08\u3002\u6267\u884c\u4ee5\u4e0b\u64cd\u4f5c\uff1a\n\n1. \u7528OpenCLI\u6253\u5f00\u6296\u97f3\u521b\u4f5c\u8005\u4e2d\u5fc3\uff0c\u67e5\u770b\u6240\u6709\u89c6\u9891\u7684\u6700\u65b0\u6570\u636e\n   - \u547d\u4ee4\uff1aopencli browser douyin open \"https://creator.douyin.com/creator-micro/content-manage/video\"\n   - \u622a\u56fe\uff1aopencli browser douyin screenshot \"D:/hermes-agent/douyin_check_pm.png\"\n   - \u7528vision_analyze\u5206\u6790\u622a\u56fe\n\n2. \u5bf9\u6bcf\u4e2a\u89c6\u9891\u5224\u65ad\uff1a\n   - \u5982\u679c\u662f\u4eca\u5929\u53d1\u5e03\u7684\u89c6\u9891\uff08\u4e0b\u53485\u70b9\u5de6\u53f3\u53d1\u7684\uff09\u2192 \u8fd9\u662f6\u5c0f\u65f6\u68c0\u67e5\uff0c\u8bb0\u5f55\u6570\u636e\n   - \u5982\u679c\u662f\u6628\u5929\u53d1\u5e03\u7684\u89c6\u9891\u4e14\u8fd8\u6ca1\u505a\u8fc724\u5c0f\u65f6\u68c0\u67e5 \u2192 \u8fd9\u662f18\u5c0f\u65f6\u68c0\u67e5\uff0c\u8bb0\u5f55\u6570\u636e\n   - \u5982\u679c\u662f\u66f4\u65e9\u7684\u89c6\u9891 \u2192 \u8df3\u8fc7\uff0c\u4e0d\u518d\u68c0\u67e5\n\n3. \u66f4\u65b0\u53d1\u5c55\u65e5\u5fd7\uff08references/\u53d1\u5c55\u65e5\u5fd7.md\uff09\u4e2d\u7684\u89c6\u9891\u6570\u636e\u8bb0\u5f55\u8868\n\n4. \u5982\u679c\u53d1\u73b0\u6570\u636e\u5f02\u5e38\uff08\u5982\u5b8c\u64ad\u7387<10%\u3001\u64ad\u653e\u91cf\u505c\u6ede\uff09\uff0c\u7ed9\u51fa\u4f18\u5316\u5efa\u8bae\n\n\u6ce8\u610f\uff1a\u7528OpenCLI session\u540d\"douyin\"\uff0cChrome\u5df2\u767b\u5f55\u521b\u4f5c\u8005\u4e2d\u5fc3\u3002",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 23 * * *",
+        "display": "0 23 * * *"
+      },
+      "schedule_display": "0 23 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 1
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-04T00:25:50.110609+08:00",
+      "next_run_at": "2026-06-05T23:00:00+08:00",
+      "last_run_at": "2026-06-04T23:05:55.071179+08:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": null,
+      "enabled_toolsets": null,
+      "workdir": null,
+      "profile": null
+    }
+  ],
+  "updated_at": "2026-06-05T22:03:14.745227+08:00"
+}
