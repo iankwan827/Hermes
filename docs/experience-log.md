@@ -1,574 +1,94 @@
-## 2026-06-20
-
-### 踩坑记录
-
-- [session] Agent之前错误声称"Ollama转录不了"导致用户一直没试Gemma4转录 → 事实是Ollama+Gemma4可以用`images`参数（不是`audio`）+`think:false`转录，只是精度不如Whisper。不要在没有验证的情况下给用户断言性结论
-- [audio-transcribe] 录音skill重构：从单一20KB SKILL.md拆分为核心流程(3.2KB)+references/setup.md+scripts/ → 按skill-creator标准，核心流程≤5k词，详细内容拆到references/，代码放scripts/
-- [llm-comparison] llama.cpp vs LM Studio vs Ollama对比：底层都是llama.cpp；LM Studio有GUI适合调参；Ollama最省事一键下模型；性能差异不大 → 转录用Whisper更准，Gemma4作为备选
-
-### 新发现
-
-- [audio-transcribe] 录音脚本统一到 `~/Pictures/录音/record.py`，支持指定输出目录、分段时长、分段数
-- [audio-transcribe] 转录脚本 `~/Pictures/录音/transcribe.py` 支持 `-l zh`(普通话) 和 `-l yue`(粤语)
-- [skill-creator] 拆分skill结构：核心流程在SKILL.md，详细配置在references/，代码在scripts/ → 当前录音skill已按此结构重构
-- [session] 用户指出Agent给的错误信息会影响用户决策 → 给结论前必须验证，不要凭印象断言
-
-### 用户偏好更新
-
-- 转录方案：Whisper和Ollama+Gemma4都可以用，看哪个方便
-- 不要给未验证的断言性结论 → 之前说"Ollama转录不了"导致用户错过Gemma4方案
-
-### Skill 更新
-
-- 新增 `audio-transcribe` 录音skill重构：SKILL.md从20KB精简到3.2KB，新增references/setup.md和scripts/
-
----
-
-## 2026-06-19
-
-### 踩坑记录
-
-- [feishu-docx-to-native] Callout块（block_type=19）语法高亮无法修改（code_style只能创建时设置一次） → 创建前就确定好高亮语言
-- [feishu-docx-to-native] 代码块不支持"plaintext"语言（language=1报错） → 需用34=PlainText
-- [feishu-docx-to-native] 原生表格（block_type=20）无法通过API创建 → 不要浪费时间尝试，用Markdown表格或其他方案
-- [feishu-docx-to-native] Callout不能内联内容 → 必须先创建空容器再用create_child_block添加子block
-- [feishu-docx-to-native] 每批最多添加10-20个blocks → 不指定index参数让API自动追加
-- [feishu-courseware-upload] Shell引号与markdown解析冲突：`***`会被解析为粗斜体导致Authorization header截断 → 写脚本到文件再执行，不要内联
-- [teams-meeting-pipeline] Graph subscriptions在72小时后过期且不自动续期 → 3天后通知静默停止，必须设置`maintain-subscriptions`自动续期
-- [teams-meeting-pipeline] Transcript not available yet → Teams会议结束后需2-5分钟生成transcript，不要立即查询
-- [audio-transcribe] Whisper领域特定听错表（八字/命理同音字）：鬼害→癸亥、鬼水→癸水、人鬼水→壬癸水、官鬼→官杀等 → 转录后必须人工校对八字术语
-- [bazi-sales] 排盘数据源必须用JS脚本 → 绝对禁止用Python手算或AI直接推算天干地支，容易出错
-- [bazi-sales-validator] 自写天干地支计算脚本容易出错（月柱算错、大运算错） → 必须用cnlunar验证，cnlunar只在uv python环境中可用
-- [touchdesigner-mcp] 绝对不要猜测参数名 → 调用`td_get_par_info`先确认参数是否存在
-- [touchdesigner-mcp] Split cleanup and creation into SEPARATE MCP calls → 合并在一个脚本中会导致"Invalid OP object"
-- [comfyui] API format required → editor格式JSON不直接可执行，需转换为API格式
-- [comfyui] Model names exact且case-sensitive → 大小写不匹配导致"class_type not found"
-- [kanban-worker] Task state可变：dispatch和startup之间可能被blocked/reassigned/archived → 先kanban_show确认状态
-- [kanban-orchestrator] Inventing profile names → dispatcher静默失败，card永远卡在ready
-- [hermes-config] 配置变更必须用 `hermes config set` → 永远不要直接编辑config.yaml，直接改文件可能不生效
-
-### 新发现
-
-- [audio-transcribe] Gemma4替代Whisper方案：用`images`参数传音频（不是`audio`参数），需要`think: false` → 在某些场景下识别质量更好
-- [audio-transcribe] 长音频（>30分钟）建议后台运行 → CPU转录93分钟音频约需30-50分钟
-- [touchdesigner-mcp] Non-Commercial TD caps resolution at 1280×1280
-- [touchdesigner-mcp] H.264/H.265/AV1需要Commercial license → macOS用prores替代
-- [touchdesigner-mcp] Audio-reactive场景：TimeSlice必须ON；Lag CHOP会把256 samples扩展到2400+导致数据归零
-- [songwriting] 动态ARC描述比列genre更重要 → 强vocal persona描述比任何单个metatag影响更大
-- [bazi-sales] 知识库.md优先于.json → JSON可能有错误
-- [bazi-sales] 五行归类要按易学体系（易学本体属水/传播属火） → 不要凭直觉归类
-
-### 用户偏好更新
-
-- 不要给不切实际的乐观时间估算 → 实际耗时多少就如实说，宁可说"还要差不多同样时间"
-- 视频内容工作流：选身边小事引发共鸣，不选时事新闻；必须走完整4阶段不能跳步
-- 抖音热搜最佳查看时间：下午4-6点抓正在涨的话题，晚上7-10点高峰期发
-- 文案修改偏好：简洁，删掉排比句和重复金句；台词要口语化；节奏快，每句话推进故事
-- 写完文案必须自动跑video-content-audit审核 → 不等用户提醒（用户原话"你没跑skill啊"）
-- 电商图工作流：首选Gemini原生图编辑（传原图+prompt，一步换背景，主体不变）
-- 小红书访问笔记详情必须用/search_result/链接（带xsec_token） → /explore/链接会触发扫码限制
-- 八字排盘：23:00-23:59算第二天子时（日期+1，hour=0）
-- 用户改完文案就是终版 → 不要自作主张加回删掉的内容
-
-### Skill 更新
-
-- 更新 `feishu-docx-to-native`：新增Callout/代码块/表格API限制踩坑记录
-- 更新 `feishu-courseware-upload`：Shell引号与markdown解析冲突解决方案
-- 更新 `teams-meeting-pipeline`：Graph subscription 72小时过期 + Transcript延迟可用
-- 更新 `audio-transcribe`：Whisper听错表（八字术语） + Gemma4替代方案 + 长音频处理
-- 更新 `bazi-sales`：排盘数据源强制JS脚本 + 断语引用必须完整 + 知识库优先级
-- 更新 `bazi-sales-validator`：cnlunar验证替代自写脚本
-- 更新 `touchdesigner-mcp`：参数查询规则 + 分离操作 + 许可证限制 + Audio-reactive配置
-- 更新 `kanban-worker`：任务状态可变 + 不要用clarify（会超时）
-- 更新 `kanban-orchestrator`：不要发明profile名称
-
----
-
-## 2026-06-18
-
-### 踩坑记录
-
-- [macos-audio-recording] Mac Mini默认输出是内置扬声器而非HDMI → 创建多输出设备时必须用 `system_profiler SPAudioDataType` 确认当前Default Output，不能假设是HDMI
-- [macos-audio-recording] 删除聚合设备(HermesMO)后，系统可能将默认输出重定向到无效ID → 每次操作后必须重新查询设备列表并重设默认输出，不要硬编码设备ID
-- [macos-audio-recording] ffmpeg avfoundation + BlackHole录制不稳定，指定60秒只录到5-17秒 → 用 `sounddevice`（Python PortAudio）替代ffmpeg，按名称查找BlackHole不受索引变化影响
-- [macos-audio-recording] avfoundation设备索引在创建/删除聚合设备后重新排列 → 每次录制前用 `-list_devices true` 确认编号，优先用sounddevice
-- [feishu] Python heredoc处理可能丢失字符 → 上传脚本中 `Authorization: Bearer` 头被截断为 `Authorization:` → 用 `patch` 工具修复而非重写heredoc
-- [feishu-oauth] Refresh token有效期30天（expires_in=2592000） → 过期后需重新走完整授权流程（启动8765服务器→用户点击授权→拿code换token）
-- [cron-job-patterns] `github-sync.sh` 脚本在 `~/.hermes/profiles/main/scripts/` 路径不存在 → 实际路径在 `~/.hermes/scripts/github-sync.sh`，cron job配置的脚本路径需要验证
-
-### 新发现
-
-- [macos-audio-recording] HermesMO多输出设备（BlackHole + Mac mini扬声器）验证成功 → sounddevice录制15秒，最大振幅0.5484，Whisper转录确认中文内容100%
-- [macos-audio-recording] 持续录制脚本 `record_live.py` 每5分钟自动保存一个WAV文件 → 支持长时间直播录制
-- [macos-audio-recording] Whisper medium模型首次运行需下载~1.5GB → 后台进程跑着不受 `/reset` 影响
-- [feishu] 浏览器工具已升级为 agent-browser 0.28.0 + Chrome 150 → config指向Chrome，CAMOFOX_URL已注释，cloud_provider=local，`/reset` 后生效
-- [feishu] 飞书文档分享设置：组织内「获得链接的人可阅读」→ 同组织成员点链接直接看，无需邀请
-- [bazi] 直播录音工作流：录1分钟→停止→转录验证→有内容则开始连续录制 → 避免无效录制浪费存储
-
-### 用户偏好更新
-
-- 直播录音流程：先录1分钟测试→转录验证→确认录到才开始正式录制，不要反复测试
-- 飞书文档分享：用户倾向「组织内获得链接的人可阅读」而非「所有人可访问」
-- Mac Mini音频输出：用户使用内置扬声器（非HDMI），配置多输出设备时需确认
-
-### Skill 更新
-
-- 更新 `macos-audio-recording`：新增「关键坑：ffmpeg avfoundation不稳定」章节，记录sounddevice替代方案和设备索引变化问题
-- 更新 `macos-audio-recording`：新增「用户可能用Mac mini扬声器而非HDMI」的坑点，补充 `system_profiler` 确认方法
-- 更新 `macos-audio-recording`：新增 HermesMO 删除后设备ID失效的解决方案
-- 更新 `feishu-oauth`：补充 refresh token 过期时间和重授权流程说明
-
----
-
-## 2026-06-17
-
-### 踩坑记录
-
-- [cron-job-patterns] `execute_code` 在 cron 环境中被禁用 → 必须用 `write_file` + `terminal` 两步操作替代
-- [cron-job-patterns] `clarify` 在 cron 中不可用 → 所有决策必须自主完成，无用户交互
-- [cron-job-patterns] `~/.git-credentials` 可能为 0 字节 → git push 前用 `wc -c` 检查
-- [cron-job-patterns] `skill_view` 大载荷（48KB+）→ 用 `file_path` 参数读取特定引用文件，避免加载完整 SKILL.md
-- [himalaya] v1.2.0 文件夹别名语法变更：`folder.alias`（单数）被静默忽略，必须用 `folder.aliases.X`（复数）→ 旧语法导致 Gmail 保存到已发送文件夹失败，产生重复邮件
-- [airtable] `filterByFormula` 必须 URL 编码 → 不能手动转义，用 `urllib.parse.quote`
-- [airtable] 空字段在响应中被省略 → 缺少 key ≠ 缺少字段，先查 schema
-- [airtable] 批量端点限制 10 条/请求 → 大量插入需循环 + sleep
-- [comfyui] 工作流 JSON 等同任意代码 → 自定义节点运行 Python，不受信任的工作流等同 `eval`
-- [python-debugpy] pdb 在 pytest-xdist 下静默无效 → 始终用 `-p no:xdist` 或 `-n 0`
-- [python-debugpy] `breakpoint()` 在 CI/非 TTY 环境会挂起进程 → 永远不要提交到代码库
-- [python-debugpy] `debugpy.listen` 无 `wait_for_client()` → 执行继续，首个断点在客户端连接前触发
-- [kanban-worker] 永远不要调用 `clarify` → 在无头模式下会静默超时约 120 秒，任务卡在 running 状态
-- [kanban-worker] 不要自称未捕获的 ID → phantom IDs 会被永久拒绝
-- [systematic-debugging] 铁律：不做根因调查就不要修复 → 症状修复即失败
-- [systematic-debugging] 3+ 次修复失败 → 停下来质疑架构，这是架构问题而非假设错误
-
-### 新发现
-
-- [hermes-agent-skill-authoring] `skill_manage(action='create')` 用于仓库内 skill 是错误的 → 它写入 `~/.hermes/skills/` 而非仓库树，仓库内应用 `write_file`
-- [hermes-agent-skill-authoring] `---` 前不能有前导空格 → 必须从字节 0 开始
-- [hermes-agent-skill-authoring] 新 skill 创建后当前会话不会看到 → loader 在会话启动时缓存
-- [test-driven-development] 测试后写的测试立即通过，什么也证明不了 → 你从未见过它捕获 bug
-- [comfyui] 视频/音频工作流默认超时 300 秒 → 重型工作流需提升至 900 秒以上
-- [github-pr-workflow] 自动修复 CI 循环限制：最多重试 3 次，然后询问用户
-
-### 用户偏好更新
-
-- 直接执行："你做一下"意味着立即开始，不要确认性提问
-- 不要乐观时间估计：说诚实的时长，不要为了安慰而低估
-- 不要部分交付：必须 100% 完成后才能交付，不要"我待会儿做完"
-- 简洁输出：不要长解释，不要排比句，快节奏
-- 内容风格："身边小事"引起共鸣，不要时事；争议性开头；粤语对话（阿强角色）
-- 不要修改终审文本：用户编辑的副本是最终版，不要重新添加已删除内容
-- Mac → GitHub 需要 SOCKS5 代理 `socks5h://127.0.0.1:7897`（Clash）
-- 配置变更必须用 `hermes config set`，永远不要直接编辑 `config.yaml`
-
-### Skill 更新
-
-- 新增 cron-job-patterns 陷阱：`execute_code` 禁用、凭证空检查、大载荷处理
-- 更新 kanban-worker：强调不要调用 `clarify`、不要用 phantom IDs
-- 更新 himalaya：v1.2.0 文件夹别名语法变更，旧语法导致重复邮件
-- 新增 systematic-debugging：铁律和规则三原则
-
----
-
 # Hermes 使用经验日志
 
-## 2026-06-06
+## 2026-06-21
 
 ### 踩坑记录
 
-- [douyin-data-check] 用户要求数据检查时也获取留存分析曲线图数据，但定时任务prompt没有包含这部分 → 更新douyin-data-check skill，新增留存分析曲线图获取和分析流程
-  - **问题细节**：用户看了定时任务跑完的数据后，问"你下次拿数据能不能把这个图的数据也一起拿了"，指的是留存分析曲线图
-  - **解决方案**：在skill中新增"留存分析曲线图"章节，包含3步操作流程（点击tab→截图→analyze-image分析）+ 如何定位文案问题（低谷点→时间秒数→对照文案）
-  - 来源：CLI session 20260606_095459
+#### analyze-image（图片批量分析）
+- [SKILL] **exec() 环境变量陷阱**: 用 `exec(open(...).read())` 运行 Python 不会加载环境变量 → 必须用 `terminal` 工具
+- [SKILL] **中文数字匹配陷阱**: 课程编号搜索必须从长到短匹配，否则"二"会被"二十二"错误截获
+- [SKILL] **长图必须切割**: 长宽比>3 或高度>8000px 的图片直接发送会丢失大量内容 → 用 `full_extract.py` 按3000px分段
+- [SKILL] **超宽图(>5000px)切割**: 需要用1500px分段而非3000px，否则文字模糊
+- [SKILL] **大图(>20M像素)**: 必须先缩放再处理，否则 MemoryError/DecompressionBomb
+- [SKILL] **不要手动解析图片头**: 必须用 `PIL.Image.open()`，手动解析在JPEG上会失败
+- [SKILL] **不要用 bash `export $(grep ...)`**: 特殊字符会出错 → 用 Python 读取 .env
+- [SKILL] **`write_file` 破坏 f-string**: 用 `terminal` 配合 heredoc 写 Python 脚本
+- [SKILL] **系统 Python 可能损坏**: 始终使用 `uv python` 路径
+- [SKILL] **批量处理前先检查源文件夹**: "最重要的教训"——在跑脚本之前先确认源文件夹里有什么
 
-- [douyin-data-check] 视频4（公司跑路）15小时检查发现"5秒完播率高但总完播率极低"的经典问题 — 5秒完播率56.34%（所有视频最高），但总完播率仅3.51%，56%的人看5秒但只有3.5%看完
-  - **根因**：开头抓人，但中间内容流失严重（15-20秒处没有第二个钩子）
-  - **数据佐证**：完播率从2h的4.75%降到15h的3.51%，说明推荐给了更多非核心用户后中间流失加剧
-  - 来源：cron session cron_337377998c4d_20260606_110820
+#### douyin-data-check（抖音数据查看）
+- [SKILL] **按钮索引偏移陷阱**: "最新作品"和"近期作品"区域有重复按钮，导致索引错位
+- [SKILL] **按钮是 `<div>` 不是 `<span>`**: 必须用 `querySelectorAll('*')` 而非 `querySelectorAll('span')`
+- [SKILL] **Python + MSYS 中文编码陷阱**: format字符串中的中文字符会触发 ValueError → 只用ASCII格式字符串
+- [SKILL] **审计陷阱（多个）**: 多轮审计发现错误但从不实际修复；不同段落引用不同数字自相矛盾；里程碑排名未随新视频更新；声称"已修复"但 read_file 显示什么都没变
+- [SKILL] **复核必须从原始数据重新计算比率**: 永远不要信任之前记录的比率
 
-- [douyin-data-check] 定时任务状态显示error但实际数据已成功获取 — 用户指出"这明显今天的定时任务不是error啊"，之前手动查看时状态标记有误
-  - **教训**：定时任务状态判断不能仅看标记，需要实际检查输出结果
-  - 来源：CLI session 20260606_095459
+#### course-notes-fusion（课件笔记融合）
+- [SKILL] **回退陷阱**: Agent4 发现匹配错误时，应发回 Agent2（不是 Agent3）
+- [SKILL] **讲稿缺失导致整章消失**: 课件独有章节不在讲稿中会被丢弃 → 必须保留并标记为"课件独有"
+- [SKILL] **macOS sed 损坏文件**: BSD sed 与 GNU sed 不同 → 用 `patch` 或 `write_file` 替代
+- [SKILL] **移动端字号陷阱**: 桌面端习惯16-17pt在手机上太大 → 必须用11pt正文
+- [SKILL] **Markdown表格转换陷阱**: `python-docx` 脚本会静默跳过markdown表格，丢失关键内容
+
+#### teams-meeting-pipeline（Teams会议摘要）
+- [SKILL] **Graph订阅72小时过期**: 微软Graph不会自动续订 → 必须设置12小时自动续订，否则会议摘要静默停止
+- [SKILL] **转录可用性**: 会后需要2-5分钟才能生成转录
+
+#### feishu-docx-to-native（飞书文档）
+- [SKILL] **Callout块语法高亮创建后不可更改**
+- [SKILL] **代码块不支持 language=1**: 必须用 language=34 (PlainText)
+- [SKILL] **原生表格(block_type=20)无法通过API创建**: Cell字段校验始终失败
+- [SKILL] **Callout检测必须在标题检测之前**: 否则 `### 📋` 会被解析为H3
+
+#### pdd-store（拼多多开店）
+- [SKILL] **1688一键铺货的 shadow DOM**: web components 无法被 OpenCLI 可靠触发
+- [SKILL] **编辑页必填字段**: 品牌、材质等必须填写否则无法提交
+- [SKILL] **必须确认成本再定价**: 不同SKU成本不同
+- [SKILL] **OpenCLI会话不稳定**: 复杂操作应由用户手动完成
+- [SKILL] **Camofox无法访问PDD后台**: PDD检测非Chrome浏览器
+
+#### pokemon-player（宝可梦）
+- [SKILL] **必须频繁使用Vision**: 每2-4步截一次图。RAM告诉你位置/HP但不告诉你环境
+- [SKILL] **传送需要2-3个 wait_60**: 否则位置读数为过时数据
+- [SKILL] **建筑出口陷阱**: 出现在门口，必须先侧移才能离开
+
+#### audio-transcribe（音频转录）
+- [SKILL] **Whisper CLI不在PATH**: 使用显式 Python 3.9 路径
+- [SKILL] **粤语(yue)中等模型不支持**: 用 `--language zh`
+
+#### creative/ascii-video
+- [SKILL] **macOS Pillow `textbbox()` 返回错误高度**: 用 `font.getmetrics()` 替代
+- [SKILL] **不要用 `stderr=subprocess.PIPE` 配合长时间运行的ffmpeg**: 64KB缓冲区满会导致死锁
+
+#### xurl（X/Twitter）
+- [SKILL] **省略 `--app my-app`**: token会保存到错误的profile
+- [SKILL] **Docker HOME 陷阱**: `~/.xurl` 根据 HERMES_HOME 与 subprocess HOME 解析到不同路径
+
+#### touchdesigner-mcp
+- [SKILL] **清理和创建必须分开MCP调用**: 同一脚本中销毁和重建同名节点会导致 "Invalid OP object" 错误
 
 ### 新发现
-
-- [douyin-data-check] 留存分析曲线图可以精确定位文案问题时间点 — 找到曲线的低谷点（下降最陡的位置），计算对应时间秒数，对照文案看那个时间点在讲什么
-  - **案例**：低谷1在13-15秒 → 对应文案"你忍咗"那段 → 可能节奏拖了
-  - **案例**：低谷2在35秒 → 对应文案"我睇报纸睇一眼"附近 → 可能内容重复
-  - **核心价值**：这是优化文案的关键依据，比猜更靠谱
-  - 来源：skill update on 20260606_095459
-
-- [douyin-data-check] 视频4（公司跑路）是目前表现最好的视频 — 节奏127播放/小时（所有视频最快），2秒跳出率17.17%（最低），5秒完播率56.34%（最高），算法推荐页99.5%
-  - **关键验证**：公司跑路+打工人+粤语吐槽 = 完美匹配账号定位，选题匹配度>时长控制的结论再次验证
-  - **24h预计播放量**：2500-3000
-  - 来源：cron session cron_337377998c4d_20260606_110820
-
-- [douyin-data-check] 算法推荐可能有延迟释放机制 — 之前标记为"已基本停止"的视频1（周末头疼）又涨了55播放，视频3（88万彩礼）也从410涨到477（+67）
-  - **教训**：不要过早放弃老视频，算法推荐可能有延迟
-  - 来源：cron session cron_6faeb88c6d7e_20260605_231217 + cron session cron_337377998c4d_20260606_110008
-
-- [anysearch] 可以用anysearch搜索工具做竞争对手/行业调研 — 用户发了一张抖音直播间截图（@大玄空易学），要求搜一下她教的是什么，通过anysearch搜索到了完整的传承谱系、公司背景、培训收费信息
-  - **流程**：截图→vision_analyze识别内容→anysearch多轮搜索→整理结果
-  - 来源：Feishu session 20260606_150851
+- [SKILL] **bazi-muku 墓库避坑规则**: 不见财库就说"有财库"；不见冲就说"开库"；无墓库≠无财；墓库化用神/化忌神=吉/凶
+- [SKILL] **bazi-kongwang 空亡分析**: 空亡查法、五行空亡断语、填实方法
+- [SKILL] **dbs-diagnosis 语言陷阱检测**: ~25%的复杂问题是语言陷阱，需停下来与用户澄清
+- [SKILL] **dbs-goal 本质主义陷阱**: 不要将SMART作为充分必要条件，应用家族相似性特征
+- [MEMORY] **小红书采集**: 必须用 `/search_result/` 链接（带 xsec_token），仿人操作3-8秒间隔
+- [MEMORY] **选股系统**: 两池(稳健/成长)，B规则推荐默认，周频策略，周五15:30出信号
+- [MEMORY] **八字巳月**: 5月5日立夏~6月5日芒种（不是6月）
+- [MEMORY] **2030=庚戌(火库), 大运甲辰(水库), 辰戌冲双库齐开**
 
 ### 用户偏好更新
-
-- **数据检查要包含留存分析曲线图** — 用户明确要求下次拿数据时一起拿留存分析的图数据，不只是基础播放量/点赞/评论
-- **定时任务输出要有完整诊断** — 用户期望定时任务不仅给数据，还要给诊断结论和改进建议，不只是罗列数字
-- **竞争对手调研用anysearch** — 用户会发截图让Hermes搜索分析，流程：截图→识别→搜索→整理
+- 用 `hermes config set` 改配置，永远不要直接编辑 config.yaml
+- 进度汇报只在 50%、80%、100% 时报告
+- 写完文案必须自动跑 video-content-audit 审核
+- 引用热搜事件必须确认时间线
+- 栋笃笑文案用"阿强"(朋友角色)做叙事载体，开头第一句必须是选题
+- 喜欢"争议性开头"，中间加钩子(共鸣/反面案例/冲突对比)
+- 过三关遇到女命(gender=F)必须额外加载 bazi-fukeshengyu skill
+- 用户痛点：不从标题推断内容要读文件；视频50秒-1分30秒；用户改完文案就是终版
 
 ### Skill 更新
-
-- **douyin-data-check**：新增"留存分析曲线图"章节，包含完整的3步操作流程（点击tab→截图→analyze-image分析）+ 如何通过低谷点定位文案问题时间点
-  - 原因：用户要求数据检查时也获取留存分析数据，这是优化文案的关键依据
-  - 关键点：每次查看数据时，如果有留存分析数据，都要截图并分析
-
----
-
-## 2026-06-05
-
-### 踩坑记录
-
-- [douyin-data-check] 视频3（88万彩礼）24小时数据全面下滑 — 播放量410（仅为视频2同期的24%），点赞率0.98%（<3%合格线），评论率0.24%，分享率0.24%
-  - **原因1**：选题不匹配 — 彩礼话题与「粤语栋笃笑/吐槽」定位不够契合，缺乏个人特色和黄子华式切入角度
-  - **原因2**：发布时间不佳 — 16:09发布，不在最佳流量时段（晚上7-10点）
-  - **教训**：选题必须与账号定位强相关，不能只看热度不看匹配度
-  - 来源：cron session 20260605_110027
-
-- [douyin-data-check] 视频4发布时间偏晚（20:38） — 最佳时段是晚上7-10点，8点半发已经错过流量高峰
-  - **铁律**：发布时间必须在晚上7-10点，下午时段绝对不发
-  - 来源：CLI session 20260605_093209
-
-- [ecommerce-image] PackyAPI图片生成服务曾整体不可用 — gemini-3-pro-image-preview和gpt-image-2一度下架，查询到的7个模型都是聊天模型
-  - **解决方案**：用户确认gpt-image-2已恢复，重新测试后文生图和图生图都通了
-  - **经验**：PackyAPI模型列表会变动，遇到不可用时等几小时再试，不要直接放弃
-  - 来源：CLI session 20260605_093209
-
-### 新发现
-
-- [hot-roast-writer] 文案终稿需严格去重 — 用户指出粤语文案中"你夹你夹喺中间"重复了"你夹"，"你喺度——你喺度做咩？"重复了"你喺度"
-  - **教训**：写粤语/口语化文案时，递进和停顿容易产生无意义重复，Agent3写完必须逐句检查是否有字词重复
-  - 来源：CLI session 20260605_093209
-
-- [douyin-data-check] 选题匹配度是比时长更关键的变量 — 视频3（1:43，最短）反而数据最差，说明缩短时长不是万能药
-  - **关键发现**：视频3时长最短但播放最低（410），视频2时长最长（4:31）但播放最高（1707），说明选题匹配度 > 时长控制
-  - 来源：cron session 20260605_110027
-
-- [douyin-data-check] 视频数据定时检查体系运转良好 — 每天11:00和23:00两次检查，覆盖6h/18h/24h三个检查点，24h检查后标记完成
-  - 本次检查发现视频3不在追踪列表中，自动纳入监控
-  - 来源：cron session 20260605_110027
-
-- [hot-roast-writer] 爆款标题参考库实际使用效果 — 从61条AI赛道爆款标题中提炼了10类钩子模式（数字反差、身份碾压、恐惧驱动等），Agent3写标题时参考变体使用
-  - 来源：CLI session 20260605_093209
-
-### 用户偏好更新
-
-- **选题必须与账号定位强相关** — 用户确认：热搜当灵感来源，但选题必须与「粤语栋笃笑/吐槽」定位契合。彩礼话题虽然热度279万，但缺乏个人特色，数据最差
-- **发布时间铁律：晚上7-10点** — 视频3下午4点发、视频4晚上8点半发，数据都不好。最佳是7-9点
-- **文案不能有重复字词** — 用户逐句检查粤语文案，发现重复的"你夹"和"你喺度"立即指出。口语化文案更要精炼
-- **文案文件要存在正确路径** — 用户问"为啥不是之前的文案文件夹"，说明文件路径要统一，不要随意改
-
-### Skill 更新
-
-- **hot-roast-writer**：Agent3新增去重自检（逐句检查字词重复），Agent4质检新增"文案去重"维度
-  - 原因：粤语口语化文案容易产生无意义重复，用户逐句检查发现后指出
-- **douyin-data-check**：选题匹配度检查加入Skill优化日志，记录为待验证优化项
-  - 原因：视频3数据证明选题匹配度是比时长更关键的变量
-
----
-
-## 2026-06-04
-
-### 踩坑记录
-
-- [hot-roast-writer] 文案开头没钩子 + 太说教 + 没共鸣点 — Agent3写完文案后自检不足，Agent4质检没真正检查（直接说"通过"）→ 新增Agent3自检3问 + Agent4新增3个检查维度
-  - **问题细节**：文案开头第一句话没有吸引力，5秒内留不住人；整体风格太说教，像在批评别人而不是搞笑；共鸣点太具体（如"擂茶"），大部分观众没经历过
-  - **解决方案**：Agent3写完必须自检3个问题（开头有钩子吗？是搞笑还是说教？观众会觉得"说的是我"吗？），Agent4新增weak_opening/preachy_tone/low_resonance三种错误类型
-  - 来源：CLI session 20260604_090355
-
-- [douyin-data-check] 视频2（老宅光伏板）24小时数据表现不佳 — 完播率9.2%（<30%合格线），分享量0，播放1605已停止增长
-  - **数据汇总**：视频1（周末头疼2:43）完播率1.7%，视频2（老宅光伏板4:31）完播率9.2%，两个视频都远低于合格线
-  - **结论**：旧视频不会再有显著增长，精力应放在新内容上
-  - 来源：cron session 20260604_111232
-
-- [feishu] 飞书文档API block_type映射错误 — block_type 16不在飞书API有效列表里，导致创建文档失败
-  - **正确映射**：2=text, 3=heading1, 4=heading2, 5=heading3, 12=bullet, 13=ordered, 14=code, 17=todo, 22=divider
-  - **解决方案**：修正Python脚本中的block_type映射，逐个测试验证
-  - 来源：Feishu session 20260604_134144
-
-- [feishu] 飞书文档共享用户看不到 — 单纯用permissions API加协作者，用户在飞书"云文档"里看不到
-  - **解决方案**：需要用 `transfer_owner` API把文档所有权转让给用户，而不是只加协作者权限
-  - 来源：Feishu session 20260604_134144
-
-### 新发现
-
-- [hot-roast-writer] 热搜选题范围可以更广 — 用户指出"热搜就是用来选题的"，不应该只看前十条，只要流量差距不大的热搜都可以看下去
-  - 来源：CLI session 20260604_090355
-
-- [douyin-data-check] 抖音数据定时检查体系运转正常 — 每天11:00和23:00两次自动检查，覆盖6h/18h/24h三个检查点，24h检查后标记完成不再复查
-  - 来源：cron sessions 20260604
-
-- [feishu] 飞书文档批量添加blocks用fallback机制 — 一次添加30个blocks如果失败，逐个添加作为fallback，比全部重试更可靠
-  - 来源：Feishu session 20260604_134144
-
-### 用户偏好更新
-
-- **热搜就是选题来源** — 用户认为不要限制只看前十条热搜，流量差距不大的可以一直往下看。热搜当灵感来源，从热搜里提炼情绪/共鸣点
-- **文案开头必须有钩子** — 血的教训：没钩子观众5秒就划走，完播率直接崩
-- **文案不能太说教** — 栋笃笑的核心是荒诞+自嘲，不是批评别人。"读一遍觉得好笑吗？不觉得就加荒诞对比或自嘲"
-- **共鸣点必须是普遍体验** — 不是具体事物（如"擂茶"），而是人人都有的感觉。检验标准：观众会说"我也是！"而不是"这是啥？"
-- **质检不能走过场** — Agent4质检不能直接说"通过"，必须逐项检查并输出具体错误和修复建议
-
-### Skill 更新
-
-- **hot-roast-writer**：Agent3（文案写手）新增自检3问（开头钩子、搞笑vs说教、共鸣普遍性），Agent4（质检员）新增3个检查维度（weak_opening、preachy_tone、low_resonance）+ 新增错误类型JSON输出格式
-  - 原因：写出来的文案开头没钩子、太说教、共鸣点太具体，质检没真正发现问题
-- **douyin-data-check**：视频2完成24小时最终检查，发展日志更新视频数据记录表和经验教训
-  - 原因：定时检查体系正常运转，需要记录数据闭环
-
----
-
-## 2026-06-03
-
-### 踩坑记录
-
-- [hot-roast-writer] 视频文案时长控制问题 — skill在写文案前没有时长限制规则，导致写了8分钟的文案（用户砍了一半还有4分30秒）→ 必须在写之前就定好目标时长（1分半/500字），不是写完再砍
-  - **根因**：规则是写完文案后才加的，不是失效而是加晚了
-  - **解决方案**：hot-roast-writer改为多Agent架构，Agent2先定目标时长，Agent4质检字数，形成闭环控制
-  - 来源：CLI session 20260603_095808
-
-- [hot-roast-writer] 新号第一条视频完播率极低 — 2:43的视频完播率只有1.7%，4:31的也只有7.4%，观众平均只看20秒
-  - **铁律**：新号视频绝对不能超过2分钟
-  - **原因**：完播率<5% = 内容没留住人，算法不会推下一轮
-  - 来源：CLI session 20260603_095808
-
-### 新发现
-
-- [mimo-video-analyze] 新建了视频分析skill — Hermes内置的video_analyze工具缺少`fps`和`media_resolution`参数，导致小米MIMO视频理解失败 → 自写Python脚本调用小米MIMO Token Plan API绕过
-  - Token Plan地址：`token-plan-cn.xiaomimimo.com`（与按量付费地址不同）
-  - 视频分析结果可用于优化口播视频的节奏、语气、手势
-  - 来源：CLI session 20260602_091341
-
-- [hot-roast-writer] 多Agent架构完善 — 从单Agent改为4个Agent协作：Agent1热搜研究员→Agent2选题分析师→Agent3文案写手→Agent4质检员
-  - 新增时长控制闭环：Agent2定目标→Agent3按字数写→Agent4质检字数
-  - 脱稿提示必须内嵌正文（用（）标注），不要单独放表格
-  - 来源：hot-roast-writer skill 更新
-
-- [douyin-data-check] 抖音数据跟踪体系建立 — 建立发展日志模板，跟踪播放量、完播率、2秒跳出率等关键指标
-  - 关键指标：完播率、2秒跳出率、点赞率
-  - 新号前7天重点关注48小时发货率
-  - 来源：CLI session 20260603_095808
-
-### 用户偏好更新
-
-- **先定时长再写文案** — 文案规则必须在写之前就加到skill里，不是写完后补。用户原话确认时间线：先写了文案（无时长控制）→ 拍完说太长 → 才加的控制规则
-- **新号视频控制在2分钟以内** — 完播率是算法推送的关键指标，超过2分钟完播率会暴跌
-- **文案要精炼** — 用户砍了一半内容还有4分30秒，说明原始文案信息密度过低，需要在写的时候就控制节奏
-
-### Skill 更新
-
-- **hot-roast-writer**：从单Agent改为多Agent架构（4个Agent），新增时长控制闭环（Agent2定目标→Agent3写文案→Agent4质检字数）。新增拍摄提示（时长控制、节奏控制、口播特点）
-  - 原因：文案时长控制完全失效，需要结构性解决方案
-- **mimo-video-analyze**：新建skill，封装小米MIMO视频理解API，支持口播视频节奏、语气、手势分析
-  - 原因：Hermes内置video_analyze工具缺少必要参数
-- **douyin-data-check**：新增发展日志跟踪模板（播放量、完播率、2秒跳出率、点赞率等）
-  - 原因：需要系统化跟踪视频数据表现
-
----
-
-## 2026-06-02
-
-### 踩坑记录
-
-- [pdd-store skill] 一键铺货流程自动化失败 — 1688的"确认店铺"弹窗使用 shadow DOM web component（sl-checkbox/sl-button），OpenCLI 的 click 和 JS eval 都无法可靠触发 → 必须用户手动在 Chrome 里点一键铺货（几秒钟的事）
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store skill] 编辑页面必填属性阻塞提交 — 1688铺货过来的商品属性为空（品牌、重要材质种类、手柄材质等），不填无法提交 → 必须先填写所有必填属性再改价/上传图片
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store skill] React组件输入框不响应直接设值 — PDD后台用 React controlled input，直接 `input.value = x` 不触发状态更新 → 必须用 `nativeInputValueSetter` 绕过 React 拦截：`Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input, '新值')` + `dispatchEvent(new Event('input',{bubbles:true}))`
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store skill] OpenCLI session频繁断开 + ref容易stale — PDD后台页面动态加载频繁，ref在下一次click时可能已经变了 → 每次click前必须重新跑state获取最新ref，关键操作要快速完成
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store skill] 修改后必须立即提交 — 重新打开页面全部丢失，用户原话："你逻辑有问题，你没点提交，重新打开不就没保存了吗" → 操作顺序：修改 → 提交 → 确认成功 → 才能关闭/离开
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store skill] 不同SKU进货价可能不同 — 电子秤1000g=9.31元，3000g=11元 → 必须用 `opencli 1688 item` 查看每个SKU具体价格再定价，不能瞎改
-  - 来源：CLI session 20260602_091341
-
-- [video_analyze] 小米MIMO视频理解API缺少必要参数 — Hermes的video_analyze工具没有传入 `fps` 和 `media_resolution` 参数，导致视频分析失败 → 需要修改Hermes代码添加这两个参数，或等官方更新
-  - 来源：CLI session 20260602_091341
-
-- [ecommerce-image] Gemini换背景会丢失原图文字叠加 — 1688商品图常有"电池款"、规格参数等文字，Gemini默认会修改/删除文字 → prompt必须加"Keep all text/labels EXACTLY as they are"，换完后用flash模型验证
-  - 来源：ecommerce-image skill 经验教训
-
-### 新发现
-
-- [pdd-store] PDD后台编辑页面URL格式 — `goods_add/index?id={id}&goods_id={goods_id}&type=edit`，从商品列表点"编辑"会开新标签
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store] PDD商品分类可能有误 — 1688铺货过来的商品分类不一定准确（如手机防水袋被分到3C数码配件），PDD后台商品体检会提示分类有误，需要手动修改
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store] "修改价格"弹窗 vs 编辑页面 — 修改价格弹窗只能改价格，编辑页面可以改价格+图片+属性，推荐用编辑页面
-  - 来源：CLI session 20260602_091341
-
-- [pdd-store] 草稿箱冲突 — 如果商品在草稿箱有编辑版本，修改价格会提示冲突，需要先处理草稿
-  - 来源：CLI session 20260602_091341
-
-- [ecommerce-image] Gemini批量换背景实测 — 20张图约2-3分钟，用gemini-3-pro-image-preview模型，prompt需明确要求保留产品不变
-  - 来源：ecommerce-image skill 经验教训
-
-- [ecommerce-image] Python urllib.request调PackyAPI比requests更稳定 — SSL兼容性更好，不要用requests库
-  - 来源：ecommerce-image skill 经验教训
-
-### 用户偏好更新
-
-- **流程自动化边界要明确区分** — 用户要求明确哪些是Hermes自动化、哪些是用户手动，不要把失败的自动化流程写成"可以做"。pdd-store skill已更新为：Hermes做选品+换图+文案，用户手动操作铺货+编辑+付款
-- **不要凭空设不存在的价格区间** — 铺货过来的SKU有固定价格范围，只能在基础上加价
-- **定价要考虑用户认知** — 用户觉得"量程越大应该越贵"，不能只按成本定价
-- **自动化率评估要实事求是** — pdd-store skill从80%修正为60%，反映了实际能力边界
-
-### Skill 更新
-
-- **pdd-store**：大幅重写，将自动化流程和用户手动流程明确分开，新增"自动化率评估"表，补充编辑页面操作React技巧、必填属性、草稿箱冲突等实战经验
-  - 原因：用户指出"昨天那个拼多多的步骤有点错了"，流程描述不准确
-- **ecommerce-image**：新增"文字叠加图换背景保留文字"技巧、批量处理文件大小检查、.env手动加载等经验
-  - 原因：实际操作中发现Gemini默认会修改文字、图片超3MB等新问题
-- **analyze-image**：新增"批量处理前必须先分析源文件夹结构"、"超大图1500px切割"、"rename_map.json混合key类型"等经验
-  - 原因：478张图批量处理中遇到的实际问题
-
----
-
-## 2026-06-01
-
-### 踩坑记录
-
-- [analyze-image skill] `vision_analyze` 内置工具在 Xiaomi Token Plan 上有 api-key header 丢失的已知问题（sync→async转换时header未保留），导致图片分析失败 → 必须用 analyze-image skill 的 Python 脚本直接调用 Xiaomi Vision API，绕过 Hermes 管道
-  - **反反复复犯错**：即使已多次被告知不能用 `vision_analyze`，模型仍然会再次使用。需要在 memory 中反复强调
-  - 来源：CLI session 20260601_153242（用户说"你刚刚咋又自己看图导致出错了"）+ Feishu session 20260601_113834
-
-- [ecommerce-image] MiniMax subject_ref 一定会变形产品 — 不能用于电商图最终交付 → 用 Gemini "banana" 原生图像编辑（传入参考图+prompt，保留主体只换背景）
-  - 来源：ecommerce-image skill 经验教训
-
-- [ecommerce-image] rembg 输出底部有大量透明区域 — 产品抠图后底部有空白，不裁剪会导致"悬浮" → 必须用numpy检测alpha通道并裁剪
-  - 来源：ecommerce-image skill 经验教训
-
-- [ecommerce-image] PackyAPI base URL 有坑 — 正确是 `www.packyapi.com`，不是 `api.packyapi.com` → Gemini 端点是 `/v1beta/models/{model}:generateContent`，不是 OpenAI 的 `/v1/images/generations`
-  - 来源：ecommerce-image skill 经验教训
-
-- [camofox] 端口 9377 被占用时服务启动失败 → 先 `netstat -ano | grep 9377` 找到 PID，用 `taskkill /PID <pid> /F` 杀掉旧进程再重启
-  - 来源：camofox-auto-start skill pitfalls
-
-- [camofox] Camofox浏览器启动问题 — AI插帧（如NVIDIA Overlay的AI帧生成）可能导致node server.js启动失败或浏览器崩溃 → 关掉游戏/系统中的AI插帧功能即可
-  - 来源：CLI session 20260531_120940（用户发现崩坏：星穹铁道启动崩溃的解决方案）
-
-### 新发现
-
-- [opencli] OpenCLI 可以绕过1688反爬 — 用 `opencli 1688 item <id>` 获取商品详情和图片URL，复用Chrome登录态，比浏览器自动化可靠
-  - 来源：ecommerce-image skill 经验教训
-
-- [ecommerce-image] Gemini图片识别 — 同一个端点，responseModalities 设为 `["TEXT"]` 只返回文字分析，可用于验证换背景后文字是否保留
-  - 来源：ecommerce-image skill 经验教训
-
-- [ecommerce-image] Clash fake IP 模式会拦截 HTTPS 连接 — 导致 SSL 错误；`requests` 库的 `verify=False` 可以绕过，`urllib.request` 更稳定
-  - 来源：ecommerce-image skill 经验教训
-
-- [content] 内容对比分析方法（关键词计数法） — 用于比较两个文档的相似度和差异
-  - 来源：session_search 结果
-
-### 用户偏好更新
-
-- **不要纠结图片问题** — 用户说过"不要纠结那个图片"，遇到图片问题快速解决或跳过
-- **先做再汇报** — 用户说过"你先跑"，不要一直问确认
-- **交付标准要求高** — 不接受部分完成+承诺后续补上
-- **优先搜B站视频** — 遇到技术问题（如游戏崩溃）优先搜B站视频教程，不要上来就放大招（如重装驱动）
-- **资料要完整再交付** — 用户期望完整的交付，不是"大部分完成+几个失败"
-
-### Skill 更新
-
-- **camofox-auto-start**：启动方式从Docker改为 `node server.js`，新增端口占用处理、Windows curl兼容性
-  - 原因：Docker不可用，改用本地Node.js启动
-- **ecommerce-image**：新增"文字叠加图换背景"、PackyAPI接入、多角度生成、平台风格对照等完整内容
-  - 原因：电商图片处理流程从零搭建
-
----
-
-## 2026-05-31
-
-### 踩坑记录
-
-- [游戏] 崩坏：星穹铁道启动崩溃（NvPresent64.dll / NVP_Init_Vulkan Access Violation）— 崩溃日志中 NVIDIA Overlay 的 NvPresent64.dll 只是表象 → 实际解决方案是关闭游戏内的「AI 插帧」功能，不需要重装显卡驱动
-  - 来源：CLI session 20260531_120940（用户自己搜索发现）
-  - **教训**：遇到游戏/软件崩溃应该先搜社区（B站优先）有没有已知解法，不要直接套通用方案
-
-### 新发现
-
-- [skill] 没有专门精炼skill的工具 — knowledge-extraction 是从文档提取知识点，不是精炼skill。要优化skill只能手动用 `skill_manage(action='edit')` 重写
-  - 来源：CLI session 20260531_120940
-
-- [skill] 从线上课笔记提炼skill的流程 — 读课程笔记 → 提取可执行步骤和判断逻辑 → 去掉废话和重复 → 按skill规范输出（触发条件+步骤+pitfalls+验证）
-  - 来源：CLI session 20260531_120940
-
-### 用户偏好更新
-
-- **用户更信任社区搜索而非AI建议** — 崩坏崩溃问题用户自己搜索B站就解决了，AI建议的"重装驱动"方案反而复杂
-- **skill精炼需求** — 用户希望从线上课笔记直接提炼成可执行skill，比knowledge-extraction更注重可操作性
-
----
-
-## 2026-05-30
-
-### 踩坑记录
-
-- [analyze-image] `write_file` 工具会破坏Python f-string语法 — 写入含嵌套引号的Python代码时可能产生语法错误 → 写Python脚本时用 `terminal` 工具的 heredoc 方式，不要用 `write_file`
-  - 来源：analyze-image skill pitfalls
-
-- [analyze-image] 系统Python可能不可用 — `python` 命令因 `importlib._bootstrap_external` 损坏无法导入标准库 → 始终使用 uv python
-  - 来源：analyze-image skill pitfalls
-
-- [analyze-image] `skill_manage(action='write_file')` 也会破坏Python脚本中的引号 — 实际案例：batch_ocr.py、retry_zero.py、retry_one.py 三个脚本的字符串字面量被截断 → 修改脚本后必须用 `python -m py_compile` 验证语法
-  - 来源：analyze-image skill pitfalls
-
-### 新发现
-
-- [bazi] 八字知识库提取检查清单 — 44个原始文档的章节提取状态检查，发现部分提取和遗漏内容，建议了目标文件映射
-  - 来源：CLI session 20260530_190553
-
-- [bazi] 知识库分类标题不要太窄 — 用"伤官见官"作标题会漏掉"伤官配印"、"金水伤官"等其他组合，应该用更宽的标题（如"伤官格"）
-  - 来源：analyze-image skill pitfalls
-
-### 用户偏好更新
-
-- **知识库组织方式** — 用户偏好十神组合分类方式（伤官格、官印格等），而不是按具体组合命名（伤官见官、官印相生等）
-
----
-
-## 通用经验教训（持续积累）
-
-### 工具使用铁律
-
-1. **绝对不要用 `vision_analyze`** — Xiaomi Token Plan 上有 api-key header 丢失的已知问题，用 analyze-image skill 的 Python 脚本
-2. **Python脚本用uv python** — 系统python不可用，路径：`E:\Users\Administrator\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\python.exe`
-3. **写Python脚本不要用 `write_file`** — 会破坏f-string语法，用terminal heredoc
-4. **修改脚本后必须用 `python -m py_compile` 验证** — write_file和skill_manage都可能破坏字符串
-5. **.env文件需手动加载** — Python脚本直接运行拿不到环境变量，必须先读取 `~/AppData/Local/hermes/.env`
-6. **OpenCLI ref容易stale** — 每次操作前必须重新获取最新ref
-
-### 流程管理
-
-1. **自动化能力边界要诚实** — 不要过度承诺自动化率，实际做不到的就标0%
-2. **用户说"先跑"就先跑** — 不要反复确认
-3. **交付必须完整** — 不接受"大部分完成+几个失败"
-4. **遇到问题先搜社区** — B站视频优先，不要直接套通用方案
-5. **不要纠结图片** — 用户说过的话要记住
-
-### 文件处理
-
-1. **长图必须切割** — 高宽比>3或高度>8000px的图片，整张发送会严重截断内容
-2. **超大图先缩小** — 20M+像素用PIL缩放后再处理，否则MemoryError
-3. **图片尺寸必须用PIL读取** — 不能手动解析文件头（只对PNG有效，JPEG会出错）
-4. **批量处理前先分析源文件夹结构** — 不要直接跑脚本
-5. **0字节文件必须主动重试** — 不要只记日志就完事
+- 删除了 `dbs-agent-migration` skill（过时，已合并到其他流程）
+- 电商图工作流：首选 Gemini banana 原生图编辑，备选 rembg 抠图+纯背景合成
+- 课件笔记生成Word文档：markdown笔记→python-docx生成带样式docx→上传飞书三板斧
+- 选股系统路径：~/Pictures/选股/
