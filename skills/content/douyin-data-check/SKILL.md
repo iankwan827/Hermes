@@ -1,6 +1,6 @@
 ---
 name: douyin-data-check
-description: "抖音数据查看。用OpenCLI复用Chrome登录态，打开创作者中心，截图分析视频数据。"
+description: "抖音数据查看。用OpenCLI复用Chrome登录态，打开创作者中心，eval提取文本数据。"
 tags: ["douyin", "data", "analytics", "opencli"]
 triggers:
   - "看看数据"
@@ -291,17 +291,16 @@ onPreview触发的预览面板仍在跨域iframe中，无法eval访问。
 ```bash
 opencli browser douyin screenshot "D:/hermes-agent/douyin_data.png"
 ```
+**⚠️ vision_analyze已不可用（2026-06-22确认）**：mimo-v2.5的Xiaomi API拒绝tool message中的图片格式（报`400: Param Incorrect: text is not set`）。这是服务端breaking change，不是临时故障。**绝对不要用截图+vision_analyze方案**，直接用eval提取文本。
 
-### Step 3：用vision分析截图
-```
-vision_analyze(image_url="D:/hermes-agent/douyin_data.png", question="提取所有视频数据：播放量、点赞、评论、分享、收藏、完播率、2秒跳出率、涨粉量")
-```
-
-**⚠️ vision_analyze可能失败**：PackyAPI返回503 model_not_found（gemini模型无可用渠道）。失败时**立即降级到eval方案**：
 ```bash
+# ✅ 唯一可靠方法：eval提取文本
 opencli browser douyin eval "document.body.innerText"
+
+# ❌ 不要这样做（会报400错误）：
+# opencli browser douyin screenshot "xxx.png"
+# vision_analyze(image_url="xxx.png", question="...")
 ```
-不要重试vision，直接用eval提取文本数据。eval是唯一100%可靠的方法。
 
 ## ⚠️ 小样本数据解读（播放量<50）
 
@@ -952,17 +951,16 @@ opencli browser douyin eval "document.body.innerText"
 点赞 9 / 评论 2 / 分享 0 / 收藏 0 / 弹幕 0
 ```
 
-**备选：截图+vision分析**（当innerText提取失败或需要视觉验证时使用）
+**⚠️ vision_analyze已不可用（2026-06-22确认）**：mimo-v2.5的Xiaomi API拒绝tool message中的图片格式（报`400: Param Incorrect: text is not set`）。这是服务端breaking change，不是临时故障。**绝对不要用截图+vision_analyze方案**，直接用eval提取文本。
+
 ```bash
-opencli browser douyin screenshot "D:/hermes-agent/douyin_data.png"
-# 然后用 vision_analyze 分析
+# ✅ 唯一可靠方法：eval提取文本
+opencli browser douyin eval "document.body.innerText"
+
+# ❌ 不要这样做（会报400错误）：
+# opencli browser douyin screenshot "xxx.png"
+# vision_analyze(image_url="xxx.png", question="...")
 ```
-
-### ⚠️ 关于视频详情页（work-detail）
-
-视频详情页有更完整的数据（完播率、2秒跳出率、涨粉量等）。
-
-**✅ 正确方法**：在内容管理页（`/content-manage/video`）或仪表盘（`/home`）点击"查看分析"按钮，会跳转到详情页。详情页内容在跨域iframe中，但可以通过eval提取`document.body.innerText`获取数据。
 
 ```bash
 # 在内容管理页点击最新视频的"查看分析"
@@ -1141,6 +1139,22 @@ uv run python E:/Users/Administrator/AppData/Local/hermes/scripts/tmp_fix.py
 # 3. 清理
 rm E:/Users/Administrator/AppData/Local/hermes/scripts/tmp_fix.py
 ```
+
+### ⚠️ 批量更新发展日志：用多次 `patch` 而非 Python 脚本
+
+**当需要同时更新多个数据行（如新视频+多个已有视频数据微调）时，不要写一个大 Python 脚本用 Unicode 转义序列（`\uXXXX`）拼接中文字符串。** Unicode 转义序列在 MSYS 环境下匹配文件中的中文文本时经常失败（字符编码不一致），导致 `str.replace()` 找不到目标。
+
+**正确做法**：用多次 `patch` 调用，每次传入实际的中文字符串：
+```bash
+# ✅ 正确：多次 patch，直接用中文
+patch(path="发展日志.md", old_string="| V21 | 脱碳甲醛...", new_string="| V22 | HR... |\n| V21 | 脱碳甲醛...")
+patch(path="发展日志.md", old_string="| V20 | 父母为你好... | 1,981", new_string="| V20 | 父母为你好... | 2,000")
+
+# ❌ 错误：Python 脚本用 \u 转义序列
+content = content.replace("\u0056\u0032\u0031...", "| V22 ...")  # 经常匹配失败
+```
+
+**什么时候可以用 Python**：只有当替换内容不包含中文字符（如纯数字、英文、百分比）时，Python 脚本才可靠。
 
 ### ⚠️ patch 工具匹配失败的 Python 回退方案
 

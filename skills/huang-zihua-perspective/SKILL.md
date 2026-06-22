@@ -190,6 +190,7 @@ description: |
 | references/expression-dna.md | 表达DNA+节奏控制 | 需要风格指导时加载 |
 | references/classic-themes.md | 经典主题素材库 | 选题时加载 |
 | references/sources.md | 调研来源+蒸馏技巧 | 需要找素材时加载 |
+| references/confirmed-quotes.md | 已验证的经典台词实录（从视频转录） | 引用具体台词时加载 |
 
 ---
 

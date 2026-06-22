@@ -90,6 +90,10 @@ uv pip install yt-dlp --python D:/temp-ytdl/Scripts/python.exe
 - `medium`：更准但更慢，约1.5GB模型
 - 首次使用某个模型会自动下载，之后缓存在 `~/.cache/whisper/`
 
+### Whisper粤语支持
+
+Whisper的 `language='yue'`（粤语）在当前安装版本（openai-whisper via `/e/Python/`）中**不支持**，会报 `ValueError: tuple.index(x): x not in tuple`。回退方案：用 `language='zh'` 转录，输出为普通话字符，但实际语音内容仍能识别。粤语专属词汇可能转录不准，需人工校对关键台词。
+
 ### 视频格式
 
 - 默认下载最高画质
@@ -99,6 +103,10 @@ uv pip install yt-dlp --python D:/temp-ytdl/Scripts/python.exe
 ### 去水印
 
 抖音视频本身没有水印（与TikTok不同），无需额外参数。
+
+### Whisper Cantonese limitation（2026-06-22）
+
+Whisper的`small`/`medium`/`large`模型不支持粤语（yue）语言代码，传`language='yue'`会报`ValueError`。只能用`language='zh'`转录，输出普通话字符。对于粤语内容，转录结果需要手动校对粤语写法（如"害怕"→"驚"，"自己"→"自己"等）。建议在转录后保存文件时标注"此为普通话字符转录，实际语音为粤语"。
 
 ### vision_analyze 在 Xiaomi 上的已知问题
 

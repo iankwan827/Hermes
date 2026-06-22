@@ -302,40 +302,40 @@
     "archived_at": null,
     "created_at": "2026-06-01T14:32:55.569801+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-21T03:13:16.122468+00:00",
-    "last_used_at": "2026-06-21T09:10:52.456005+00:00",
-    "last_viewed_at": "2026-06-21T09:10:52.444007+00:00",
-    "patch_count": 76,
+    "last_patched_at": "2026-06-22T12:42:33.451381+00:00",
+    "last_used_at": "2026-06-22T12:42:01.882441+00:00",
+    "last_viewed_at": "2026-06-22T12:42:01.868801+00:00",
+    "patch_count": 88,
     "pinned": false,
     "state": "active",
-    "use_count": 106,
-    "view_count": 106
+    "use_count": 114,
+    "view_count": 114
   },
   "douyin-data-check": {
     "archived_at": null,
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-21T03:35:54.004730+00:00",
-    "last_used_at": "2026-06-21T03:36:08.974701+00:00",
-    "last_viewed_at": "2026-06-21T03:36:08.952957+00:00",
-    "patch_count": 161,
+    "last_patched_at": "2026-06-22T08:04:46.923912+00:00",
+    "last_used_at": "2026-06-22T08:22:38.857731+00:00",
+    "last_viewed_at": "2026-06-22T08:22:38.844717+00:00",
+    "patch_count": 164,
     "pinned": false,
     "state": "active",
-    "use_count": 158,
-    "view_count": 158
+    "use_count": 168,
+    "view_count": 168
   },
   "douyin-download": {
     "archived_at": null,
     "created_at": "2026-06-21T07:53:02.757000+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-21T08:47:39.101486+00:00",
-    "last_used_at": "2026-06-21T08:47:27.182766+00:00",
-    "last_viewed_at": "2026-06-21T08:47:27.168684+00:00",
-    "patch_count": 4,
+    "last_patched_at": "2026-06-22T12:42:40.668423+00:00",
+    "last_used_at": "2026-06-22T09:50:19.285485+00:00",
+    "last_viewed_at": "2026-06-22T09:50:19.270970+00:00",
+    "patch_count": 6,
     "pinned": false,
     "state": "active",
-    "use_count": 5,
-    "view_count": 5
+    "use_count": 7,
+    "view_count": 7
   },
   "ecommerce-image": {
     "archived_at": null,
@@ -362,6 +362,19 @@
     "state": "active",
     "use_count": 15,
     "view_count": 15
+  },
+  "hermes-vision-routing": {
+    "archived_at": null,
+    "created_at": "2026-06-22T08:31:12.579961+00:00",
+    "created_by": "agent",
+    "last_patched_at": "2026-06-22T08:46:15.677460+00:00",
+    "last_used_at": "2026-06-22T08:45:47.449671+00:00",
+    "last_viewed_at": "2026-06-22T08:45:47.435644+00:00",
+    "patch_count": 3,
+    "pinned": false,
+    "state": "active",
+    "use_count": 3,
+    "view_count": 3
   },
   "hermes-web-gateway": {
     "archived_at": null,
@@ -393,14 +406,14 @@
     "archived_at": null,
     "created_at": "2026-06-01T15:27:04.254921+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-21T03:13:25.839381+00:00",
-    "last_used_at": "2026-06-21T02:49:19.443699+00:00",
-    "last_viewed_at": "2026-06-21T02:49:19.433697+00:00",
-    "patch_count": 18,
+    "last_patched_at": "2026-06-22T09:56:59.567907+00:00",
+    "last_used_at": "2026-06-22T09:40:53.205350+00:00",
+    "last_viewed_at": "2026-06-22T09:40:53.193821+00:00",
+    "patch_count": 20,
     "pinned": false,
     "state": "active",
-    "use_count": 14,
-    "view_count": 14
+    "use_count": 19,
+    "view_count": 19
   },
   "huashu-nuwa": {
     "archived_at": null,
@@ -493,18 +506,31 @@
     "use_count": 2,
     "view_count": 2
   },
+  "topic-ideas": {
+    "archived_at": null,
+    "created_at": "2026-06-21T15:05:50.304999+00:00",
+    "created_by": null,
+    "last_patched_at": "2026-06-22T12:42:41.815335+00:00",
+    "last_used_at": "2026-06-22T09:08:10.754063+00:00",
+    "last_viewed_at": "2026-06-22T09:08:10.737963+00:00",
+    "patch_count": 5,
+    "pinned": false,
+    "state": "active",
+    "use_count": 3,
+    "view_count": 3
+  },
   "video-content-audit": {
     "archived_at": null,
     "created_at": "2026-06-09T04:00:36.332179+00:00",
     "created_by": null,
     "last_patched_at": "2026-06-20T08:01:49.121802+00:00",
-    "last_used_at": "2026-06-21T02:49:14.813744+00:00",
-    "last_viewed_at": "2026-06-21T02:49:14.803744+00:00",
+    "last_used_at": "2026-06-22T09:46:13.310238+00:00",
+    "last_viewed_at": "2026-06-22T09:46:13.293186+00:00",
     "patch_count": 11,
     "pinned": false,
     "state": "active",
-    "use_count": 18,
-    "view_count": 18
+    "use_count": 19,
+    "view_count": 19
   },
   "windows-python-development": {
     "archived_at": null,

@@ -869,7 +869,7 @@ image_gen:
 2. `hermes auth` — re-authenticate OAuth providers (or `hermes auth add <provider>`)
 3. Check `.env` has the right API key
 4. **Copilot 403**: `gh auth login` tokens do NOT work for Copilot API. You must use the Copilot-specific OAuth device code flow via `hermes model` → GitHub Copilot.
-5. **Xiaomi MiMo 400 "text is not set"**: MiMo models require `reasoning_content` to be passed back in multi-turn conversations. See `references/xiaomi-mimo-provider-quirks.md` for details and affected models.
+5. **Xiaomi MiMo 400 "text is not set"**: Two known causes — (a) missing `reasoning_content` in multi-turn conversations, or (b) image content in tool messages when the main model is mimo-v2.5. Fix (b): source code patches `_PROVIDER_VISION_MODELS["xiaomi"]` from `mimo-v2.5` to `mimo-v2-omni` in `agent/auxiliary_client.py`. See `references/xiaomi-mimo-provider-quirks.md` for full details.
 
 ### Changes not taking effect
 - **Tools/skills:** `/reset` starts a session with updated toolset

@@ -54,6 +54,55 @@ If Hermes doesn't properly handle reasoning_content passthrough:
 
 ---
 
+## Vision / Image Content in Tool Messages (2026-06 fix)
+
+### The Problem
+
+When `vision_analyze` returns an image in its tool result, the image gets embedded as a list-type content in the tool message (`[{type: "text", ...}, {type: "image_url", ...}]`). When the **main model** is mimo-v2.5, the Xiaomi API rejects this format with the same `text is not set` error — even though mimo-v2.5 is listed as vision-capable in models.dev.
+
+### Root Cause
+
+mimo-v2.5's API does not accept list-type `content` in `role: "tool"` messages that contain `image_url` parts. The `text is not set` error is ambiguous — it fires for both missing `reasoning_content` AND for malformed tool message content.
+
+### The Fix (source code)
+
+Changed `_PROVIDER_VISION_MODELS["xiaomi"]` from `"mimo-v2.5"` to `"mimo-v2-omni"` in `agent/auxiliary_client.py` line 288. mimo-v2-omni handles image content correctly.
+
+**Affected files:**
+- `agent/auxiliary_client.py` — vision model mapping
+- `tests/hermes_cli/test_xiaomi_provider.py` — test assertion
+- `tests/agent/test_auxiliary_main_first.py` — test assertion
+
+### How to Verify
+
+```bash
+# Test mimo-v2-omni directly with an image
+export XIAOMI_API_KEY=your_key
+node -e "
+const https = require('https');
+const fs = require('fs');
+const b64 = fs.readFileSync('test.png').toString('base64');
+const body = JSON.stringify({
+  model: 'mimo-v2-omni',
+  messages: [{role:'user', content:[
+    {type:'text', text:'Describe this image.'},
+    {type:'image_url', image_url:{url:'data:image/png;base64,'+b64}}
+  ]}],
+  max_tokens: 200
+});
+const req = https.request({hostname:'api.xiaomimimo.com',path:'/v1/chat/completions',method:'POST',
+  headers:{'Content-Type':'application/json','Authorization':'Bearer '+process.env.XIAOMI_API_KEY}},
+  res => {let d='';res.on('data',c=>d+=c);res.on('end',()=>console.log(JSON.parse(d).choices?.[0]?.message?.content))});
+req.write(body);req.end();
+"
+```
+
+### models.dev Data
+
+models.dev lists mimo-v2.5 as vision-capable (`"attachment": true`, `"modalities": {"input": ["text","image","audio","video"]}`). This is technically correct (mimo-v2.5 can analyze images when sent directly), but the API rejects image content embedded in tool messages. The models.dev data doesn't distinguish between "can analyze images" and "accepts images in tool message format".
+
+---
+
 ## API Key Format
 
 - Pay-as-you-go: `sk-xxxxx` format, base URL: `https://api.xiaomimimo.com/v1`
