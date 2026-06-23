@@ -4,7 +4,7 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 写完文案必须自动跑video-content-audit审核，不等用户提醒（用户原话"你没跑skill啊"）。引用热搜事件必须确认时间线（几月、第几轮、谁赢谁输），不能凭印象写。审核是内建流程不是可选步骤。
 §
-小米API：tool消息不支持多模态，config加`agent.image_input_mode: text`。文案存`D:/hermes-agent/文案/`，命名`YYYY-MM-DD_主题.md`。八字十神性格：比劫=犟（死硬不认输），偏财=倔（任性不听话）。
+小米API：tool消息不支持多模态，config加`agent.image_input_mode: text`。文案存`D:/hermes-agent/文案/`，命名`YYYY-MM-DD_主题.md`。八字十神性格：比劫=犟，偏财=倔。取象：庚金伤官=生殖系统（刀剑→快），取象直接对应不绕生克。
 §
 粤语金句不要直接写，用剧情/对话体现。文案时间线必须符合现实逻辑。质检需检查每个叙事转折点前是否有钩子。粤语用词：叛逆→反骨（"反骨"才是粤语词）。标签中热搜话题必须原样保留（吃搜索流量），不能替换成内容关键词。
 §
@@ -20,12 +20,14 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 ⚠️写skill前必须先加载skill-creator（E:/Users/Administrator/AppData/Local/hermes/skills/skill-creator/SKILL.md），按Claude标准写。⚠️改完skill/重要文件必须推GitHub同步Mac：cd /e/Users/Administrator/hermes-repo && git add . && git commit -m "xxx" && git push origin main（冲突时用--force）。Mac拉取：git pull。memory同步文件：docs/memory-sync.md。
 §
-⚠️搜网页/热点用OpenCLI复用Chrome登录态。提到"热搜"默认抖音（API: douyin.com/aweme/v1/web/hot/search/list/，免登录）。OpenCLI default session已登录抖音可搜话题详情。用户做共鸣类内容，不追体育/娱乐热搜。站点适配器148个。
+⚠️搜网页/热点用OpenCLI复用Chrome登录态。热搜默认抖音（API免登录）。用户做共鸣类内容，不追体育/娱乐热搜。
 §
 dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2开头用模板库套用。部分段落用直接吐槽/旁白（不要全对话体）。比喻简洁不重复。用户多次修正角度，直接改不argue。
 §
-Mac SSH连不上（port 22 refused），不要尝试SSH到Mac。有需要直接看GitHub仓库（https://github.com/iankwan827/Hermes）。⚠️审核文案时必须严格按字数估算时长（粤语约4字/秒），超90秒的文案不能标"通过"。用户原话"这字那么多还能过"。
+Mac SSH连不上（port 22 refused），不要SSH到Mac。看GitHub仓库：https://github.com/iankwan827/Hermes。⚠️审核文案必须按字数估时长（粤语4字/秒），超90秒不能标通过。
 §
 文案写作：用户给的比喻/故事是用来教我理解角度的，不是写进文案的。要区分"解释给我听"和"写进脚本"。用户说"我用XX故事讲解给你听，不是让你写出来"时，只取角度不取内容。
 §
-制造恐慌的喜剧技巧：不要啰嗦和刻意。恐慌只是阿强反问后的一句顺势接话（"系啊，大嘅先系。怕未？"），不是一整段展开。拉满再拆穿的节奏：开头反转→阿强反问→一句恐慌→马上拆穿收尾。越短越自然越好笑。
+栋笃笑喜剧节奏：反转/punchline要一句话打完，不要拆成多段铺垫再给结论。用户原话"我这句就是一句话，你别拆开说"。越短越自然越好笑。用户给的结构框架就是终稿结构，不要自作主张加段落。
+§
+八字取象：庚金做伤官=生殖系统（不需要绕金生水）。逻辑：庚金=刀剑→锐利→快。取象从五行本质出发，不要混取象逻辑和生克逻辑。例：己土日主，庚金是伤官（己土生庚金，异性=伤官）。用户教的，不是我自己推的。
