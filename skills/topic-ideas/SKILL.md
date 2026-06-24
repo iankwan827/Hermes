@@ -59,6 +59,12 @@ curl -s 'https://www.douyin.com/aweme/v1/web/hot/search/list/' \
 ```
 免登录，返回JSON。用node解析 `data.word_list` 数组，取 `word`（话题名）和 `hot_value`（热度值）。label字段：`[1]=新` `[3]=热` `[5]=荐` `[8]=荐` `[16]=科普`。
 
+### 1b. 今日头条热搜榜（抖音API挂了时的备选）
+```bash
+opencli toutiao hot --limit 20
+```
+返回结构化热搜列表，含rank、title、hot_value、label（new/hot/onSite/refuteRumors）。免登录，直接出结果。注意：toutiao adapter没有搜索功能，只有hot命令。
+
 ### 2. 背景调研（深挖某个话题时）
 - **搜狗（首选）**：`https://www.sogou.com/web?query=关键词` — 中文分词准确，能正确处理复合词（如"圣女果"不会拆成"圣女"+"果"）
 - **Bing（备选）**：`https://www.bing.com/search?q=关键词` — 英文内容更好，但中文复合词容易误拆
@@ -108,8 +114,9 @@ opencli xiaohongshu search "关键词" --limit 5 -f json
 - 状态是「已定」的选题，备注里要写清楚关键信息（人物、场景、笑点来源）
 - OpenCLI搜索小红书的正确语法是 `opencli xiaohongshu search "关键词"`，不是 `opencli search xiaohongshu`（后者会报 unknown command）
 - 热搜全是世界杯/股市/娱乐时不要硬凑，直接切小红书搜痛点方向更高效
+- OpenCLI浏览器桥接断开时（报BROWSER_CONNECT错误），所有browser命令都会失败。备选方案：用curl模拟手机UA直接抓取移动版网页，再用grep提取正文段落。示例：`curl -sL "https://m.toutiao.com/article/ID/" -H "User-Agent: Mozilla/5.0 (iPhone; ...)" | grep -oP '<p[^>]*>.*?</p>'`
 
-## 选题决策流程
+## 内容方向过滤（用户说"看看今天热点"时必须执行）
 
 用户的标准工作流：**记录灵感 → 扫热点 → 定选题 → 开写**
 
