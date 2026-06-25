@@ -4,7 +4,7 @@ description: |
   选题灵感管理。随时记录、查看、筛选选题。
   触发方式：「记一下选题」「看看选题库」「选题灵感」
   Manage topic ideas — record, view, filter, and track status.
-version: 1.1.0
+version: 1.2.0
 created: 2026-06-21
 platforms: [windows]
 ---
@@ -59,6 +59,28 @@ curl -s 'https://www.douyin.com/aweme/v1/web/hot/search/list/' \
 ```
 免登录，返回JSON。用node解析 `data.word_list` 数组，取 `word`（话题名）和 `hot_value`（热度值）。label字段：`[1]=新` `[3]=热` `[5]=荐` `[8]=荐` `[16]=科普`。
 
+### 1a. 抖音热搜页（curl API返回空时的备选）
+当curl API返回空的`aweme_list`时，用OpenCLI浏览器直接抓取热搜页：
+```bash
+opencli browser douyin open "https://www.douyin.com/hot"
+sleep 3
+opencli browser douyin eval "
+const allLinks = document.querySelectorAll('a');
+const topics = [];
+allLinks.forEach(a => {
+  const h = a.href || '';
+  const t = a.innerText || '';
+  if(h.includes('/hot/') && t.length > 3 && t.length < 50) {
+    topics.push(t);
+  }
+});
+[...new Set(topics)].join('\\n');
+"
+```
+注意：热搜页显示的是「热点视频」列表，真正的热搜话题藏在`<a href="/hot/...">`链接里。不要用innerText直接提取（会混入视频信息）。
+
+⚠️ 重复eval变量冲突：页面上下文中`const`声明的变量不会被清除，再次eval同名变量会报`SyntaxError: Identifier 'xxx' has already been declared`。解法：每次eval用不同变量名（如第一次`allLinks`，第二次`pageLinks`）。
+
 ### 1b. 今日头条热搜榜（抖音API挂了时的备选）
 ```bash
 opencli toutiao hot --limit 20
@@ -84,19 +106,55 @@ opencli browser default screenshot "$HOME/topic_search.png"
 注意：vision_analyze只支持本地文件路径（不支持远程URL），截图保存到本地再读取。
 
 ### 5. 小红书灵感搜索（热点不适用时的备选）
-当抖音热搜全是新闻/体育/娱乐，不适合「身边小事共鸣」风格时，用小红书搜生活痛点：
+当抖音热搜全是新闻/体育/娱乐，不适合「身边小事共鸣」风格时，用小红书搜生活痛点。
+
+#### 方法A：OpenCLI浏览器（推荐，更稳定）
+```bash
+# 打开小红书搜索页
+opencli browser xiaohongshu open "https://www.xiaohongshu.com/search_result?keyword=关键词&type=1"
+sleep 4
+
+# 提取搜索结果标题
+opencli browser xiaohongshu eval "
+const cards = document.querySelectorAll('[class*=\"note\"], [class*=\"card\"], [class*=\"item\"]');
+const results = [];
+cards.forEach(card => {
+  const title = card.querySelector('[class*=\"title\"], [class*=\"desc\"], h3, span');
+  if(title && title.innerText && title.innerText.length > 5) {
+    results.push(title.innerText.trim());
+  }
+});
+[...new Set(results)].slice(0, 20).join('\\n');
+"
+```
+
+⚠️ 小红书采集规则：间隔3-8秒随机，每分钟≤5次eval，每5篇暂停10-15秒。
+
+#### 方法B：OpenCLI适配器（备选）
 ```bash
 opencli xiaohongshu search "关键词" --limit 5 -f json
 ```
-常用搜索词方向：
-- 「打工人 崩溃 吐槽」— 职场共鸣
-- 「成年人 崩溃 瞬间」— 中年/生活压力
-- 「半熟人 尴尬」— 社交场景
-- 「工作群 消息 崩溃」— 职场工具类
-- 「社恐 尴尬 时刻」— 社交恐惧共鸣
 
-搜索结果用 `--limit 5 -f json` 格式化输出，取 `title`（标题）、`likes`（点赞数）、`published_at`（发布时间）。
-筛选标准：点赞数>100的优先，最近3个月发布的优先。
+#### 常用搜索词方向（按主题分组搜）
+**职场/打工人**：打工人、上班、职场、同事、领导、加班、辞职
+**社交/人际**：社交累、人际关系、朋友、独处、社恐、尴尬
+**生活/中年**：成年人、累、崩溃、心累、内耗、中年
+**情绪/吐槽**：怒气、吐槽、生气、发泄、阴阳怪气
+
+#### 搜索策略
+1. 先搜大类词（如"打工人"、"社交"、"成年人"），看整体方向
+2. 再搜具体痛点词（如"社交疲惫"、"心累"、"职场人际"），找具体角度
+3. 每次搜索间隔5-6秒，避免触发限制
+
+#### 结果呈现
+搜索结果按主题分组呈现，每组3-5个标题，格式：
+```
+【主题名】（热度说明）
+  · 标题1
+  · 标题2
+  · 标题3
+```
+
 筛选后给用户2-3个方向选项，等用户选定再进dbs-video-workflow。
 
 ### 6. 角度提案格式

@@ -66,9 +66,11 @@ opencli browser douyin eval "document.body.innerText"
 ```
 
 **⚠️ 不要在 cron job 中尝试：**
-- ❌ `content-manage/video` → 会重定向到 home
+- ❌ `content-manage/video` → 会重定向到 home（即使task prompt要求用这个URL，也必须用data-center方法）
 - ❌ 投稿列表中的"分析详情"按钮 → div元素点击不触发跳转（2026-06-15验证）
 - ❌ 方法A（侧边栏导航）→ 步骤多，容易失败
+
+**⚠️ task prompt可能给出错误URL（2026-06-24验证）**：外部prompt可能建议用`content-manage/video`，但该URL会重定向。**始终以本skill的方法0（data-center/content）为准**，忽略prompt中的URL建议。
 
 **⚠️ 仪表盘"查看分析"按钮可以导航（2026-06-16验证）：**
 - ✅ 仪表盘（/home）的"查看分析"按钮 → **可以**点击进入详情页，然后可点击"流量分析"tab获取完整数据
@@ -800,8 +802,10 @@ terminal(command='"/c/Program Files/Google/Chrome/Application/chrome.exe" --prof
 sleep 12
 
 # Step 3：验证连接状态
-opencli doctor
-# 应显示：[OK] Extension: connected
+opencli daemon status  # ⚡ 比 opencli doctor 快得多（<2s vs 可能超时30s+）
+# 应显示：Extension: connected
+# ⚠️ opencli doctor 经常挂起/超时（30s+无响应），用 daemon status 代替
+# daemon status 返回：Daemon: running, Extension: connected, Port: XXXXX
 
 # Step 4：验证 Chrome 在运行
 tasklist | grep -i chrome
@@ -816,7 +820,7 @@ tasklist | grep -i chrome
 5. **验证步骤不能省**：启动后必须用 `opencli doctor` 确认连接成功
 
 ### 如果 Browser Bridge 未连接
-
+### ⚠️ 如果 Browser Bridge 未连接
 ```bash
 # 检查 Chrome 是否在运行
 tasklist | grep -i chrome
@@ -824,7 +828,7 @@ tasklist | grep -i chrome
 # 如果 Chrome 在运行但扩展未连接，重启 daemon
 opencli daemon restart
 sleep 5
-opencli doctor
+opencli daemon status  # ⚡ 用 daemon status 而非 doctor
 
 # 如果仍未连接，可能需要重新加载扩展（见上方"扩展完全未安装时的手动安装"）
 ```
@@ -839,8 +843,8 @@ if ! tasklist 2>/dev/null | grep -qi chrome; then
   sleep 12
 fi
 
-# 2. 验证 OpenCLI 连接
-opencli doctor
+# 2. 验证 OpenCLI 连接（⚡ 用 daemon status 而非 doctor，doctor 经常超时）
+opencli daemon status
 # 如果未连接，重启 daemon
 # opencli daemon restart
 
@@ -1043,7 +1047,35 @@ opencli browser douyin open "https://creator.douyin.com/creator-micro/data-cente
 opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
 ```
 
-## ⚠️⚠️⚠️ 每次查看数据前必须做的事（血的教训）
+### ⚠️ `opencli doctor` 经常挂起/超时（2026-06-25验证）
+
+**`opencli doctor` 命令可能挂起30秒以上无响应。** 替代方案：
+
+```bash
+# ❌ opencli doctor 经常超时
+opencli doctor  # 可能挂起30s+
+
+# ✅ 用 opencli daemon status 代替（<2秒返回）
+opencli daemon status
+# 返回：Daemon: running, Extension: connected, Port: XXXXX
+```
+
+**`daemon status` 返回的信息等价于 `doctor`**（都显示连接状态），但速度快10倍以上。在cron job中优先使用 `daemon status`。
+
+**`opencli doctor` 命令可能挂起30秒以上无响应。** 替代方案：
+
+```bash
+# ❌ opencli doctor 经常超时
+opencli doctor  # 可能挂起30s+
+
+# ✅ 用 opencli daemon status 代替（<2秒返回）
+opencli daemon status
+# 返回：Daemon: running, Extension: connected, Port: XXXXX
+```
+
+**`daemon status` 返回的信息等价于 `doctor`**（都显示连接状态），但速度快10倍以上。在cron job中优先使用 `daemon status`。
+
+### ⚠️ ⚠️ ⚠️ 每次查看数据前必须做的事（血的教训）
 
 **第零步：先读发展日志（references/发展日志.md）！**
 
