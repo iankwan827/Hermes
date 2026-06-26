@@ -145,6 +145,8 @@ description: |
 
 **⚠️ 小红书 note/comments 命令必须传完整签名URL（2026-06-23）：** `opencli xiaohongshu note <note-id>` 和 `opencli xiaohongshu comments <note-id>` 现在要求完整URL（含xsec_token），不能只传note ID。正确做法：从搜索结果的 `url` 字段取完整链接传入。示例：`opencli xiaohongshu note "https://www.xiaohongshu.com/search_result/xxx?xsec_token=yyy=&xsec_source=" -f plain`
 
+**⚠️ 追溯热搜具体内容时，必须先搜来源平台（2026-06-26 用户纠正）：** 用户问"这个是啥事情"指的是抖音热搜上的具体内容，应该先搜抖音（`opencli duckduckgo search "关键词 抖音" -f json`），而不是默认搜B站/小红书。用户纠正："你看的不是抖音啊？"——我搜了B站和小红书，没搜抖音原视频。正确顺序：1) 确认话题来源平台（抖音/微博/小红书） 2) 在来源平台搜索具体内容（抖音用duckduckgo site:douyin.com） 3) 再扩展到其他平台补充素材。`opencli douyin hashtag search --keyword` 接口不稳定，duckduckgo搜索更可靠。
+
 **⚠️ 搜抖音热点/话题：优先用eval提取文本，vision_analyze作为补充（2026-06-22 更新）：**
 - eval提取文本更快更稳定：`opencli browser default eval "document.body.innerText"`
 - vision_analyze现在可用（config已加 `agent.image_input_mode: text`），但只支持本地文件路径截图，不支持远程URL

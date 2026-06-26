@@ -121,6 +121,46 @@ sleep 3
 opencli browser douyin eval "document.body.innerText"
 ```
 
+**⚠️ 表格行懒加载陷阱（2026-06-26验证）**：投稿列表表格初始只加载可见区域的行（约10-12行）。如果视频超过12条，必须先滚动到底部触发懒加载，再提取数据。否则会丢失后半部分视频的数据。
+
+```bash
+# Step 3.5：滚动到底部触发懒加载（视频>12条时必须！）
+opencli browser douyin eval "window.scrollTo(0, document.body.scrollHeight); 'scrolled'"
+sleep 2
+
+# Step 4：提取全部视频数据（滚动后才能获取完整数据）
+opencli browser douyin eval "document.body.innerText"
+```
+
+**验证方法**：提取数据后用eval检查表格行数 `document.querySelectorAll('table tbody tr').length`，应等于视频总数+1（含空行）。如果行数明显少于发展日志中的视频数，说明滚动未生效，需要重试。
+
+**⚠️ 表格列顺序映射（防止评论/分享互换，2026-06-26验证）**：数据中心投稿列表的列顺序与发展日志的列顺序**不同**，必须按以下映射转换：
+
+| 数据中心列顺序 | 发展日志列顺序 |
+|---------------|---------------|
+| 点赞量 (cells[8]) | 点赞 |
+| 分享量 (cells[9]) | 分享 |
+| 评论量 (cells[10]) | 评论 |
+| 收藏量 (cells[11]) | 收藏 |
+
+**⚠️ 关键**：数据中心是"点赞→分享→评论→收藏"，发展日志是"点赞→评论→分享→收藏"。评论和分享的顺序是**反的**！这是12次审核都发现评论/分享互换的根本原因。
+
+```javascript
+// ✅ 正确的eval提取代码（已验证2026-06-26）
+data.push({
+  likes: cells[8].textContent.trim(),    // 点赞量
+  shares: cells[9].textContent.trim(),   // 分享量
+  comments: cells[10].textContent.trim(), // 评论量
+  fav: cells[11].textContent.trim()      // 收藏量
+})
+
+// ✅ 正确的映射到发展日志
+// likes → 点赞
+// comments → 评论（注意：不是shares！）
+// shares → 分享（注意：不是comments！）
+// fav → 收藏
+```
+
 **返回的数据结构**（直接包含所有指标，无需二次点击）：
 ```
 作品名称 | 发布时间    审核状态  播放量  完播率  5s完播率  封面点击率  2s跳出率  平均播放时长  点赞量  分享量  评论量  收藏量  主页访问量  粉丝增量  操作
