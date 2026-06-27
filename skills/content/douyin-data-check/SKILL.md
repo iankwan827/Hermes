@@ -121,18 +121,19 @@ sleep 3
 opencli browser douyin eval "document.body.innerText"
 ```
 
-**⚠️ 表格行懒加载陷阱（2026-06-26验证）**：投稿列表表格初始只加载可见区域的行（约10-12行）。如果视频超过12条，必须先滚动到底部触发懒加载，再提取数据。否则会丢失后半部分视频的数据。
+**⚠️ 表格行懒加载+虚拟滚动陷阱（2026-06-26验证）**：投稿列表表格使用虚拟滚动，初始只渲染可见区域的行（约10-12行）。即使滚动到`scrollHeight`，也不会加载更多行——所有容器的`scrollHeight === clientHeight`，没有可滚动的父容器。**结果**：视频超过10条时，`document.body.innerText`只能获取前10条视频的数据，后半部分不可见。
+
+**应对策略**：
+1. **对于cron job（只关注新视频+近期变化）**：10行足够——新视频在最前面，已完成的旧视频变化微小
+2. **如果需要全部视频数据**：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动，可显示全部视频（但只有基础数据，没有完播率等详细指标）
+3. **不要尝试通过JavaScript强制加载更多行**：虚拟滚动是React组件层面的控制，无法通过DOM操作绕过
 
 ```bash
-# Step 3.5：滚动到底部触发懒加载（视频>12条时必须！）
-opencli browser douyin eval "window.scrollTo(0, document.body.scrollHeight); 'scrolled'"
-sleep 2
-
-# Step 4：提取全部视频数据（滚动后才能获取完整数据）
+# Step 4：提取视频列表数据（虚拟滚动限制，只能获取前10-12行）
 opencli browser douyin eval "document.body.innerText"
 ```
 
-**验证方法**：提取数据后用eval检查表格行数 `document.querySelectorAll('table tbody tr').length`，应等于视频总数+1（含空行）。如果行数明显少于发展日志中的视频数，说明滚动未生效，需要重试。
+**⚠️ 虚拟滚动限制**：`document.querySelectorAll('table tbody tr').length` 通常返回11（10条视频+1空行），即使账号有21条视频。这是虚拟滚动的正常行为，不是错误。对于cron job（只关注新视频+近期变化），10行数据已足够。
 
 **⚠️ 表格列顺序映射（防止评论/分享互换，2026-06-26验证）**：数据中心投稿列表的列顺序与发展日志的列顺序**不同**，必须按以下映射转换：
 
