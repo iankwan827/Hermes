@@ -336,7 +336,13 @@ The registry of record is `hermes_cli/commands.py` — every consumer
 
 ```
 ~/.hermes/config.yaml       Main configuration
-~/.hermes/.env              API keys and secrets
+`~/.hermes/.env`              API keys and secrets
+
+**Debug empty/missing keys**: When a key appears as `***` in config output, it can mean either (a) it is properly configured and Hermes is redacting it for display, or (b) the `.env` file literally contains the placeholder string `***` with no real key. Distinguish by reading the raw file:
+```
+grep "^XIAOMI_API_KEY" ~/.hermes/.env | cat -A
+```
+A literal placeholder shows as `XIAOMI_API_KEY=***` with no hidden characters. Also check line numbers with `grep -n "XIAOMI" ~/.hermes/.env` — if the same key appears twice (once commented, once uncommented), the uncommented literal wins at runtime. Full checklist: `references/api-key-debug.md`.
 $HERMES_HOME/skills/        Installed skills
 ~/.hermes/sessions/         Gateway routing index, request dumps, *.jsonl transcripts (and optional per-session JSON snapshots when sessions.write_json_snapshots: true)
 ~/.hermes/state.db          Canonical session store (SQLite + FTS5)
@@ -870,6 +876,7 @@ image_gen:
 3. Check `.env` has the right API key
 4. **Copilot 403**: `gh auth login` tokens do NOT work for Copilot API. You must use the Copilot-specific OAuth device code flow via `hermes model` → GitHub Copilot.
 5. **Xiaomi MiMo 400 "text is not set"**: Two known causes — (a) missing `reasoning_content` in multi-turn conversations, or (b) image content in tool messages when the main model is mimo-v2.5. Fix (b): source code patches `_PROVIDER_VISION_MODELS["xiaomi"]` from `mimo-v2.5` to `mimo-v2-omni` in `agent/auxiliary_client.py`. See `references/xiaomi-mimo-provider-quirks.md` for full details.
+5. **Xiaomi MiMo reports "Invalid API Key" immediately after payment/top-up**: Check whether the key in `~/.hermes/.env` is a real key or a literal `***` placeholder. `grep -n "XIAOMI" ~/.hermes/.env` — if `XIAOMI_API_KEY=***` appears uncommented at the active line, the key is empty. The three-asterisk mask and a literal placeholder look identical in all outputs. Fix: obtain a fresh key from https://platform.xiaomimimo.com and set it with `hermes config set secrets.xiaomi.api_key <key>`. Also check `~/.hermes/auth.json` — key exhaustion states (402欠费/401无效) are stored there separately from `.env`. After paying, reset with `hermes auth reset xiaomi` or manually edit `auth.json` to set `last_status: "ok"`. See `references/xiaomi-mimo-provider-quirks.md` for the full reset procedure including gateway restart.
 
 ### Changes not taking effect
 - **Tools/skills:** `/reset` starts a session with updated toolset
@@ -912,6 +919,21 @@ Common gateway problems:
 The `display_config.py` per-platform overrides control display settings only (tool_progress, streaming, reasoning visibility, etc.), not model selection.
 
 If you need platform-specific models, the current workaround would require running separate Hermes profiles with different configs, each connected to a different platform.
+
+### Diagnostic pitfall: read the error message before assuming
+
+When troubleshooting API errors, **read the actual error text** before jumping to conclusions. The error message often contains the exact model name, error code, and provider — don't assume which key or model failed without checking.
+
+Example: user reports "401 error on xiaomi" — check `auth.json` for which credential (env key vs manual key) actually produced the error. The env key might show `402` (欠费) while a stale manual key shows `401` (invalid). Don't conflate them.
+
+### Style: keep commands simple, don't over-explain
+
+When giving the user a command to run:
+- Just give the command. No "bash", no "zsh", no shell qualifiers.
+- Don't explain what the command does unless asked.
+- If the user says "just give me the command", stop adding context.
+- On Mac: `hermes gateway restart` works directly — no need to specify shell.
+- One-liners are better than multi-line scripts when possible.
 
 ### Diagnostic pitfall: stale log false positives
 

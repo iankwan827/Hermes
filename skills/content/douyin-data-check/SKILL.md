@@ -1,12 +1,21 @@
 ---
 name: douyin-data-check
-description: "抖音数据查看。用OpenCLI复用Chrome登录态，打开创作者中心，eval提取文本数据。"
+description: "抖音数据查看 + 热点/新闻搜索。用OpenCLI复用Chrome登录态操作网站（创作者中心/头条/微博/小红书/知乎），eval提取文本数据。"
 tags: ["douyin", "data", "analytics", "opencli"]
 triggers:
   - "看看数据"
   - "抖音数据"
   - "查看播放量"
   - "视频数据"
+  - "看看热点"
+  - "今天热点"
+  - "搜热点"
+  - "热搜"
+  - "搜新闻"
+  - "看看新闻"
+  - "搜小红书"
+  - "搜微博"
+  - "看看知乎"
 ---
 
 # 抖音数据查看 Skill
@@ -14,6 +23,29 @@ triggers:
 ## ⚠️ 核心工具：OpenCLI
 
 **OpenCLI复用你本地Chrome的登录态来操作网站。** 不需要额外登录，Chrome已经登录了抖音创作者中心。
+
+## ⚠️⚠️⚠️ 核心原则：OpenCLI是默认工具
+
+**任何需要访问网页的任务，第一步永远是检查OpenCLI是否可用。**
+
+用户原话："老老实实说你是不是忘记怎么用opencli了，我发现gateway每天都会用这个来查数据，你这个cli却老忘记怎么用"
+
+**正确流程**：
+1. `opencli daemon status` → 检查连接状态
+2. 如果断开 → `opencli daemon restart` → 等待5秒 → 再检查
+3. 如果Chrome没开 → 启动Chrome → 等待10-15秒
+4. 连接成功后才开始操作
+
+**不要做的事**：
+- ❌ 一上来就用curl/API搜索新闻
+- ❌ 忘记OpenCLI直接用其他方法
+- ❌ 搜热点时没想到用OpenCLI打开网页
+
+**OpenCLI的用途远不止查抖音数据**：
+- 搜热点：打开头条/微博搜索页，eval提取文本
+- 查公司信息：打开企查查/天眼查
+- 找对标账号：打开抖音搜索页
+- 任何需要浏览器的操作都可以用OpenCLI
 
 ## ⚠️⚠️⚠️ 提取数据方式（用户明确偏好）
 
@@ -764,7 +796,103 @@ UV_PYTHON="E:\\Users\\Administrator\\AppData\\Roaming\\uv\\python\\cpython-3.11-
   3. 结尾加互动引导
 - **已标记为"待24h检查"**：明天上午进行最终数据检查
 
-## OpenCLI常用命令速查
+## 🔴 搜任何网页/热点/新闻 → 必须用OpenCLI（最高优先级规则）
+
+**⚠️⚠️⚠️⚠️⚠️ 这是本skill最重要的规则。任何需要搜网页、查热点、看新闻、搜小红书/微博/知乎的任务，第一步永远是OpenCLI。**
+
+**绝对不要用的（全部会失败）：**
+- ❌ curl调微博/知乎/百度/搜狗/Bing/Google API → 反爬拦截（403/443/空响应/编码错误）
+- ❌ execute_code中用urllib.request → Python SRE模块mismatch / ASCII编码错误
+- ❌ node fetch各搜索引擎 → 返回空或JS代码
+- ❌ 所有第三方新闻API（codelife/vvhan/thepaper等）→ 超时/空响应
+
+**100%可靠的方法：OpenCLI复用本地Chrome登录态。**
+
+```bash
+# 标准流程（3步，适用于所有搜索场景）
+opencli browser douyin open "https://www.toutiao.com/search?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜微博
+opencli browser douyin open "https://s.weibo.com/weibo?q=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜小红书
+opencli browser douyin open "https://www.xiaohongshu.com/search_result?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜知乎
+opencli browser douyin open "https://www.zhihu.com/search?type=content&q=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 失败案例（2026-06-28）**：忘了OpenCLI，用curl调codelife/weibo/baidu/sogou/bing API + node fetch + Python urllib，全部失败，浪费15+轮工具调用。用户指出"gateway每天都在用这个查数据，你这个cli却老忘记怎么用"。
+
+**⚠️ 首次使用前检查**：如果OpenCLI报"Browser Bridge extension not connected"，先 `opencli daemon status` 确认连接状态。Chrome必须在运行。
+
+**⚠️ 搜什么平台用什么URL**：
+
+| 平台 | URL模板 | 说明 |
+|------|---------|------|
+| 今日头条 | `https://www.toutiao.com/search?keyword=XXX` | 最常用，热榜+搜索 |
+| 微博 | `https://s.weibo.com/weibo?q=XXX` | 微博搜索 |
+| 小红书 | `https://www.xiaohongshu.com/search_result?keyword=XXX` | 需登录 |
+| 知乎 | `https://www.zhihu.com/search?type=content&q=XXX` | 知乎搜索 |
+| 百度 | `https://www.baidu.com/s?wd=XXX` | 百度搜索 |
+
+## 用OpenCLI搜索热点新闻（通用方法）
+
+**适用场景**：搜微博热搜、头条热点、抖音热搜等中文平台内容。
+
+**最佳方法：用头条搜索页 + eval提取文本**
+```bash
+# 搜索关键词
+opencli browser douyin open "https://www.toutiao.com/search?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 不要用curl/API抓中文新闻站**：微博、知乎、百度等都有反爬机制，curl返回空或403。OpenCLI复用Chrome登录态，是最可靠的方法。
+
+**⚠️ 操作节奏：每次操作之间加 `sleep 5-8`，模拟人操作。不要连续快速调用。**
+
+**⚠️ 搜索多个关键词时**：每次搜索之间 `sleep 8`，避免触发风控。
+
+**搜索顺序**：先 `open` 打开搜索页 → `sleep 5` → `eval "document.body.innerText"` 提取内容。
+
+## ⚠️ OpenCLI Chrome扩展断连修复（2026-06-28验证）
+
+**症状**：`opencli browser douyin open` 超时或返回"Browser Bridge extension not connected"
+
+**快速修复流程**：
+```bash
+# 1. 检查状态
+opencli daemon status
+
+# 2. 如果Extension: disconnected，重启daemon
+opencli daemon restart
+sleep 5
+
+# 3. 再次检查
+opencli daemon status
+# 应显示 Extension: connected
+
+# 4. 如果仍 disconnected，检查Chrome是否在运行
+tasklist | grep -i chrome
+
+# 5. 如果Chrome在运行但扩展未连接，可能需要：
+#    - 打开 chrome://extensions/
+#    - 找到Browser Bridge扩展，点击刷新按钮
+#    - 或者关闭Chrome重新打开
+```
+
+**⚠️ 注意**：`opencli doctor` 经常挂起30秒+，用 `opencli daemon status` 代替（<2秒返回）。
+
+## OpenCLI 常用命令速查
 
 ```bash
 # 打开页面（前台模式，可能超时）
@@ -1612,6 +1740,7 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 1. **均值/中位数必须先独立验证正确，再用其做诊断判断**
 2. **诊断中涉及"接近均值""高于/低于均值"的表述，必须用实际均值重新验证**
 3. **当均值错误被修正后，所有引用均值的诊断结论必须逐条复核**
+4. **低播放量视频会显著拉低均值（2026-06-28验证）**：V27仅107播放，将均值从1,460拉低至1,375（-5.8%）。当新视频播放量远低于往期均值时，均值会大幅下降，此时"播放量接近均值"的判断需要更新为"播放量低于均值"。诊断结论中引用均值时，必须用最新计算值。
 
 ### 审核陷阱：跨阶段数据对比（2026-06-23发现）
 

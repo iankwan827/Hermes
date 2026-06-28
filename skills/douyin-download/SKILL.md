@@ -64,6 +64,23 @@ uv pip install yt-dlp --python D:/temp-ytdl/Scripts/python.exe
 
 已安装，路径 `/e/Users/Administrator/AppData/Local/Microsoft/WinGet/Links/ffmpeg`
 
+## ⚡ 备选方案：TikHub API下载（免Cookie）
+
+当yt-dlp因Cookie问题失败时，可用TikHub API获取下载链接：
+
+```bash
+# 1. 用TikHub API获取视频下载链接（需要API Key，见 tikhub-api skill）
+TIKHUB_KEY=$(cat "E:/Users/Administrator/AppData/Local/hermes/skills/research/tikhub-api/references/api_key.txt")
+curl -X GET "https://api.tikhub.io/api/v1/douyin/web/fetch_video_high_quality_play_url?aweme_id=<AWEME_ID>" \
+  -H "Authorization: Bearer $TIKHUB_KEY"
+
+# 2. 从返回的 original_video_url 字段下载
+curl -sk -L -o "output.mp4" "<original_video_url>" -H "User-Agent: Mozilla/5.0"
+```
+
+**优点**：不需要Cookie，不需要浏览器运行
+**缺点**：每次请求消耗API额度（$0.001/次）
+
 ## 支持的链接格式
 
 - 短链接：`https://v.douyin.com/xxxxx/`

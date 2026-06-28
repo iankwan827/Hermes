@@ -259,6 +259,19 @@
     "use_count": 1,
     "view_count": 1
   },
+  "boss-job-search": {
+    "archived_at": null,
+    "created_at": "2026-06-28T11:44:52.798567+00:00",
+    "created_by": "agent",
+    "last_patched_at": null,
+    "last_used_at": null,
+    "last_viewed_at": null,
+    "patch_count": 0,
+    "pinned": false,
+    "state": "active",
+    "use_count": 0,
+    "view_count": 0
+  },
   "camofox-auto-start": {
     "archived_at": null,
     "created_at": "2026-05-31T03:58:33.022896+00:00",
@@ -302,40 +315,40 @@
     "archived_at": null,
     "created_at": "2026-06-01T14:32:55.569801+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-27T08:18:17.161772+00:00",
-    "last_used_at": "2026-06-27T08:24:32.270094+00:00",
-    "last_viewed_at": "2026-06-27T08:24:32.256506+00:00",
-    "patch_count": 118,
+    "last_patched_at": "2026-06-28T08:12:06.462357+00:00",
+    "last_used_at": "2026-06-28T08:11:42.707471+00:00",
+    "last_viewed_at": "2026-06-28T08:11:42.691343+00:00",
+    "patch_count": 120,
     "pinned": false,
     "state": "active",
-    "use_count": 130,
-    "view_count": 130
+    "use_count": 131,
+    "view_count": 131
   },
   "douyin-data-check": {
     "archived_at": null,
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-26T15:09:45.024399+00:00",
-    "last_used_at": "2026-06-27T07:40:19.092927+00:00",
-    "last_viewed_at": "2026-06-27T07:40:19.076384+00:00",
-    "patch_count": 178,
+    "last_patched_at": "2026-06-28T12:26:09.020781+00:00",
+    "last_used_at": "2026-06-28T11:52:11.284609+00:00",
+    "last_viewed_at": "2026-06-28T11:52:11.156183+00:00",
+    "patch_count": 190,
     "pinned": false,
     "state": "active",
-    "use_count": 200,
-    "view_count": 200
+    "use_count": 216,
+    "view_count": 216
   },
   "douyin-download": {
     "archived_at": null,
     "created_at": "2026-06-21T07:53:02.757000+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-22T12:42:40.668423+00:00",
-    "last_used_at": "2026-06-22T09:50:19.285485+00:00",
-    "last_viewed_at": "2026-06-22T09:50:19.270970+00:00",
-    "patch_count": 6,
+    "last_patched_at": "2026-06-28T11:44:32.336530+00:00",
+    "last_used_at": "2026-06-28T11:31:11.232386+00:00",
+    "last_viewed_at": "2026-06-28T11:31:11.215508+00:00",
+    "patch_count": 7,
     "pinned": false,
     "state": "active",
-    "use_count": 7,
-    "view_count": 7
+    "use_count": 8,
+    "view_count": 8
   },
   "ecommerce-image": {
     "archived_at": null,
@@ -506,18 +519,31 @@
     "use_count": 2,
     "view_count": 2
   },
+  "tikhub-api": {
+    "archived_at": null,
+    "created_at": "2026-06-28T10:38:57.898503+00:00",
+    "created_by": null,
+    "last_patched_at": "2026-06-28T13:51:02.133916+00:00",
+    "last_used_at": "2026-06-28T13:50:29.345220+00:00",
+    "last_viewed_at": "2026-06-28T13:50:29.335125+00:00",
+    "patch_count": 26,
+    "pinned": false,
+    "state": "active",
+    "use_count": 7,
+    "view_count": 7
+  },
   "topic-ideas": {
     "archived_at": null,
     "created_at": "2026-06-21T15:05:50.304999+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-25T08:28:56.103809+00:00",
-    "last_used_at": "2026-06-25T08:28:39.262072+00:00",
-    "last_viewed_at": "2026-06-25T08:28:39.006869+00:00",
-    "patch_count": 13,
+    "last_patched_at": "2026-06-28T04:55:45.086761+00:00",
+    "last_used_at": "2026-06-28T04:55:08.383930+00:00",
+    "last_viewed_at": "2026-06-28T04:55:08.367930+00:00",
+    "patch_count": 18,
     "pinned": false,
     "state": "active",
-    "use_count": 9,
-    "view_count": 9
+    "use_count": 12,
+    "view_count": 12
   },
   "video-content-audit": {
     "archived_at": null,
