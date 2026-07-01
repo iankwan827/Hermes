@@ -587,7 +587,16 @@ sleep 5
 
 ### 流量分析页的关键指标
 
-**⚠️ 点击"流量分析"tab的坑（2026-06-10验证）**：`Array.from(document.querySelectorAll('*')).find(el => el.textContent.trim() === '流量分析' && el.offsetParent !== null)` 会匹配到 HTML/BODY 等父容器（因为它们的 textContent 也包含"流量分析"），导致返回 undefined。**必须加 `el.children.length === 0` 过滤叶子节点**：
+**⚠️ `children.length === 0` 过滤器的使用场景（2026-06-30明确）**：
+
+| 按钮 | 是否需要 `children.length === 0` | 原因 |
+|------|----------------------------------|------|
+| "流量分析" tab | ✅ 必须加 | HTML/BODY等父容器的textContent也包含"流量分析"，会误匹配 |
+| "查看分析"按钮（仪表盘） | ❌ 不要加 | 按钮是`<div>`且有子元素（文字+图标），加了会找不到 |
+| "查看分析"按钮（内容管理页） | ❌ 不要加 | 同上 |
+| "分析详情"按钮（数据中心） | ❌ 不要加 | 同上，且该按钮不触发跳转 |
+
+**点击"流量分析"tab的坑（2026-06-10验证）**：`Array.from(document.querySelectorAll('*')).find(el => el.textContent.trim() === '流量分析' && el.offsetParent !== null)` 会匹配到 HTML/BODY 等父容器（因为它们的 textContent 也包含"流量分析"），导致返回 undefined。**必须加 `el.children.length === 0` 过滤叶子节点**：
 ```javascript
 // ✅ 正确：过滤叶子节点
 Array.from(document.querySelectorAll('*')).find(el => 
