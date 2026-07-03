@@ -1,19 +1,115 @@
 ---
 name: douyin-data-check
-description: "抖音数据查看。用OpenCLI复用Chrome登录态，打开创作者中心，截图分析视频数据。"
+description: "抖音数据查看 + 热点/新闻搜索。用OpenCLI复用Chrome登录态操作网站（创作者中心/头条/微博/小红书/知乎），eval提取文本数据。"
 tags: ["douyin", "data", "analytics", "opencli"]
 triggers:
   - "看看数据"
   - "抖音数据"
   - "查看播放量"
   - "视频数据"
+  - "看看热点"
+  - "今天热点"
+  - "搜热点"
+  - "热搜"
+  - "搜新闻"
+  - "看看新闻"
+  - "搜小红书"
+  - "搜微博"
+  - "看看知乎"
 ---
 
 # 抖音数据查看 Skill
 
-## ⚠️ 核心工具：OpenCLI
+## ⚠️ 核心工具：Hermes Browser Tools（首选）或 OpenCLI
 
-**OpenCLI复用你本地Chrome的登录态来操作网站。** 不需要额外登录，Chrome已经登录了抖音创作者中心。
+**首选方案：Hermes内置browser工具（通过CDP连接现有Chrome）。** 不需要OpenCLI daemon，直接用browser_navigate/browser_console操作浏览器，复用登录态。
+
+**备选方案：OpenCLI** — 当browser工具不可用时回退。
+
+### Hermes Browser 工具配置（2026-07-03验证，Mac已跑通）
+
+**前置条件**：Chrome必须以远程调试模式启动，Hermes通过CDP协议连接。
+
+**Config设置**（必须用`ws://`协议，不是`http://`）：
+```bash
+hermes config set browser.cdp_url "ws://127.0.0.1:9222"
+```
+
+**⚠️⚠️⚠️ Windows Chrome CDP启动的正确方式（2026-07-03血的教训）**
+
+**必须用独立`--user-data-dir`**，否则Chrome lockfile冲突导致端口9222永远不开：
+
+```bash
+# 1. 先杀掉所有Chrome（必须用PowerShell，bash的taskkill /F有时杀不干净）
+powershell.exe -NoProfile -Command "Get-Process chrome -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue"
+sleep 3
+
+# 1. 启动Chrome带remote debugging port（⚠️ 不要指定--user-data-dir，保留登录态）
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --no-first-run --restore-last-session &
+
+# 3. 验证端口已开（必须看到JSON输出才算成功）
+sleep 8 && curl -s http://localhost:9222/json/version
+```
+
+**⚠️ 常见失败原因**：如果用默认用户目录（`AppData/Local/Google/Chrome/User Data`），Chrome的lockfile会阻止第二个实例绑定调试端口。症状：Chrome进程在跑，`--remote-debugging-port=9222`参数也在，但`curl localhost:9222`无响应。
+
+**⚠️ 不要用bash的`taskkill /F`**：MSYS环境下`taskkill /F /IM chrome.exe`经常杀不干净（PowerShell编码问题）。必须用`powershell.exe -NoProfile -Command "Get-Process chrome | Stop-Process -Force"`。
+
+**⚠️ Config必须用`ws://`不是`http://`**：`browser.cdp_url`的值必须是`ws://127.0.0.1:9222`，不是`http://localhost:9222`。用`http://`会导致连接失败。
+
+**⚠️ CAMOFOX_URL陷阱**：如果`.env`中设置了`CAMOFOX_URL=http://localhost:9377`但Camofox未安装，browser工具会尝试连接Camofox而失败。解决：注释掉`.env`中的`CAMOFOX_URL`行。
+
+**⚠️ 改完config必须`/reset`**：`browser.cdp_url`和`.env`改动在当前session不生效，必须`/reset`开新session。
+
+**Hermes Browser工具对照表**：
+
+| OpenCLI命令 | Hermes工具 | 说明 |
+|------------|-----------|------|
+| `opencli browser douyin open "URL"` | `browser_navigate(url="URL")` | 打开页面 |
+| `opencli browser douyin eval "js"` | `browser_console(expression="js")` | 执行JavaScript |
+| `opencli browser douyin screenshot "path"` | `browser_vision()` | 截图 |
+| `opencli browser douyin click "[N]"` | `browser_click(ref="@eN")` | 点击元素 |
+| `opencli browser douyin find --text "text"` | `browser_snapshot()` | 获取页面快照 |
+
+**⚠️ 注意**：browser_console执行JS后返回的是JSON序列化结果，不是直接的文本。需要解析返回值。
+
+## ⚠️⚠️⚠️ 核心原则：Hermes Browser是默认工具，OpenCLI是备选
+
+**任何需要访问网页的任务，第一步永远是检查Hermes browser工具是否可用（CDP连接）。** 如果不可用，再回退到OpenCLI。
+
+用户原话："老老实实说你是不是忘记怎么用opencli了，我发现gateway每天都会用这个来查数据，你这个cli却老忘记怎么用"
+
+**正确流程**：
+1. `opencli daemon status` → 检查连接状态
+2. 如果断开 → `opencli daemon restart` → 等待5秒 → 再检查
+3. 如果Chrome没开 → 启动Chrome → 等待10-15秒
+4. 连接成功后才开始操作
+
+**不要做的事**：
+- ❌ 一上来就用curl/API搜索新闻
+- ❌ 忘记OpenCLI直接用其他方法
+- ❌ 搜热点时没想到用OpenCLI打开网页
+
+**⚠️⚠️⚠️ 工作流铁律：Chrome一旦跑起来就不要杀它**
+
+用户明确说过："你能不能报到一下进度呢，别自己乱来"、"你就是个傻逼，我一直看着浏览器开了又关"。
+
+**正确流程**：
+1. 启动Chrome带调试端口（用background模式）
+2. 等8秒验证端口通了
+3. 直接用browser_navigate/browser_console操作
+4. **不要因为某次调用失败就杀Chrome重来** — 先检查是不是其他原因（config没刷新、URL写错等）
+
+**错误流程**（用户看到Chrome反复闪烁，非常烦）：
+- ❌ 测试失败 → 杀Chrome → 重启Chrome → 再测试 → 再失败 → 再杀...
+- ❌ 没验证端口就急着用browser工具
+- ❌ 忘了`/reset`导致config没生效，然后怪Chrome没开
+
+**OpenCLI的用途远不止查抖音数据**：
+- 搜热点：打开头条/微博搜索页，eval提取文本
+- 查公司信息：打开企查查/天眼查
+- 找对标账号：打开抖音搜索页
+- 任何需要浏览器的操作都可以用OpenCLI
 
 ## ⚠️⚠️⚠️ 提取数据方式（用户明确偏好）
 
@@ -66,9 +162,11 @@ opencli browser douyin eval "document.body.innerText"
 ```
 
 **⚠️ 不要在 cron job 中尝试：**
-- ❌ `content-manage/video` → 会重定向到 home
+- ❌ `content-manage/video` → 会重定向到 home（即使task prompt要求用这个URL，也必须用data-center方法）
 - ❌ 投稿列表中的"分析详情"按钮 → div元素点击不触发跳转（2026-06-15验证）
 - ❌ 方法A（侧边栏导航）→ 步骤多，容易失败
+
+**⚠️ task prompt可能给出错误URL（2026-06-24验证）**：外部prompt可能建议用`content-manage/video`，但该URL会重定向。**始终以本skill的方法0（data-center/content）为准**，忽略prompt中的URL建议。
 
 **⚠️ 仪表盘"查看分析"按钮可以导航（2026-06-16验证）：**
 - ✅ 仪表盘（/home）的"查看分析"按钮 → **可以**点击进入详情页，然后可点击"流量分析"tab获取完整数据
@@ -117,6 +215,66 @@ sleep 3
 
 # Step 4：提取全部视频数据（一次eval获取所有视频的所有指标！）
 opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 表格行懒加载+虚拟滚动陷阱（2026-06-26验证）**：投稿列表表格使用虚拟滚动，初始只渲染可见区域的行（约10-12行）。即使滚动到`scrollHeight`，也不会加载更多行——所有容器的`scrollHeight === clientHeight`，没有可滚动的父容器。**结果**：视频超过10条时，`document.body.innerText`只能获取前10条视频的数据，后半部分不可见。
+
+**应对策略**：
+1. **对于cron job（只关注新视频+近期变化）**：10行足够——新视频在最前面，已完成的旧视频变化微小
+2. **如果需要全部视频数据**：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动，可显示全部视频（但只有基础数据，没有完播率等详细指标）
+3. **不要尝试通过JavaScript强制加载更多行**：虚拟滚动是React组件层面的控制，无法通过DOM操作绕过
+
+```bash
+# Step 4：提取视频列表数据（虚拟滚动限制，只能获取前10-12行）
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 虚拟滚动限制**：`document.querySelectorAll('table tbody tr').length` 通常返回11（10条视频+1空行），即使账号有21条视频。这是虚拟滚动的正常行为，不是错误。对于cron job（只关注新视频+近期变化），10行数据已足够。
+
+**🔴 评论/分享互换：14次审计遗留的根因（2026-06-30总结）**
+
+这个错误已经连续14次审计被发现但从未在数据采集阶段修复。根因：**表格数据正确，但诊断文本写反了。**
+
+**错误模式**：表格显示 comments=0, shares=2（正确），但诊断文本写成"评论2，分享0"（错误）。
+
+**原因**：诊断文本是手写的，容易凭直觉把顺序搞反（发展日志列顺序是"点赞→评论→分享"，但数据源列顺序是"点赞→分享→评论"）。
+
+**修复方法**：写诊断文本时，**逐字对照表格行**：
+```
+表格行: V23 | ... | 4 | 0 | 2 | 1 | 已完成 |
+                          ↑  ↑  ↑  ↑
+                        点赞 评论 分享 收藏
+
+诊断文本: 点赞4，评论0（对应cells[10]），分享2（对应cells[9]），收藏1
+```
+
+**⚠️ 强制验证步骤**：写完诊断文本后，对比诊断中的评论数/分享数与表格行中的对应值。如果表格说"评论0、分享2"但诊断说"评论2、分享0"，就是互换错误。
+
+**⚠️ 表格列顺序映射（防止评论/分享互换，2026-06-26验证）**：数据中心投稿列表的列顺序与发展日志的列顺序**不同**，必须按以下映射转换：
+
+| 数据中心列顺序 | 发展日志列顺序 |
+|---------------|---------------|
+| 点赞量 (cells[8]) | 点赞 |
+| 分享量 (cells[9]) | 分享 |
+| 评论量 (cells[10]) | 评论 |
+| 收藏量 (cells[11]) | 收藏 |
+
+**⚠️ 关键**：数据中心是"点赞→分享→评论→收藏"，发展日志是"点赞→评论→分享→收藏"。评论和分享的顺序是**反的**！这是12次审核都发现评论/分享互换的根本原因。
+
+```javascript
+// ✅ 正确的eval提取代码（已验证2026-06-26）
+data.push({
+  likes: cells[8].textContent.trim(),    // 点赞量
+  shares: cells[9].textContent.trim(),   // 分享量
+  comments: cells[10].textContent.trim(), // 评论量
+  fav: cells[11].textContent.trim()      // 收藏量
+})
+
+// ✅ 正确的映射到发展日志
+// likes → 点赞
+// comments → 评论（注意：不是shares！）
+// shares → 分享（注意：不是comments！）
+// fav → 收藏
 ```
 
 **返回的数据结构**（直接包含所有指标，无需二次点击）：
@@ -291,17 +449,16 @@ onPreview触发的预览面板仍在跨域iframe中，无法eval访问。
 ```bash
 opencli browser douyin screenshot "D:/hermes-agent/douyin_data.png"
 ```
+**⚠️ vision_analyze已不可用（2026-06-22确认）**：mimo-v2.5的Xiaomi API拒绝tool message中的图片格式（报`400: Param Incorrect: text is not set`）。这是服务端breaking change，不是临时故障。**绝对不要用截图+vision_analyze方案**，直接用eval提取文本。
 
-### Step 3：用vision分析截图
-```
-vision_analyze(image_url="D:/hermes-agent/douyin_data.png", question="提取所有视频数据：播放量、点赞、评论、分享、收藏、完播率、2秒跳出率、涨粉量")
-```
-
-**⚠️ vision_analyze可能失败**：PackyAPI返回503 model_not_found（gemini模型无可用渠道）。失败时**立即降级到eval方案**：
 ```bash
+# ✅ 唯一可靠方法：eval提取文本
 opencli browser douyin eval "document.body.innerText"
+
+# ❌ 不要这样做（会报400错误）：
+# opencli browser douyin screenshot "xxx.png"
+# vision_analyze(image_url="xxx.png", question="...")
 ```
-不要重试vision，直接用eval提取文本数据。eval是唯一100%可靠的方法。
 
 ## ⚠️ 小样本数据解读（播放量<50）
 
@@ -323,7 +480,7 @@ opencli browser douyin eval "document.body.innerText"
 | 指标 | 合格 | 优秀 | 说明 |
 |------|------|------|------|
 | 完播率 | >15% | >30% | 2025年权重已下降，不再是第一指标 |
-| 5秒完播率 | >50% | >70% | 开头是否抓人，冷启动基础门槛 |
+| 5秒完播率 | ≥50% | >70% | 开头是否抓人，冷启动基础门槛（≥50%视为达标，从"5s完播率<50%"分组中移除） |
 | 2秒跳出率 | <30% | <15% | 开头是否抓人 |
 | 收藏率 | >2% | >5% | 2025年权重最高！代表"长尾价值" |
 | 点赞率 | >3% | >8% | 点赞/播放（权重最低，成本最低） |
@@ -494,7 +651,16 @@ sleep 5
 
 ### 流量分析页的关键指标
 
-**⚠️ 点击"流量分析"tab的坑（2026-06-10验证）**：`Array.from(document.querySelectorAll('*')).find(el => el.textContent.trim() === '流量分析' && el.offsetParent !== null)` 会匹配到 HTML/BODY 等父容器（因为它们的 textContent 也包含"流量分析"），导致返回 undefined。**必须加 `el.children.length === 0` 过滤叶子节点**：
+**⚠️ `children.length === 0` 过滤器的使用场景（2026-06-30明确）**：
+
+| 按钮 | 是否需要 `children.length === 0` | 原因 |
+|------|----------------------------------|------|
+| "流量分析" tab | ✅ 必须加 | HTML/BODY等父容器的textContent也包含"流量分析"，会误匹配 |
+| "查看分析"按钮（仪表盘） | ❌ 不要加 | 按钮是`<div>`且有子元素（文字+图标），加了会找不到 |
+| "查看分析"按钮（内容管理页） | ❌ 不要加 | 同上 |
+| "分析详情"按钮（数据中心） | ❌ 不要加 | 同上，且该按钮不触发跳转 |
+
+**点击"流量分析"tab的坑（2026-06-10验证）**：`Array.from(document.querySelectorAll('*')).find(el => el.textContent.trim() === '流量分析' && el.offsetParent !== null)` 会匹配到 HTML/BODY 等父容器（因为它们的 textContent 也包含"流量分析"），导致返回 undefined。**必须加 `el.children.length === 0` 过滤叶子节点**：
 ```javascript
 // ✅ 正确：过滤叶子节点
 Array.from(document.querySelectorAll('*')).find(el => 
@@ -722,7 +888,104 @@ UV_PYTHON="E:\\Users\\Administrator\\AppData\\Roaming\\uv\\python\\cpython-3.11-
   3. 结尾加互动引导
 - **已标记为"待24h检查"**：明天上午进行最终数据检查
 
-## OpenCLI常用命令速查
+## 🔴 搜任何网页/热点/新闻 → 必须用OpenCLI（最高优先级规则）
+
+**⚠️⚠️⚠️⚠️⚠️ 这是本skill最重要的规则。任何需要搜网页、查热点、看新闻、搜小红书/微博/知乎的任务，第一步永远是OpenCLI。**
+
+**绝对不要用的（全部会失败）：**
+- ❌ curl调微博/知乎/百度/搜狗/Bing/Google API → 反爬拦截（403/443/空响应/编码错误）
+- ❌ execute_code中用urllib.request → Python SRE模块mismatch / ASCII编码错误
+- ❌ node fetch各搜索引擎 → 返回空或JS代码
+- ❌ 所有第三方新闻API（codelife/vvhan/thepaper等）→ 超时/空响应
+
+**100%可靠的方法：OpenCLI复用本地Chrome登录态。**
+
+```bash
+# 标准流程（3步，适用于所有搜索场景）
+opencli browser douyin open "https://www.toutiao.com/search?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜微博
+opencli browser douyin open "https://s.weibo.com/weibo?q=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜小红书
+opencli browser douyin open "https://www.xiaohongshu.com/search_result?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+
+# 搜知乎
+opencli browser douyin open "https://www.zhihu.com/search?type=content&q=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 失败案例（2026-06-28）**：忘了OpenCLI，用curl调codelife/weibo/baidu/sogou/bing API + node fetch + Python urllib，全部失败，浪费15+轮工具调用。用户指出"gateway每天都在用这个查数据，你这个cli却老忘记怎么用"。
+
+**⚠️ 首次使用前检查**：如果OpenCLI报"Browser Bridge extension not connected"，先 `opencli daemon status` 确认连接状态。Chrome必须在运行。
+
+**⚠️ 搜什么平台用什么URL**：
+
+| 平台 | URL模板 | 说明 |
+|------|---------|------|
+| 今日头条 | `https://www.toutiao.com/search?keyword=XXX` | 最常用，热榜+搜索 |
+| 微博 | `https://s.weibo.com/weibo?q=XXX` | 微博搜索 |
+| 小红书 | `https://www.xiaohongshu.com/search_result?keyword=XXX` | 需登录 |
+| 知乎 | `https://www.zhihu.com/search?type=content&q=XXX` | 知乎搜索 |
+| 百度 | `https://www.baidu.com/s?wd=XXX` | 百度搜索 |
+
+## 用OpenCLI搜索热点新闻（通用方法）
+
+**适用场景**：搜微博热搜、头条热点、抖音热搜等中文平台内容。
+
+**最佳方法：用头条搜索页 + eval提取文本**
+```bash
+# 搜索关键词
+opencli browser douyin open "https://www.toutiao.com/search?keyword=关键词"
+sleep 5
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 不要用curl/API抓中文新闻站**：微博、知乎、百度等都有反爬机制，curl返回空或403。OpenCLI复用Chrome登录态，是最可靠的方法。
+
+**⚠️ 操作节奏：每次操作之间加 `sleep 5-8`，模拟人操作。不要连续快速调用。**
+
+**⚠️ 搜索多个关键词时**：每次搜索之间 `sleep 8`，避免触发风控。
+
+**搜索顺序**：先 `open` 打开搜索页 → `sleep 5` → `eval "document.body.innerText"` 提取内容。
+
+## ⚠️ OpenCLI Chrome扩展断连修复（2026-06-28验证）
+
+**症状**：`opencli browser douyin open` 超时或返回"Browser Bridge extension not connected"
+
+**快速修复流程（2026-07-03验证）**：
+```bash
+# 1. 重启daemon
+opencli daemon restart
+sleep 5
+
+# 2. 直接尝试open，不要等daemon status显示connected
+opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
+sleep 8
+
+# 3. 提取数据
+opencli browser douyin eval "document.body.innerText"
+```
+
+**⚠️ 关键发现（2026-07-03）**：`daemon status` 可能一直显示 "Extension: disconnected"，但 `opencli browser douyin open` 仍然可以成功！不要因为状态显示 disconnected 就放弃尝试。重启 daemon 后直接尝试 open，成功了就继续用。
+
+**如果 open 确实超时/失败**，再检查 Chrome 是否运行：
+```bash
+tasklist | grep -i chrome
+# 如果没运行，启动Chrome（见上方"启动 Chrome 的正确命令"）
+# 如果在运行，尝试打开 chrome://extensions/ 刷新Browser Bridge扩展
+```
+
+**⚠️ 注意**：`opencli doctor` 经常挂起30秒+，用 `opencli daemon status` 代替（<2秒返回）。
+
+## OpenCLI 常用命令速查
 
 ```bash
 # 打开页面（前台模式，可能超时）
@@ -801,8 +1064,10 @@ terminal(command='"/c/Program Files/Google/Chrome/Application/chrome.exe" --prof
 sleep 12
 
 # Step 3：验证连接状态
-opencli doctor
-# 应显示：[OK] Extension: connected
+opencli daemon status  # ⚡ 比 opencli doctor 快得多（<2s vs 可能超时30s+）
+# 应显示：Extension: connected
+# ⚠️ opencli doctor 经常挂起/超时（30s+无响应），用 daemon status 代替
+# daemon status 返回：Daemon: running, Extension: connected, Port: XXXXX
 
 # Step 4：验证 Chrome 在运行
 tasklist | grep -i chrome
@@ -817,7 +1082,7 @@ tasklist | grep -i chrome
 5. **验证步骤不能省**：启动后必须用 `opencli doctor` 确认连接成功
 
 ### 如果 Browser Bridge 未连接
-
+### ⚠️ 如果 Browser Bridge 未连接
 ```bash
 # 检查 Chrome 是否在运行
 tasklist | grep -i chrome
@@ -825,10 +1090,35 @@ tasklist | grep -i chrome
 # 如果 Chrome 在运行但扩展未连接，重启 daemon
 opencli daemon restart
 sleep 5
-opencli doctor
+opencli daemon status  # ⚡ 用 daemon status 而非 doctor
 
 # 如果仍未连接，可能需要重新加载扩展（见上方"扩展完全未安装时的手动安装"）
 ```
+
+### ⚠️ CDP 直连备选方案（2026-07-03验证）
+
+当 OpenCLI 完全无法连接时，可以用 Hermes 的 `browser_cdp` 工具直接操作 Chrome：
+
+```bash
+# 1. 启动Chrome带remote debugging port（⚠️ 不要指定--user-data-dir，保留登录态）
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --no-first-run --restore-last-session &ugging port（⚠️ 不要指定--user-data-dir，保留登录态）
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --no-first-run --restore-last-session &
+sleep 12
+
+# 2. 验证CDP端口
+curl -s http://localhost:9222/json/version
+
+# 3. 设置Hermes browser config
+hermes config set browser.cdp_url "ws://127.0.0.1:9222"
+
+# 4. 用browser_cdp导航和提取数据
+# browser_cdp(method="Page.navigate", params={"url": "..."}, target_id="...")
+# browser_cdp(method="Runtime.evaluate", params={"expression": "document.body.innerText", "returnByValue": true}, target_id="...")
+```
+
+**⚠️ CDP的限制**：如果指定了错误的`--user-data-dir`路径，会创建没有登录态的Chrome。解决：不要指定`--user-data-dir`，让Chrome自动用默认目录。
+
+**⚠️ 默认user-data-dir的lockfile问题**：如果Chrome已经用默认profile运行，`--remote-debugging-port=9222` 会被lockfile阻止。必须用独立 `--user-data-dir`。
 
 ### 完整的 Cron Job 启动流程
 
@@ -840,8 +1130,8 @@ if ! tasklist 2>/dev/null | grep -qi chrome; then
   sleep 12
 fi
 
-# 2. 验证 OpenCLI 连接
-opencli doctor
+# 2. 验证 OpenCLI 连接（⚡ 用 daemon status 而非 doctor，doctor 经常超时）
+opencli daemon status
 # 如果未连接，重启 daemon
 # opencli daemon restart
 
@@ -952,17 +1242,16 @@ opencli browser douyin eval "document.body.innerText"
 点赞 9 / 评论 2 / 分享 0 / 收藏 0 / 弹幕 0
 ```
 
-**备选：截图+vision分析**（当innerText提取失败或需要视觉验证时使用）
+**⚠️ vision_analyze已不可用（2026-06-22确认）**：mimo-v2.5的Xiaomi API拒绝tool message中的图片格式（报`400: Param Incorrect: text is not set`）。这是服务端breaking change，不是临时故障。**绝对不要用截图+vision_analyze方案**，直接用eval提取文本。
+
 ```bash
-opencli browser douyin screenshot "D:/hermes-agent/douyin_data.png"
-# 然后用 vision_analyze 分析
+# ✅ 唯一可靠方法：eval提取文本
+opencli browser douyin eval "document.body.innerText"
+
+# ❌ 不要这样做（会报400错误）：
+# opencli browser douyin screenshot "xxx.png"
+# vision_analyze(image_url="xxx.png", question="...")
 ```
-
-### ⚠️ 关于视频详情页（work-detail）
-
-视频详情页有更完整的数据（完播率、2秒跳出率、涨粉量等）。
-
-**✅ 正确方法**：在内容管理页（`/content-manage/video`）或仪表盘（`/home`）点击"查看分析"按钮，会跳转到详情页。详情页内容在跨域iframe中，但可以通过eval提取`document.body.innerText`获取数据。
 
 ```bash
 # 在内容管理页点击最新视频的"查看分析"
@@ -1045,7 +1334,35 @@ opencli browser douyin open "https://creator.douyin.com/creator-micro/data-cente
 opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
 ```
 
-## ⚠️⚠️⚠️ 每次查看数据前必须做的事（血的教训）
+### ⚠️ `opencli doctor` 经常挂起/超时（2026-06-25验证）
+
+**`opencli doctor` 命令可能挂起30秒以上无响应。** 替代方案：
+
+```bash
+# ❌ opencli doctor 经常超时
+opencli doctor  # 可能挂起30s+
+
+# ✅ 用 opencli daemon status 代替（<2秒返回）
+opencli daemon status
+# 返回：Daemon: running, Extension: connected, Port: XXXXX
+```
+
+**`daemon status` 返回的信息等价于 `doctor`**（都显示连接状态），但速度快10倍以上。在cron job中优先使用 `daemon status`。
+
+**`opencli doctor` 命令可能挂起30秒以上无响应。** 替代方案：
+
+```bash
+# ❌ opencli doctor 经常超时
+opencli doctor  # 可能挂起30s+
+
+# ✅ 用 opencli daemon status 代替（<2秒返回）
+opencli daemon status
+# 返回：Daemon: running, Extension: connected, Port: XXXXX
+```
+
+**`daemon status` 返回的信息等价于 `doctor`**（都显示连接状态），但速度快10倍以上。在cron job中优先使用 `daemon status`。
+
+### ⚠️ ⚠️ ⚠️ 每次查看数据前必须做的事（血的教训）
 
 **第零步：先读发展日志（references/发展日志.md）！**
 
@@ -1118,29 +1435,40 @@ opencli browser douyin open "https://creator.douyin.com/creator-micro/data-cente
 
 **`execute_code` 在 cron job 中被禁止**（无用户审批模式）。如果需要用 Python 处理数据（如格式化报告、计算比率），改用 `terminal` 执行 Python 脚本，或直接在 final response 中手写 markdown 表格。
 
-### ⚠️ Python 执行方式（2026-06-20验证）
+### ⚠️ Python 执行方式（2026-06-23更新）
 
-**`python3` 命令在本机返回 exit code 49（Windows Store stub），必须用 `uv run python` 代替。**
+**`python3` 命令在本机返回 exit code 49（Windows Store stub），必须用 `python` 或 `uv run python` 代替。**
 
 ```bash
 # ❌ python3 返回 exit code 49（Windows Store stub）
 python3 script.py  # exit code 49
+python3 -c "print(1)"  # exit code 49
 
-# ✅ 用 uv run python
+# ✅ 用 python（不带3）
+python script.py
+python -c "print(1)"
+
+# ✅ 或用 uv run python
 uv run python script.py
 ```
 
-**完整流程**：写脚本到文件 → 用 `uv run python` 执行 → 读取结果
+**terminal中直接用 `python -c "..."` 最简单**，无需写脚本文件。
+
+### ⚠️ 批量更新发展日志：用多次 `patch` 而非 Python 脚本
+
+**当需要同时更新多个数据行（如新视频+多个已有视频数据微调）时，不要写一个大 Python 脚本用 Unicode 转义序列（`\uXXXX`）拼接中文字符串。** Unicode 转义序列在 MSYS 环境下匹配文件中的中文文本时经常失败（字符编码不一致），导致 `str.replace()` 找不到目标。
+
+**正确做法**：用多次 `patch` 调用，每次传入实际的中文字符串：
 ```bash
-# 1. 写脚本到临时文件
-write_file(path="E:/Users/Administrator/AppData/Local/hermes/scripts/tmp_fix.py", content="...")
+# ✅ 正确：多次 patch，直接用中文
+patch(path="发展日志.md", old_string="| V21 | 脱碳甲醛...", new_string="| V22 | HR... |\n| V21 | 脱碳甲醛...")
+patch(path="发展日志.md", old_string="| V20 | 父母为你好... | 1,981", new_string="| V20 | 父母为你好... | 2,000")
 
-# 2. 用 uv run python 执行
-uv run python E:/Users/Administrator/AppData/Local/hermes/scripts/tmp_fix.py
-
-# 3. 清理
-rm E:/Users/Administrator/AppData/Local/hermes/scripts/tmp_fix.py
+# ❌ 错误：Python 脚本用 \u 转义序列
+content = content.replace("\u0056\u0032\u0031...", "| V22 ...")  # 经常匹配失败
 ```
+
+**什么时候可以用 Python**：只有当替换内容不包含中文字符（如纯数字、英文、百分比）时，Python 脚本才可靠。
 
 ### ⚠️ patch 工具匹配失败的 Python 回退方案
 
@@ -1288,7 +1616,7 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
    - 数据漂移可能导致视频脱离或进入某个分组（如V18播放123→127，点赞率0.81%→0.79%）
    - 小样本视频（播放<50）的比率可能大幅波动（如V19从1→3播放，点赞率0%→33.33%），需在分组中注明"样本无意义"
    - 更新分组时，用最新的播放量和互动数重新计算每个视频的比率，确保分组准确
-4. **⚠️ "已完成"视频也可能有数据漂移**：即使视频已标记"已完成"，播放量/点赞等仍可能微增（如V17从580→723）。更新表格时检查所有视频的最新数据，不只是新视频。
+4. **⚠️ "已完成"视频也可能有显著增长（2026-06-22验证）**：即使视频已标记"已完成"，播放量仍可能大幅增长。**V22案例**：24h检查时807播放标记"已完成"，但后续增长到1,471（+82.3%），接近往期均值。**规则**：每次cron job检查时，都要对比发展日志中"已完成"视频的播放量与数据中心最新值，发现显著增长（>20%）则更新记录。
 5. 如果有里程碑事件（破1000播放、破100赞等），更新里程碑表
 6. 如果发现新的经验教训，添加到"经验教训"部分
 7. 更新待验证假设的状态（验证了就打勾）
@@ -1460,6 +1788,35 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 3. **系统级统计（条均完播率、5s均值）在新视频添加后必须重新计算**
 4. **里程碑中的数值必须与表格最终值对齐**（如V13播放应为2456而非2447）
 
+### ⚠️ 遗漏陷阱：质量恶化趋势被高推荐率掩盖（2026-06-23发现）
+
+**问题**：视频推荐页占比高（>99%）时，诊断容易只关注"算法在推"而忽略质量指标的下滑。
+
+**案例**：V21→V22
+- V22推荐页99.4%，诊断只说"算法强力推荐"
+- 但播放量从1,808降至1,471（-18.6%），完播率从3.29%降至1.64%（-50.2%），点赞从12降至5（-58.3%）
+- 质量指标全面下滑，诊断完全未提及
+
+**规则**：
+1. **趋势对比必须用同阶段数据**：对比V21和V22时，都用最终值或都用首次值
+2. **推荐页占比高不代表内容质量好**：算法推流≠内容留人，必须同时检查完播率、互动率趋势
+3. **当连续2+个视频质量指标下降时，必须在诊断中标注恶化趋势**
+4. **审核时对最近3个视频做"质量趋势表"**：播放量、完播率、5s完播率、点赞数逐个对比
+
+### ⚠️ 遗漏陷阱：话题类型规律未总结（2026-06-23发现）
+
+**问题**：数据中存在明显的话题类型规律，但诊断只逐条分析没有归纳。
+
+**案例**：辟谣/科普话题完播率普遍高于均值
+- V8(金价暴跌) 6.61%、V13(西瓜打针) 3.28%、V21(脱碳甲醛) 3.29%、V23(圣女果) 5.45%
+- 均值2.83%，该类型全部高于均值
+- 诊断未归纳此规律
+
+**规则**：
+1. **每5个视频后做一次"话题类型分析"**：按话题分类统计平均完播率、互动率
+2. **发现某类话题持续表现好/差时，必须在诊断中归纳并更新选题优先级**
+3. **审核时检查诊断是否遗漏了跨视频的规律性发现**
+
 ### 审核陷阱：优化分组表首次值残留（2026-06-21发现）
 
 **问题**：新视频首次检查时，数据被添加到"关键优化方向"分组表。但24h最终数据来后，分组表中的数值没有同步更新。V21在分组表中显示5s完播率=38.60%、点赞率=0.90%、评论率=0.10%（首次检查值），实际最终值为44.56%、0.68%、0.06%。
@@ -1470,6 +1827,52 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 1. **每次新视频最终数据检查后，必须遍历"关键优化方向"分组表，确认该视频的所有比率值已更新为最终值**
 2. **特别注意首次检查时用旧播放量计算的比率**：如V21首次998播放时点赞率0.90%（9/998），最终1770播放时0.68%（12/1770），分组表必须用最终值
 3. **审核时对分组表做"数据新鲜度检查"**：对比分组表中的每个数值与数据表最终值，不一致则标记
+
+### 审核陷阱：三处数据不同步（2026-06-23发现）
+
+**问题**：同一视频的数据在三个位置不一致——数据记录表（表格）、诊断正文、里程碑。更新其中一处后遗漏另外两处。
+
+**案例**：V19「纸尿裤」
+- 表格：播放6，2s跳出率60%，评论0
+- 诊断正文：播放3，2s跳出率50%，评论1（33.33%）
+- 里程碑：播放3，2s跳出率50%
+- → 表格已更新至6播放，但诊断和里程碑仍引用旧的3播放数据
+
+**根因**：数据更新时只修改了表格，没有回溯检查诊断正文和里程碑中引用的同一视频数据。
+
+**规则**：
+1. **每次更新表格数据后，必须在诊断正文和里程碑中搜索该视频的所有引用，同步更新**
+2. **审核时对每个视频做"三处交叉验证"**：表格值 = 诊断值 = 里程碑值
+3. **优先级：表格为准**，诊断和里程碑必须与表格对齐
+
+### 审核陷阱：错误均值导致错误诊断结论（2026-06-23发现）
+
+**问题**：播放量均值计算错误后，诊断结论中引用均值做的判断也随之错误。
+
+**案例**：
+- 日志均值1,553（实际1,386，偏差+12.0%）
+- V22诊断称"播放量1,471接近往期均值"
+- 实际：1,471 > 1,386（高于均值6.1%），应表述为"略高于均值"
+
+**规则**：
+1. **均值/中位数必须先独立验证正确，再用其做诊断判断**
+2. **诊断中涉及"接近均值""高于/低于均值"的表述，必须用实际均值重新验证**
+3. **当均值错误被修正后，所有引用均值的诊断结论必须逐条复核**
+4. **低播放量视频会显著拉低均值（2026-06-28验证）**：V27仅107播放，将均值从1,460拉低至1,375（-5.8%）。当新视频播放量远低于往期均值时，均值会大幅下降，此时"播放量接近均值"的判断需要更新为"播放量低于均值"。诊断结论中引用均值时，必须用最新计算值。
+
+### 审核陷阱：跨阶段数据对比（2026-06-23发现）
+
+**问题**：对比两个视频时混用首次检查值和最终值，导致对比不公平。
+
+**案例**：V23诊断称"5s完播率42.45%优于V22（42.17%）"
+- V23是首次检查值（42.45%）
+- V22引用的是最终值（42.17%）
+- V22首次检查值其实是44.91%——如果用同阶段对比，V23(42.45%) < V22首次(44.91%)
+
+**规则**：
+1. **同阶段对比原则**：对比两个视频时，必须使用相同检查阶段的数据（都是首次检查值，或都是最终值）
+2. **如果必须跨阶段对比，必须明确标注**："V23首次检查完播率5.45%高于V22最终值1.64%"
+3. **审核时检查诊断中的跨视频对比是否使用了同阶段数据**
 
 ### 审核陷阱：中位数反复计算错误（2026-06-21发现，多次审计反复出现）
 

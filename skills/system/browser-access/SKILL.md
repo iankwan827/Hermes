@@ -34,11 +34,22 @@ curl -s http://localhost:9222/json/version
 
 # 2. 如果通了，直接用browser工具，不用管Chrome
 # 3. 如果不通，Chrome可能没启动或被关了，启动它：
-"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --user-data-dir="C:/Users/Administrator/AppData/Local/Google/Chrome/User Data" --profile-directory="Default" --no-first-run --restore-last-session &
+#    ⚠️ 不要指定--user-data-dir！让Chrome自动用默认目录（保留Google账号登录态）
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 &
 
 # 4. 验证端口（必须看到JSON输出）
 sleep 8 && curl -s http://localhost:9222/json/version
 ```
+
+**⚠️ 关键**：不要指定`--user-data-dir`参数！Chrome会自动使用用户默认目录（可能是C盘或E盘），保留所有登录态（Google账号、抖音等）。如果指定了错误的路径，会创建一个干净的Chrome，丢失所有登录。
+
+**⚠️ 前提**：Chrome快捷方式已配置CDP参数（`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk`）。如果快捷方式被Chrome更新覆盖，需要重新添加参数。
+- ❌ 杀掉正在运行的Chrome再重启（会导致用户看到新Chrome窗口，丢失Google账号登录态）
+- ❌ 启动第二个Chrome实例（Chrome是单实例应用，新实例会合并到旧会话，CDP参数被忽略）
+
+**⚠️ 如果Chrome已经在跑但端口不通**：
+- 告知用户：需要关掉所有Chrome窗口，从开始菜单重新启动
+- 不要偷偷杀Chrome，用户会看到新窗口
 
 **⚠️ 前提**：Chrome快捷方式已配置CDP参数（`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk`）。如果快捷方式被Chrome更新覆盖，需要重新添加参数。
 
@@ -80,6 +91,28 @@ browser_click(ref="@eN")  # 点击对应元素
 5. **Chrome快捷方式已配置CDP参数**：从开始菜单启动即可，不用手动加参数
 6. **定时任务不要杀Chrome**：直接检查端口，通了就用，不通再启动
 7. **如果Chrome更新覆盖了快捷方式**：需要重新添加`--remote-debugging-port=9222`参数
+
+### ⚠️⚠️⚠️ Chrome单实例行为（血的教训，2026-07-03）
+
+**Chrome是单实例应用。** 如果Chrome已经在运行，再启动一个带`--remote-debugging-port=9222`的Chrome，它**不会创建新进程**，而是打开一个新窗口到已有的Chrome会话。已有的会话没有CDP参数，所以端口9222永远不会开。
+
+**症状**：
+- Chrome进程在跑，`--remote-debugging-port=9222`参数也在命令行里
+- 但`curl localhost:9222`无响应
+- 用户看到一个新Chrome窗口，但不是他平时用的那个
+
+**根本原因**：Chrome检测到已有会话，把新窗口合并到旧会话，CDP参数被忽略。
+
+**正确做法**：Chrome必须从一开始就带CDP参数启动。如果Chrome已经在跑，不能通过启动新实例来开启CDP。
+
+**定时任务的正确流程**：
+1. 检查端口9222是否通
+2. 通了 → 直接用browser工具
+3. 不通 → Chrome可能没启动或没带CDP参数
+4. **不要杀Chrome重启**（会导致用户看到新Chrome窗口）
+5. 告知用户：需要关掉Chrome，从开始菜单重新启动（快捷方式已配置CDP参数）
+
+**用户原话**："我平常用的chrome是登录了我的谷歌账号的，那你打开那个是没有账号登录的"
 
 ## 方案B（备选）：OpenCLI浏览器桥
 
@@ -179,6 +212,18 @@ opencli browser douyin eval "document.body.innerText"
 | 抖音 | `https://www.douyin.com/search/XXX` |
 
 ## Pitfalls
+
+### Chrome单实例行为导致CDP端口不开
+- **症状**：Chrome进程在跑，`--remote-debugging-port=9222`在命令行里，但`curl localhost:9222`无响应
+- **原因**：Chrome是单实例应用。如果Chrome已经在运行，启动新实例会合并到旧会话，CDP参数被忽略
+- **解决**：必须关掉所有Chrome窗口，从开始菜单重新启动（快捷方式已配置CDP参数）
+- **绝对不要**：杀掉Chrome再重启（会导致用户看到新Chrome窗口，丢失Google账号登录态）
+
+### Chrome没有Google账号登录
+- **症状**：打开Chrome发现没有登录Google账号，书签、密码都没了
+- **原因**：启动Chrome时指定了错误的`--user-data-dir`路径（如C盘，但实际在E盘）
+- **解决**：不要指定`--user-data-dir`，让Chrome自动用默认目录
+- **⚠️ 关键**：Chrome会自动检测用户的默认数据目录，不需要手动指定
 
 ### Chrome快捷方式被更新覆盖
 - **症状**：定时任务又开始杀Chrome重启
