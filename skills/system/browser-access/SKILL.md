@@ -26,23 +26,21 @@ platforms: [windows]
 
 ### 启动Chrome（如未运行）
 
-**⚠️ 必须用原来的Chrome用户目录**，否则没有登录态（抖音、头条等账号都没登录）。
-
-**⚠️ 不能同时开两个Chrome实例用同一个用户目录**（lockfile冲突）。必须先关掉现有Chrome再启动。
+**Chrome快捷方式已配置`--remote-debugging-port=9222`**，从开始菜单启动即可。定时任务不需要杀Chrome重启。
 
 ```bash
-# 1. 先杀掉已有Chrome（必须用PowerShell，bash的taskkill杀不干净）
-powershell.exe -NoProfile -Command "Get-Process chrome -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue"
-sleep 3
+# 1. 先检查CDP端口是否通
+curl -s http://localhost:9222/json/version
 
-# 2. 用原来的用户目录 + CDP端口启动（保持所有登录态）
+# 2. 如果通了，直接用browser工具，不用管Chrome
+# 3. 如果不通，Chrome可能没启动或被关了，启动它：
 "/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --user-data-dir="C:/Users/Administrator/AppData/Local/Google/Chrome/User Data" --profile-directory="Default" --no-first-run --restore-last-session &
 
-# 3. 验证端口（必须看到JSON输出）
+# 4. 验证端口（必须看到JSON输出）
 sleep 8 && curl -s http://localhost:9222/json/version
 ```
 
-**⚠️ 前提**：执行前必须确认Chrome没在跑。如果用户正在用Chrome，需要先告诉用户关掉Chrome，再执行上面的命令。不要偷偷杀掉用户正在用的Chrome。
+**⚠️ 前提**：Chrome快捷方式已配置CDP参数（`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk`）。如果快捷方式被Chrome更新覆盖，需要重新添加参数。
 
 ### 工具对照表
 
@@ -79,9 +77,9 @@ browser_click(ref="@eN")  # 点击对应元素
 2. **改完config必须`/reset`**：当前session不生效
 3. **Chrome一旦跑起来不要杀**：不要因为某次调用失败就杀Chrome重来
 4. **browser_console返回JSON**：需要解析返回值，不是直接文本
-5. **必须用原来的Chrome用户目录**：`C:/Users/Administrator/AppData/Local/Google/Chrome/User Data`，否则没有登录态
-6. **不能同时开两个Chrome**：启动CDP版前必须先关掉现有Chrome
-7. **启动前告知用户**：不要偷偷杀掉用户正在用的Chrome
+5. **Chrome快捷方式已配置CDP参数**：从开始菜单启动即可，不用手动加参数
+6. **定时任务不要杀Chrome**：直接检查端口，通了就用，不通再启动
+7. **如果Chrome更新覆盖了快捷方式**：需要重新添加`--remote-debugging-port=9222`参数
 
 ## 方案B（备选）：OpenCLI浏览器桥
 
@@ -182,11 +180,11 @@ opencli browser douyin eval "document.body.innerText"
 
 ## Pitfalls
 
-### Chrome没有登录态
-- **症状**：打开抖音/头条发现没有登录
-- **原因**：用了独立`--user-data-dir`（如`D:/chrome-cdp`），不是原来的用户目录
-- **解决**：必须用`--user-data-dir="C:/Users/Administrator/AppData/Local/Google/Chrome/User Data"`
-- **⚠️ 前提**：执行前先关掉正在运行的Chrome，否则lockfile冲突
+### Chrome快捷方式被更新覆盖
+- **症状**：定时任务又开始杀Chrome重启
+- **原因**：Chrome更新可能覆盖快捷方式，丢失`--remote-debugging-port=9222`参数
+- **解决**：重新添加参数到快捷方式
+- **检查方法**：`powershell.exe -NoProfile -Command "(New-Object -ComObject WScript.Shell).CreateShortcut('C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Google Chrome.lnk').Arguments"`
 
 ### Chrome反复闪烁问题
 - **原因**：某次调用失败就杀Chrome重来
