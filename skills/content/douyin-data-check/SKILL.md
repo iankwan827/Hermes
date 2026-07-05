@@ -960,21 +960,25 @@ opencli browser douyin eval "document.body.innerText"
 
 **症状**：`opencli browser douyin open` 超时或返回"Browser Bridge extension not connected"
 
-**快速修复流程（2026-07-03验证）**：
+**快速修复流程（2026-07-04验证）**：
 ```bash
-# 1. 重启daemon
+# 1. 先用 state 检查（最快，<2秒）
+opencli browser douyin state
+# 如果返回 URL 和 viewport，说明连接正常，跳到步骤3
+
+# 2. 如果 state 失败，重启 daemon（可能超时，没关系）
 opencli daemon restart
 sleep 5
 
-# 2. 直接尝试open，不要等daemon status显示connected
+# 3. 直接尝试 open，不要等 daemon status 显示 connected
 opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
 sleep 8
 
-# 3. 提取数据
+# 4. 提取数据
 opencli browser douyin eval "document.body.innerText"
 ```
 
-**⚠️ 关键发现（2026-07-03）**：`daemon status` 可能一直显示 "Extension: disconnected"，但 `opencli browser douyin open` 仍然可以成功！不要因为状态显示 disconnected 就放弃尝试。重启 daemon 后直接尝试 open，成功了就继续用。
+**⚠️ 关键发现（2026-07-04）**：`daemon status` 和 `daemon restart` 都可能超时（10-15秒无响应），但 `opencli browser douyin state` 通常能在2秒内返回。如果 `state` 能返回 URL 和 viewport，说明 OpenCLI 连接正常，直接用 `open` 和 `eval` 即可。不要因为 `daemon status` 超时就以为连接断了——`state` 才是最快的诊断方式。
 
 **如果 open 确实超时/失败**，再检查 Chrome 是否运行：
 ```bash
@@ -1130,14 +1134,15 @@ if ! tasklist 2>/dev/null | grep -qi chrome; then
   sleep 12
 fi
 
-# 2. 验证 OpenCLI 连接（⚡ 用 daemon status 而非 doctor，doctor 经常超时）
-opencli daemon status
-# 如果未连接，重启 daemon
-# opencli daemon restart
+# 2. 用 state 检查 OpenCLI 连接（⚡ 最快，<2秒）
+opencli browser douyin state
+# 如果返回 URL 和 viewport，直接跳到步骤3
+# 如果 state 失败，尝试 daemon restart（可能超时）
+# opencli daemon restart && sleep 5
 
 # 3. 打开抖音创作者中心
-opencli browser douyin open "https://creator.douyin.com/creator-micro/content-manage/video"
-sleep 5
+opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
+sleep 8
 
 # 4. 提取数据
 opencli browser douyin eval "document.body.innerText"
