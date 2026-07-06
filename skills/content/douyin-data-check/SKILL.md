@@ -250,7 +250,28 @@ opencli browser douyin eval "document.body.innerText"
 
 **⚠️ 强制验证步骤**：写完诊断文本后，对比诊断中的评论数/分享数与表格行中的对应值。如果表格说"评论0、分享2"但诊断说"评论2、分享0"，就是互换错误。
 
-**⚠️ 表格列顺序映射（防止评论/分享互换，2026-06-26验证）**：数据中心投稿列表的列顺序与发展日志的列顺序**不同**，必须按以下映射转换：
+**⚠️ 表格列顺序映射（防止评论/分享互换，2026-07-06更新）**：数据中心投稿列表的表格有**15列**（不是16列），列顺序与发展日志**不同**，必须按以下映射转换：
+
+**⚠️ 实际列索引（2026-07-06实测验证）**：
+```
+cells[0]:  作品名称（标题）
+cells[1]:  审核状态（"通过"）
+cells[2]:  播放量 ← ⚠️ 不是cells[3]！
+cells[3]:  完播率
+cells[4]:  5s完播率
+cells[5]:  封面点击率（通常为"-"）
+cells[6]:  2s跳出率
+cells[7]:  平均播放时长
+cells[8]:  点赞量
+cells[9]:  分享量
+cells[10]: 评论量
+cells[11]: 收藏量
+cells[12]: 主页访问量
+cells[13]: 粉丝增量
+cells[14]: 操作（"分析详情"）
+```
+
+**⚠️ 重要**：发布日期不在表格cells中！日期显示在innerText文本里但不是独立的td元素。提取日期需要从innerText解析。
 
 | 数据中心列顺序 | 发展日志列顺序 |
 |---------------|---------------|
@@ -262,12 +283,21 @@ opencli browser douyin eval "document.body.innerText"
 **⚠️ 关键**：数据中心是"点赞→分享→评论→收藏"，发展日志是"点赞→评论→分享→收藏"。评论和分享的顺序是**反的**！这是12次审核都发现评论/分享互换的根本原因。
 
 ```javascript
-// ✅ 正确的eval提取代码（已验证2026-06-26）
+// ✅ 正确的eval提取代码（已验证2026-07-06）
+// 先用这个验证列索引：
+// opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('table tbody tr'); var r = []; for (var i = 0; i < rows.length; i++) { var c = rows[i].querySelectorAll('td'); if (c.length >= 5) { var a = []; for (var j = 0; j < Math.min(c.length, 16); j++) { a.push(j + ':' + c[j].textContent.trim().substring(0, 20)); } r.push('ROW' + i + ' [' + c.length + ' cells]: ' + a.join(' | ')); } } return r.join('\\n'); })()"
+
+// 正确提取数据：
 data.push({
-  likes: cells[8].textContent.trim(),    // 点赞量
-  shares: cells[9].textContent.trim(),   // 分享量
-  comments: cells[10].textContent.trim(), // 评论量
-  fav: cells[11].textContent.trim()      // 收藏量
+  plays: cells[2].textContent.trim(),     // 播放量（⚠️ 不是cells[3]！）
+  completion: cells[3].textContent.trim(), // 完播率
+  fiveSec: cells[4].textContent.trim(),    // 5s完播率
+  twoSec: cells[6].textContent.trim(),     // 2s跳出率（⚠️ 不是cells[7]！）
+  avgDur: cells[7].textContent.trim(),     // 平均播放时长
+  likes: cells[8].textContent.trim(),      // 点赞量
+  shares: cells[9].textContent.trim(),     // 分享量
+  comments: cells[10].textContent.trim(),  // 评论量
+  fav: cells[11].textContent.trim()        // 收藏量
 })
 
 // ✅ 正确的映射到发展日志
@@ -276,6 +306,8 @@ data.push({
 // shares → 分享（注意：不是comments！）
 // fav → 收藏
 ```
+
+**⚠️ 首次提取前必须验证列索引**：不同页面版本的列数可能不同（15列vs16列）。在写提取代码前，先用上方的验证代码确认实际列索引。本次session（2026-07-06）实测：15列，plays=cells[2]，不是cells[3]。
 
 **返回的数据结构**（直接包含所有指标，无需二次点击）：
 ```
