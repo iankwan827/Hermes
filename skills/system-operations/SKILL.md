@@ -88,10 +88,52 @@ git rm <旧路径文件>    # 删除旧路径（如果存在）
 
 **❌ 不同步的文件：** .env（API密钥）、auth.json（OAuth令牌）、sessions/（会话数据）、logs/、*.db、cache/、gateway.lock/pid
 
+### ⚠️ GitHub 连接问题：代理/防火墙绕过
+
+在某些网络环境下（如中国大陆），GitHub HTTPS (443端口) 可能被防火墙阻断，但 ICMP ping 正常。症状：`git pull/push` 超时，curl 也连不上 `github.com:443`。
+
+#### 解决方案：GitHub 加速代理
+
+```bash
+# 1. 设置代理（用于 pull/fetch，解决了连接问题）
+git config --global url."https://ghfast.top/https://github.com/".insteadOf "https://github.com/"
+
+# 2. 拉取
+git pull origin main --rebase
+
+# 3. 清理代理后推送（push 走代理反而超时）
+git config --global --unset url."https://ghfast.top/https://github.com/".insteadOf
+git push origin main
+```
+
+**关键发现**：`ghfast.top` 代理对 pull 生效但 push 会超时。正确流程是：设置代理 → pull → 清理代理 → push。
+
+#### SSH 方案（备选）
+
+如果不想每次处理 HTTPS 代理，可配置 SSH key：
+- `git remote set-url origin git@github.com:iankwan827/Hermes.git`
+- 但需要先确保 SSH key 已配置并添加到 GitHub（本机目前未配置）
+
+#### 诊断命令
+
+```bash
+# 检查 HTTPS 连通性
+curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 https://github.com
+
+# 检查 ICMP（ping 可能正常但 HTTPS 不通）
+ping -n 3 github.com
+
+# 检查当前代理设置
+git config --global --get http.proxy
+git config --global --get https.proxy
+netsh winhttp show proxy
+```
+
 ### 常见问题
 
 - **Push 被拒绝**：远程有本地没有的 commit → 先 pull（merge）再 push
 - **.env 被 add**：`git reset HEAD .env` 然后加到 `.gitignore`
+- **GitHub 连接超时**：可能是防火墙阻断 443 端口 → 用 `ghfast.top` 代理绕过（见上方）
 
 ### 冲突解决实例
 
@@ -166,3 +208,4 @@ wmic process where "commandline like '%keyword%'" call terminate
 - ⚠️ 自动重启的进程：杀了子进程会重生，必须找到父进程
 - ⚠️ Windows 下不要用 `kill` 命令（那是 MSYS/Git Bash 的），用 `taskkill` 或 `wmic`
 - ⚠️ Git 同步时 merge 优于 rebase（自动合并更多）；但如果 cron 指定了 --rebase，可用按文件类型策略手动解决冲突
+- ⚠️ GitHub HTTPS 被墙时：ghfast.top 代理对 pull 生效但 push 会超时，必须 pull 后清理代理再 push
