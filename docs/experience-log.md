@@ -1,212 +1,242 @@
 # Hermes 使用经验日志
 
-> 自动生成于 2026-07-08，汇总 Skills 经验教训 + 近期会话踩坑记录
+> 自动生成于 2026-07-09，基于 Skills 踩坑库、Memory 记录和最近会话分析
 
 ---
 
-## 2026-07-08
+## 2026-07-09（本周总结）
 
 ### 踩坑记录
-- [课件笔记/Skill] 课件图片文件夹中可能包含非课件图片（如录音界面截图），第一步必须先确认文件夹内有几张课件图片 → 先用vision_analyze逐张识别，过滤非课件图片，再按实际课件数量处理
-- [课件笔记/案例] 第十三课案例（丁丑庚戌乙巳庚辰）转录稿中未找到完整排盘信息，需要从用户提供的截屏中提取 → 收到案例截屏后立即保存到对应课次文件夹，再从截屏中OCR提取排盘数据补充到笔记
+
+#### 课件笔记系统（高频重灾区）
+
+| # | 问题 | 解决方案 | 来源 |
+|---|------|----------|------|
+| 1 | **没读 skill 就动手** — 误用 `course-notes-docx` 而非 `course-notes-fusion` | 删除 `course-notes-docx`，合并到 `course-notes-fusion`，现在只有一个 skill | 会话 07/08 |
+| 2 | **凭印象走旧流程** — 看到 docx 就以为要生成 docx | 每次执行前必须读 skill 文档 | 会话 07/08 |
+| 3 | **记忆短暂/失忆** — 反复忘记之前的纠正 | 关键纠正立即存入 memory，不依赖会话记忆 | 会话 07/08 |
+| 4 | **课次搞混** — 第十三课录音存到第五课文件夹 | 开始前先确认当前课次，录音文件名包含课次编号 | 会话 07/07 |
+| 5 | **语录追加第四次忘记** — 收到课程内容必须立即追加到语录文件 | 收到课程笔记后第一步就是追加语录，用 `bazi-yulu` skill | 会话 07/05 |
+
+#### OCR / 图片识别
+
+| # | 问题 | 解决方案 | 来源 |
+|---|------|----------|------|
+| 6 | **tesseract 中文识别率极低** — "肺痨"→"肺许"，"逢三冲"→"估三冲" | tesseract 只用于定位章节边界，逐字识别用 `vision_analyze` | 会话 07/07 |
+| 7 | **OCR 切片高度 2000px 太粗** — 8426px 高图漏掉中间内容 | 改用 600-800px 切片 | 会话 07/07 |
+| 8 | **课件图片文件夹混入非课件图片** — 录音界面截图混在其中 | 用 `vision_analyze` 逐张识别过滤 | 会话 07/08 |
+| 9 | **不能边写边传** — 只写 3 个点实际有 8 个点 | 先完整 OCR → 列目录确认 → 再动笔 → 每章核对 → 全部完成再传 | 会话 07/07 |
+
+#### 八字系统
+
+| # | 问题 | 解决方案 | 来源 |
+|---|------|----------|------|
+| 10 | **Step 2 条件触发检测被跳过** — 上下同五行、女命剖腹产 skill 没触发 | 审核 agent 新增"条件触发验证"检查项（6 项自动检测） | 会话 07/07 |
+| 11 | **身强身弱判断错误** — 印星无地支根≠"虚浮不弱" | 必须综合四项（得令/得地/得生/得助）判断，`bazi-geju` skill 已更新 | 会话 07/07 |
+| 12 | **排盘错误** — 日元庚金应为丙火 | 必须以转录稿为准，不能自己推断排盘 | 会话 07/05 |
+| 13 | **申亥穿分析修正** — 案例一是星宫同宫被亥水穿，不是宫星相穿 | 重新核对穿的定义：宫与星的关系 | 会话 07/05 |
+| 14 | **6 个八字 skill 的 SKILL.md 缺失** — 目录存在但文件不存在 | 需要补充创建 SKILL.md | 会话 07/06 |
+
+#### 飞书集成
+
+| # | 问题 | 解决方案 | 来源 |
+|---|------|----------|------|
+| 15 | **Token 过期导致上传失败** | 定期刷新 token，上传前先检测有效性 | 会话 07/05-07/07 |
+| 16 | **课件笔记格式 🎙️ 块内嵌套 ### 标题** — 飞书 orange 块只显示几行 | `upload_notes.py` 已修复嵌套问题 | 会话 07/05 |
+| 17 | **案例解释错误，237 个 block 全部重传** | 上传前必须逐条审核案例解释 | 会话 07/05 |
 
 ### 新发现
-- [执行价采集] 周二(7/7)开盘数据：40只股票中30只比周一便宜（75%），平均滑点-3.68% → 周五信号等到周二买入比周一追高平均省3.68%，持有收益也显著更好（-0.66% vs -4.32%）
-- [风险监控] 43只持仓扫描26条预警，过滤后仅2条需关注：飞凯材料控股股东减持计划预披露、矩子科技一周3次频繁质押 → 大部分预警为正常经营公告（担保、正常解禁、已完成减持），无需恐慌
-- [用户反馈] 用户指出"记忆是5秒就没了"——搜索错误文件夹后又找错位置 → 必须在每次任务开始时先确认当前课次和文件夹路径，不能凭印象操作
+
+| # | 发现 | 来源 |
+|---|------|------|
+| 1 | **选股系统：周二开盘比周一便宜 75%** — 40 只股票对比，30 只周二更便宜（平均 -3.68%） | 会话 07/08 |
+| 2 | **风险监控 26 条仅 2 条需关注** — 大部分是噪音，需要优化过滤规则 | 会话 07/08 |
+| 3 | **飞书 token 管理经验库：29 条飞书相关教训** | 会话 07/07 |
+| 4 | **3 个八字 skill 避坑指南**（宫穿、直断、审核）已沉淀 | 会话 07/07 |
+| 5 | **完整八字 skill 架构梳理** — 7 个 Agent + 25 个分析 skill + 2 个框架 skill + 5 个其他 = 39 个 skill | 会话 07/06 |
+| 6 | **周一执行价采集** — 40 只股票平均滑点 +0.10%，16 涨 24 跌 | 会话 07/06 |
 
 ### 用户偏好更新
-- 用户要求"一步到位"：收到任务直接执行，不要反复确认。改配置必须用Hermes CLI命令，不要直接编辑config.yaml
-- 用户对交付标准要求高：不接受部分完成+承诺后续补上的模式，一次做到位再交付
+
+| 偏好 | 说明 |
+|------|------|
+| **一步到位交付** | 不要分步确认，直接交付终版 |
+| **读 skill 再动手** | 每次执行前读 SKILL.md，不靠名字/印象 |
+| **语录即时追加** | 收到课程内容第一步就是追加语录文件 |
+| **课次核对** | 开始录音/整理前先确认当前课次编号 |
+| **案例以转录稿为准** | 八字排盘和案例分析必须以转录稿原文为准 |
 
 ---
 
-## 2026-07-07
+## 2026-07-05 至 2026-07-09 高频踩坑排行
 
-### 踩坑记录
-- [课件笔记/OCR] tesseract对中文专业术语（八字命理）识别率极低，形近字错误频发（"肺痨"→"肺许"，"逢三冲"→"估三冲"）→ 正确流程：tesseract定位章节 → vision_analyze逐字识别 → 修正后写入笔记
-- [课件笔记] 必须对照课件逐点核对，不能边写边传 → 写完直接上传导致遗漏整个章节（只写了3个点，实际有8个点）。正确流程：先完整OCR → 列目录确认 → 再动笔 → 每章核对 → 全部完成再传
-- [课件笔记/OCR切片] 8426px高的图片用2000px切片太粗，漏了中间第4-7点 → 改用600-800px切片
-- [八字笔记] 用户纠正"辛金具体知识点"不应作为通用规则 → 改为通用检查清单（目录完整性、关键词完整性、表格完整性、题外话提取、上传前格式检查）
-
-### 新发现
-- [飞书集成] 完整的token管理经验库：29条飞书相关教训，涵盖token刷新、OAuth流程、表格操作、文档block类型等
-- [选股系统] 26条选股相关教训，涵盖数据源差异、飞书写入、datetime比较、risk_monitor流程等
-- [八字系统] 3个八字skill的避坑指南（宫穿、直断、审核），含用户原话纠正
-
-### Skill 更新
-- 汇总14个skill的经验教训，共计~115条踩坑记录
+| 排名 | 问题 | 出现次数 | 严重程度 |
+|------|------|----------|----------|
+| 1 | 没读 skill 就动手执行 | 3+ 天 | 🔴 严重 |
+| 2 | 记忆短暂/反复忘记纠正 | 3+ 天 | 🔴 严重 |
+| 3 | 忘记追加语录文件 | 4 次 | 🔴 严重 |
+| 4 | OCR 中文识别率低 | 3+ 天 | 🟡 中等 |
+| 5 | 飞书 Token 过期 | 3 天 | 🟡 中等 |
+| 6 | 课次搞混 | 2 天 | 🟡 中等 |
 
 ---
 
-## 2026-07-06
+## Skill 踩坑库精选（22 个 Skill 的关键 Pitfalls）
 
-### 踩坑记录
-- [八字系统] 6个八字skill目录存在但SKILL.md缺失：bazi-dinghuo、bazi-duanpeifu、bazi-gongchuan、bazi-hunyin-cishu、bazi-ganbing、bazi-xinzangbing → 需要补全SKILL.md才能正常被加载
-- [八字笔记] "看skill开始录音"被误解为看八字skill一览表 → 用户原话"啥啊，我要你看录音skill啊"，应直接加载macos-audio-recording skill
+### 开发工具类
 
-### 新发现
-- [执行价采集] 周一开盘数据：40只股票，平均滑点+0.10%，16涨24跌（跌多涨少）。最大正滑点+3.92%（快克智能追高），最大负滑点-4.30%（艾迪精密低开）。低开的股票开盘后继续走低（如艾迪开盘后又跌-2.8%），追高的反而可能继续走强（如快克开盘后又涨+5.3%）
-- [八字系统] 完整skill架构梳理：7个Agent + 25个分析skill + 2个框架skill + 5个其他skill = 共39个八字相关skill
+#### OpenCode (`autonomous-ai-agents/opencode`)
+- TUI 模式必须 `pty=true`，`opencode run` 不需要
+- `/exit` 不是有效命令（会打开 agent 选择器），用 Ctrl+C
+- PATH 不匹配可能选错二进制文件
+- 不要让多个 OpenCode session 共享同一个工作目录
+- Enter 可能需要按两次（一次定稿，一次发送）
 
-### 用户偏好更新
-- 用户说"看skill开始录音"=加载录音skill开始录音，不是查看skill列表
+#### Claude Code (`autonomous-ai-agents/claude-code`)
+- 交互模式必须用 tmux
+- `--dangerously-skip-permissions` 对话框默认选"No, exit"，需要先按 Down 再 Enter
+- `--max-budget-usd` 最低约 $0.05
+- `--max-turns` 只在 print 模式生效
+- 后台 tmux session 会持久存在，必须 `tmux kill-session` 清理
 
----
+#### Airtable (`productivity/airtable`)
+- `filterByFormula` 必须 URL 编码
+- PATCH 合并，PUT 替换——默认用 PATCH
+- 空字段从响应中省略，缺失 key 不代表字段不存在
+- 限流按 base 而非 token：不同 base 各 5 req/sec
 
-## 2026-07-05
+#### Teams Meeting (`productivity/teams-meeting-pipeline`)
+- **Graph 订阅 72 小时过期** — 不会自动续期，3 天后通知静默停止
+- Transcript 生成需要等 2-5 分钟
+- Delivery mode 不匹配会导致摘要生成但 Teams 收不到
 
-### 踩坑记录
-- [语录追加] **第四次**忘记追加语录文件！用户发送Day81-99课程内容后，只回复了整理要点，没有自动追加到语录文件。用户原话"你又忘记语录了" → 收到课程内容必须立即追加到 `~/Pictures/八字课/语录/理华老师语录.md`，不用等用户说
-- [课件笔记格式] 第十一课笔记中🎙️块内嵌套了###标题，导致飞书上传时orange块只显示几行内容 → 脚本已修复（遇到###不再break），但生成笔记时仍建议保持第十课格式（每段用---分隔，不用###嵌套在🎙️块内）
-- [八字排盘错误] 案例一（木子）排盘搞错：日元庚金→应为丙火，日支寅木→应为申金。根因：没有以转录稿为准，自己推断排盘。用户原话"应该是丙火日元，丙申日柱，申金也是财星" → 案例排盘必须以转录稿为准，不能自己推断
-- [飞书上传] Token过期导致上传失败 → 需先运行 `refresh_token.py` 刷新token再上传
-- [飞书案例修正] 飞书文档中三个案例解释都是错的，重新上传修正版（237个block全部成功）
+### 创意编码类
 
-### 新发现
-- [八字案例] 申亥穿分析修正：案例一（木子）是星宫同宫（申金既是夫妻宫也是夫妻星）被亥水穿，不是宫星相穿。案例二（孟川）有亥卯半合+申子半合化解穿害，婚姻不会动摇根基
-- [八字系统] 审核agent新增侧写审核（8️⃣），逐条检查侧写文本中的每个判断是否与JSON数据一致。正印写成偏印这种错误会被拦住
+#### P5.js WebGL
+- `createCanvas(w, h, WEBGL)` 原点在中心，不是左上角
+- Y 轴方向反转
+- `texture()` 必须在 `rect()`/`plane()` 之前调用
+- 每次 transform 必须 `push()`/`pop()` 包裹
 
-### 用户偏好更新
-- 课件笔记格式：🎙️块内不要嵌套###标题。第十课格式（每段用---分隔）是正确的
-- 课件和转录要分开处理别搞混（如课件第十课、转录第十一课）
-- 整理笔记时要对比前一课的格式，发现差异先修脚本或统一格式再上传
+#### ComfyUI (`creative/comfyui`)
+- API 需要 API 格式的工作流 JSON，不是编辑器格式
+- 模型名称区分大小写且包含扩展名
+- "class type not found" = 缺少自定义节点
+- 免费版 API 限制：`/api/prompt` 等端点返回 403
 
-### Skill 更新
-- `upload_notes.py` 脚本修复：遇到###不再break，支持🎙️块内有子标题的格式
+### 软件开发类
 
----
+#### Node Inspector
+- `--inspect` 不会暂停执行，需要 `--inspect-brk`
+- 端口冲突：默认 9229，用 `--inspect=0` 随机端口
+- 子进程不会被父进程的 `--inspect` 覆盖
+- 通过 agent 终端运行 `node inspect` 需要 PTY 模式
 
-## 2026-07-04
+#### Python debugpy
+- pdb 在 pytest-xdist 下静默失效，用 `-p no:xdist`
+- `breakpoint()` 在 CI/非 TTY 环境会挂起进程
+- `PYTHONBREAKPOINT=0` 会禁用所有 `breakpoint()`
+- pdb 只调试当前线程，多线程用 debugpy
 
-### 踩坑记录
-- [GitHub 同步] clone 超时（120s）→ 使用 `--filter=blob:none` 或 `--depth 1` 解决
-- [cron 环境] cron 环境 clone 大仓库超时 → 使用浅克隆 `--depth 1`
+#### Code Review
+- diff >15k 字符需要按文件拆分
+- 空 diff 检查 `git status`
+- `delegate_task` 返回非 JSON 时重试一次，然后标记失败
 
-### 新发现
-- 无新增
+### 生产力类
 
----
+#### Maps (`productivity/maps`)
+- Nominatim 限制 1 req/s
+- `nearby` 必须提供 lat/lon 或 `--near "<address>"`
+- OSRM 覆盖率在欧洲和北美最佳
 
-## 2026-07-03
+#### Skill Authoring (`software-development/hermes-agent-skill-authoring`)
+- `skill_manage(action='create')` 写入 `~/.hermes/skills/`，不是项目内
+- 前导空格会导致 YAML frontmatter 解析失败
+- Description 应以 "Use when ..." 开头
+- 新 skill 创建后当前 session 看不到（需要重载）
 
-### 踩坑记录
-- [macos-browser-cdp] `cp -R` 复制Chrome profile会丢失cookies等登录态 → 改用 `rsync -a`（保留文件权限、时间戳和特殊属性）
-- [GitHub 同步] `~/.git-credentials` 可能为空文件（0 bytes）→ 推送前先用 `wc -c` 检查
-- [飞书集成] OIDC refresh endpoint要求 `tenant_access_token` 作为 `Authorization: Bearer` header，不是放在request body里。错误症状：`{"code": 20014}`
-- [飞书集成] `redirect_uri` 必须精确匹配 `http://localhost:8765`，不能加 `/callback`
-- [飞书集成] `refresh_token` 30天过期 + 单次使用。过期后必须重新走OAuth授权流程
-- [飞书集成] Token过期 → 自动执行OAuth，不要问用户。用户原话"你是不是有毛病，授权一直都是你自己点的"
-- [飞书集成] Shell引号 + markdown `***` 冲突 → 始终先写Python脚本到文件再执行
-- [钉钉直播] Finder窗口遮挡DingTalk（高频！）→ 激活DingTalk前必须先隐藏Finder
-- [钉钉直播] vision_analyze严重误判截图内容（将钉钉直播间识别为飞书文档）→ 截图后必须让用户确认，不要用AI描述屏幕内容
-- [钉钉直播] 多进程record.py冲突BlackHole音频设备 → 启动前必须 `pkill -f "record.py"`
-- [选股系统] datetime比较必须用 `.date()` → `day_date >= monday` 因时间分量失败
-- [选股系统] Feishu写入必须用 `user_access_token`，`tenant_token` 只能读
-- [选股系统] `update_feishu_sheet.py` O/P列数据源错误 → O列应为周一开盘价（非收盘价）
-- [图片分析] 长图直接发给vision_analyze会丢失50-70%内容 → 强制流程：`Image.open → .size → h>2000? → slice → 逐段识别`，2000px切片高度最优
-- [图片分析] >20M像素图片需先缩放，否则MemoryError
+### 研究类
 
-### 新发现
-- [飞书集成] Chrome CDP连接成功方案：杀掉所有Chrome → rsync profile到 `/tmp/chrome-cdp-profile` → 用 `--remote-debugging-port=9222 --user-data-dir` 启动
-- [飞书集成] 完整的block_type参考：2=段落、12=无序列表、22=分割线、34=纯文本code block
-- [飞书集成] `folder_token=""` 表示根目录，不是null
-- [飞书集成] `tenant` vs `user` token用途：drive操作用tenant，doc操作用user
-- [飞书集成] CSV有BOM → 读取时用 `encoding='utf-8-sig'`
-- [选股系统] 突破计算用60日最高价，不用120日绝对最高价
-- [选股系统] B规则卖出：必须连续2周出Top20，累计触发不算
-- [选股系统] 大幅回调>20%时不适用突破判断
-- [选股系统] 被剔除的股票必须红色高亮 + 追加在表末尾（row 21+），字体色 `#FF0000`
-- [选股系统] `risk_monitor.py` 现在会自动扫描被剔除的股票
-- [选股系统] 更新飞书表格后**必须**运行risk_monitor，不能跳过
-- [选股系统] 历史比较用 `recent[0]`（最早记录），不用 `recent[-2]`
-- [选股系统] risk诊断不是门槛工具，只在与上周对比时触发
-- [选股系统] `history.json` 需要存top20和top20_scores，不能只存top5
-- [AStock数据] Sina API的 `node=hs_a` 包含北交所(92xxx)股票，必须按板块过滤
-- [AStock数据] macOS系统代理(Clash 127.0.0.1:7897)导致东方财富API请求失败 → 用 `curl --noproxy '*'` 或Sina API
-- [AStock数据] 腾讯实时API返回GBK编码 → 必须 `decode('gbk')`
-- [AStock数据] Sina K线API只返回约300天数据（scale=240=daily），不是全量历史
+#### LLM Wiki (`research/llm-wiki`)
+- 永远不要修改 `raw/` 目录的文件
+- 每次新 session 先读 SCHEMA + index + recent log
+- 前 200 行以内保持可扫描性
+- 标签必须来自已有分类体系
 
-### 用户偏好更新
-- Mac SSH连不上（port 22 refused）→ 不要尝试SSH到Mac，有需要直接看GitHub仓库
-- Chrome 反复开关很烦 → 不要无意义地重复启动/关闭浏览器
-- "你是不是有毛病" = 用户不耐烦的信号，停止当前操作
-- 飞书"创建表格不是文档" → 创建spreadsheet，不是document。不同API
-
-### Skill 更新
-- `macos-browser-cdp`: 复制profile命令从 `cp -R` 改成 `rsync -a`（SKILL.md + scripts + references 3个文件同步更新）
+#### 研究论文模板
+- 复制 `.tex` 文件时必须连同 `.sty` 一起复制
+- 永远不要修改 `.sty` 文件
+- 图表用矢量 PDF (`savefig('fig.pdf')`)，不用 PNG
 
 ---
 
-## 2026-07-02
+## 飞书集成经验（29 条精选）
 
-### 踩坑记录
-- [图片分析] 长图直接发给vision_analyze会丢失50-70%内容 → 强制流程：`Image.open → .size → h>2000? → slice → 逐段识别`，2000px切片高度最优
-- [图片分析] >20M像素图片需先缩放，否则MemoryError
-- [拼多多] Shadow DOM阻止自动化（sl-checkbox/sl-button）→ 必须手动操作
-- [拼多多] 编辑页面必须立即提交，否则页面刷新后所有修改丢失
-- [拼多多] PDD要求图片<3MB → 用PIL quality参数压缩
-- [macOS] **绝不运行** `tccutil reset ScreenCapture` — 会移除所有应用的屏幕录制权限，不可逆
-- [TouchDesigner] 同名节点在同一脚本中销毁+重建会导致 "Invalid OP object" → 拆分为独立MCP调用
-- [Teams] Graph webhook订阅72小时后过期 → 设置12小时间隔的续期cron
+> 来源：会话 07/07 完整 token 管理经验库
 
-### 新发现
-- [选股回测] 行业分散规则（行业≤2）将第一池收益率从-5.56%提升到-2.99%（+2.57pp）
-- [选股回测] 周二开盘优于周一（+1.29pp）
-
-### 用户偏好更新
-- 转录用gemma模型（不用whisper）
-- 八字十天干性格分类（不用五行）
-- 🎙️表情符号和内容分两行显示
-
-### Skill 更新
-- 新建 `llm-provider-fix` skill（LLM provider 401/402错误诊断）
+- Token 过期是上传失败的头号原因
+- 上传前必须检测 token 有效性
+- Block 数量大时（237 个）需分批上传
+- Markdown 格式导入比 docx 更稳定
+- Callout 颜色检测逻辑需要简化
+- 嵌套标题在飞书块级元素中会导致渲染问题
 
 ---
 
-## 跨日期通用经验汇总（来自 Skills）
+## 八字系统 39 Skill 架构概览
 
-### 飞书集成（29条教训）
-- Token管理：refresh_token单次使用+30天过期，OAuth自动执行不要问用户
-- 表格操作：sheet_id必须查询获取（"Sheet1"不行），批量写入可能静默失败，逐行写更安全
-- 文档block：block_type=2段落、12无序列表、22分割线、34纯文本code block
-- 权限：新scope需要重新授权（不只是token刷新）
-- macOS OAuth：用AppleScript控制Chrome，不用headless browser
-
-### 选股系统（26条教训）
-- datetime比较必须 `.date()`
-- 飞书写入用 `user_access_token`
-- 被剔除股票红色高亮 + 表末尾追加
-- 更新后必须运行risk_monitor
-- `history.json` 存top20和top20_scores
-
-### AStock数据（6条教训）
-- 必须按板块过滤（排除北交所92xxx）
-- macOS代理会干扰API请求
-- 腾讯API返回GBK编码
-
-### 钉钉直播（10条教训）
-- Finder遮挡DingTalk（最高频！）
-- vision_analyze误判截图（不可信）
-- 多进程record.py冲突BlackHole
-
-### 八字系统（10条教训）
-- 穿≠必离婚（需宫星同穿+旺衰失衡+无制化三者同时满足）
-- 直断不能只扫描28秘诀（必须扫描全部查找表）
-- 审核agent逐条校验侧写文本
-
-### 课件笔记（8条教训）
-- OCR必须逐字校对（tesseract对中文专业术语不可靠）
-- 不能边写边传（必须先完成再上传）
-- 🎙️块内不嵌套###标题
-- 长图切片600-800px（2000px太粗）
-
-### 其他
-- `write_file` 破坏Python引号 → 改用terminal heredoc
-- macOS `tccutil reset ScreenCapture` 不可逆
-- Teams Graph订阅72小时过期
-- 代码review不要超过3个reviewer
+```
+八字系统
+├── 协调层（1）
+│   └── bazi-master（主协调器）
+├── Agent 层（6）
+│   ├── bazi-paipan-agent（排盘）
+│   ├── bazi-analyst（分析）
+│   ├── bazi-reviewer（审核）
+│   ├── bazi-exporter（导出）
+│   ├── bazi-responder（回复）
+│   └── bazi-trigger（条件触发）
+├── 分析 skill（25）
+│   ├── 格局：bazi-geju、bazi-sizhu
+│   ├── 十神：bazi-shishen
+│   ├── 地支：bazi-dizhi
+│   ├── 性格：bazi-xingge
+│   ├── 配偶：bazi-peiou、bazi-duanpeifu
+│   ├── 婚姻：bazi-hunyin-tongwuxing、bazi-hunyin-cishu
+│   ├── 健康：bazi-feibu、bazi-weibing、bazi-shenbing、bazi-ganbing、bazi-xinzangbing
+│   ├── 身材：bazi-shencai、bazi-xiongbu
+│   ├── 其他：bazi-zhi（痣）、bazi-chuanzhuo（穿搭）、bazi-haose、bazi-daogui...
+│   └── ...
+├── 框架 skill（2）
+│   ├── bazi-baceng（八层体系）
+│   └── bazi-duanshi（断事流程）
+└── 其他（5）
+    ├── bazi-paipan（排盘脚本）
+    ├── bazi-trigger（条件触发）
+    ├── bazi-reviewer（审核标准）
+    └── ...
+```
 
 ---
 
-*本日志由 Hermes 经验同步 cron 任务自动生成*
+## 本周关键修复
+
+| 修复 | 说明 |
+|------|------|
+| 删除 `course-notes-docx` | 合并到 `course-notes-fusion`，避免混淆 |
+| `bazi-reviewer` 新增条件触发验证 | 6 项自动检测，防止漏触发 |
+| `bazi-geju` 新增身强身弱判断要点 | 得令/得地/得生/得助四项综合 |
+| OCR 切片高度 2000px → 600-800px | 避免漏掉中间内容 |
+| `upload_notes.py` 修复嵌套问题 | ### 标题不再嵌套在 callout 块内 |
+| 审核 agent 新增侧写审核 | 逐条检查侧写文本与 JSON 数据一致性 |
+
+---
+
+## 行动建议
+
+1. **强制读 skill 流程**：每次执行前，先 `skill_view(name)` 读取当前 skill，不依赖记忆
+2. **语录即时追加**：收到课程内容后，第一步执行 `bazi-yulu` 追加语录
+3. **OCR 最佳实践**：tesseract 定位 → vision_analyze 识别 → 600-800px 切片
+4. **八字身强身弱**：必须综合四项判断，不能只看月令
+5. **飞书上传前**：先检测 token 有效性，再逐 block 审核
