@@ -1474,22 +1474,24 @@ opencli daemon status
 
 ### ⚠️ Python 执行方式（2026-06-23更新）
 
-**`python3` 命令在本机返回 exit code 49（Windows Store stub），必须用 `python` 或 `uv run python` 代替。**
+**`python3` 命令在本机返回 exit code 49（Windows Store stub），必须用 `python` 代替。**
 
 ```bash
 # ❌ python3 返回 exit code 49（Windows Store stub）
 python3 script.py  # exit code 49
 python3 -c "print(1)"  # exit code 49
 
-# ✅ 用 python（不带3）
+# ❌ uv run python 有 SRE 模块 mismatch 问题（反复出现），不要使用
+# uv run python script.py
+# uv run python -c "print(1)"
+
+# ✅ 用 python（不带3，不带uv）— 唯一可靠方式
 python script.py
 python -c "print(1)"
-
-# ✅ 或用 uv run python
-uv run python script.py
 ```
 
 **terminal中直接用 `python -c "..."` 最简单**，无需写脚本文件。
+⚠️ **绝对不要用 `uv run python`**，本机的 uv Python 版本与系统 Python 存在 SRE 模块版本冲突，每次都会报 `AssertionError: SRE module mismatch`。
 
 ### ⚠️ 批量更新发展日志：Python脚本 vs 多次patch
 
