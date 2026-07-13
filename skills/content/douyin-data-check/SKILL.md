@@ -35,20 +35,30 @@ triggers:
 hermes config set browser.cdp_url "ws://127.0.0.1:9222"
 ```
 
-**⚠️⚠️⚠️ Windows Chrome CDP启动的正确方式（2026-07-03血的教训）**
+**⚠️⚠️⚠️ Windows Chrome CDP启动的正确方式（2026-07-03血的教训，2026-07-12更新）**
 
-**必须用独立`--user-data-dir`**，否则Chrome lockfile冲突导致端口9222永远不开：
+**首选方案：OpenCLI daemon restart（最可靠）**。手动启动Chrome带`--remote-debugging-port=9222`在很多Windows机器上会因lockfile问题静默失败（Chrome进程启动了但端口不开）。最可靠的方法是让OpenCLI自己管理Chrome：
 
 ```bash
 # 1. 先杀掉所有Chrome（必须用PowerShell，bash的taskkill /F有时杀不干净）
 powershell.exe -NoProfile -Command "Get-Process chrome -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue"
 sleep 3
 
-# 1. 启动Chrome带remote debugging port（⚠️ 不要指定--user-data-dir，保留登录态）
-"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --no-first-run --restore-last-session &
+# 2. 重启OpenCLI daemon（它会自动启动Chrome并连接）
+opencli daemon restart
+sleep 8
 
-# 3. 验证端口已开（必须看到JSON输出才算成功）
-sleep 8 && curl -s http://localhost:9222/json/version
+# 3. 验证连接（必须看到Extension: connected）
+opencli daemon status
+```
+
+**备选方案：手动启动Chrome带CDP（仅在daemon restart失败时使用）**
+
+**必须用独立`--user-data-dir`**，否则Chrome lockfile冲突导致端口9222永远不开：
+
+```bash
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --no-first-run --restore-last-session --user-data-dir="C:/Users/Administrator/AppData/Local/Google/Chrome/User Data Copy" &
+sleep 10 && curl -s http://localhost:9222/json/version
 ```
 
 **⚠️ 常见失败原因**：如果用默认用户目录（`AppData/Local/Google/Chrome/User Data`），Chrome的lockfile会阻止第二个实例绑定调试端口。症状：Chrome进程在跑，`--remote-debugging-port=9222`参数也在，但`curl localhost:9222`无响应。
@@ -1857,6 +1867,7 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 2. **优化分组表做"数据新鲜度检查"**：对比分组表中每个数值与数据表最终值
 3. **系统统计值（完播率均值、5s均值）在每次数据变更后重新计算**
 4. **评论率分组需定期全量校验**：用最新数据重新计算所有视频的评论率，确认分组计数准确（2026-07-08发现V10/V12/V7被遗漏，实际22条非声称的20条）
+5. **⚠️ 表格自身也可能部分过时（2026-07-13发现）**：定时更新日志记录了率值变化（如"5s 49.17%→48.96%"），但表格中的完播率/5s完播率/2s跳出率列仍显示旧值，只有播放量已同步。**审核时不仅要比对"诊断vs表格"，还要比对"更新日志vs表格"**——如果更新日志说V27 5s从49.17%变为48.96%，但表格仍显示49.17%，说明表格率列未同步。**验证方法**：检查最近一次更新日志中的"→"右侧值是否与表格一致。
 
 ### ⚠️ 遗漏陷阱：质量恶化趋势被高推荐率掩盖（2026-06-23发现）
 
@@ -1950,18 +1961,31 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 
 **根因**：每次添加新视频后，中位数被重新计算，但排序或取中间值的步骤出错。
 
-**中位数正确公式（N=偶数时）**：
-1. 将所有播放量从小到大排序
-2. 取第 N/2 和第 N/2+1 位的值
-3. 中位数 = (第N/2位 + 第N/2+1位) / 2
+**中位数正确公式**：
+- **N为偶数时**：取第 N/2 和第 N/2+1 位的平均值
+- **N为奇数时**：直接取第 (N+1)/2 位的值（不需要平均！）
 
-**示例（16条视频）**：
-- 排序后第8位和第9位的平均值
-- 如当前数据：第8位=1770(V21)，第9位=1794(V11)，中位数=(1770+1794)/2=1782
+**⚠️ Python代码陷阱（2026-07-13发现）**：
+```python
+# ❌ 错误：对奇数N也用了偶数公式，结果偏移
+n = len(sorted_plays)  # n=23 (奇数)
+median = (sorted_plays[n//2-1] + sorted_plays[n//2]) / 2  # 取了第11和第12位平均=1524.5
+
+# ✅ 正确：奇数N直接取中间值
+n = len(sorted_plays)  # n=23 (奇数)
+median = sorted_plays[n//2]  # 取第12位=1531
+```
+
+**示例（23条视频，N为奇数）**：
+- 排序后第12位=1,531(V25)，中位数=1,531
+- 错误公式取第11位(1,518)和第12位(1,531)平均=1,524.5，偏差-0.4%
+
+**示例（16条视频，N为偶数）**：
+- 排序后第8位=1770(V21)，第9位=1794(V11)，中位数=(1770+1794)/2=1782
 
 **规则**：
 1. **每次更新数据表后，必须用正确公式重新计算中位数**
-2. **审核时独立验证中位数**：排序播放量列表，取中间两值的平均
+2. **审核时独立验证中位数**：排序播放量列表，奇数取中间值，偶数取中间两值平均
 3. **同时验证最高值和最低值**：遍历播放量列表确认max和min
 
 ### 审核陷阱：伪修正（2026-06-19发现，第7次审计仍未解决）+ 回归式修复（2026-07-09发现）

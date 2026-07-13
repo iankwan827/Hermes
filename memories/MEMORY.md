@@ -5,7 +5,7 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 写完文案必须自动跑video-content-audit审核，不等用户提醒（用户原话"你没跑skill啊"）。引用热搜事件必须确认时间线（几月、第几轮、谁赢谁输），不能凭印象写。审核是内建流程不是可选步骤。
 §
-电商图工作流：1)首选Gemini banana原生图编辑（传原图+prompt，一步换背景，主体不变）2)备选：rembg抠图+纯背景合成 3)不用subject_ref（变形）4)不用vision_analyze 5)背景不要家具（会悬浮）6)PackyAPI端点www.packyapi.com（不是api），Gemini用/v1beta/models/{model}:generateContent + x-goog-api-key。插件image_gen/openai已改造支持双端点。
+电商图：Gemini原生编辑>rembg合成。PackyAPI端点www.packyapi.com。
 §
 粤语金句不要直接写，用剧情/对话体现。文案时间线必须符合现实逻辑。质检需检查每个叙事转折点前是否有钩子。粤语用词：叛逆→反骨（"反骨"才是粤语词）。标签中热搜话题必须原样保留（吃搜索流量），不能替换成内容关键词。
 §
@@ -13,18 +13,20 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 用户喜欢"争议性开头"（"99%的人都理解错了"）。中间太平时加钩子：1)共鸣"你系唔系都试过？" 2)反面案例（笑点）3)冲突对比型（"迟到一次记一世，帮十次忘光"比权威佐证更有力）。开头要埋伏笔（"99%的人都是会这样"），不说结论。
 §
-小红书采集：访问笔记详情必须用/search_result/链接（带xsec_token），/explore/链接会触发扫码限制。仿人操作：间隔3-8秒随机，每分钟≤5次eval，每5篇暂停10-15秒。Chrome已登录小红书，OpenCLI session名"xiaohongshu"。
+小红书：用/search_result/链接（带xsec_token），不用/explore/（触发扫码）。仿人操作：间隔3-8秒，每分钟≤5次eval，每5篇暂停10-15秒。Chrome已登录。
 §
-八字排盘：23:00-23:59算第二天子时（日期+1，hour=0）。generate_bazi_analysis.js已自动处理。
+八字：23点后算次日子时。generate_bazi_analysis.js已自动处理。
 §
-用户痛点：不从标题推断内容要读文件；做自己vs自律=对立；文案简洁；视频50秒-1分30秒。⚠️用户改完文案就是终版，不要自作主张加回删掉的内容。
+用户痛点：文案简洁；视频50秒-1分30秒。⚠️用户改完文案就是终版。
 §
 ⚠️写skill前必须先加载skill-creator（E:/Users/Administrator/AppData/Local/hermes/skills/skill-creator/SKILL.md），按Claude标准写。⚠️改完skill/重要文件必须推GitHub同步Mac：cd /e/Users/Administrator/hermes-repo && git add . && git commit -m "xxx" && git push origin main（冲突时用--force）。Mac拉取：git pull。memory同步文件：docs/memory-sync.md。
 §
 ⚠️搜网页/热点用OpenCLI复用Chrome登录态。提到"热搜"默认抖音（API: douyin.com/aweme/v1/web/hot/search/list/，免登录）。OpenCLI default session已登录抖音可搜话题详情。用户做共鸣类内容，不追体育/娱乐热搜。站点适配器148个。
 §
-dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2开头用模板库套用。部分段落用直接吐槽/旁白（不要全对话体）。比喻简洁不重复。用户多次修正角度，直接改不argue。
+dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2用模板库。⚠️多期文案写完必须逐期交叉检查逻辑矛盾，不能只看相邻两期（用户原话"你没发现前面几期和后面几期有矛盾吗"）。用户多次修正角度，直接改不argue。
 §
 Mac SSH连不上（port 22 refused），不要尝试SSH到Mac。有需要直接看GitHub仓库（https://github.com/iankwan827/Hermes）。⚠️审核文案时必须严格按字数估算时长（粤语约4字/秒），超90秒的文案不能标"通过"。用户原话"这字那么多还能过"。
 §
 文案写作：用户给的比喻/故事是用来教我理解角度的，不是写进文案的。要区分"解释给我听"和"写进脚本"。用户说"我用XX故事讲解给你听，不是让你写出来"时，只取角度不取内容。
+§
+一人之下八奇技猜想（用户提供）：36贼结义≠八奇技。八奇技=远古天机第二次泄露。禁制=天道保护壳。无根生带8人去二十四节谷，可能为救已死女儿冯宝宝。追杀者不知有禁制，掌门知但说不出。详见：E:\Users\Administrator\一人之下八奇技猜想.md
