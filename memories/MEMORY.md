@@ -25,8 +25,10 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2用模板库。⚠️多期文案写完必须逐期交叉检查逻辑矛盾，不能只看相邻两期（用户原话"你没发现前面几期和后面几期有矛盾吗"）。用户多次修正角度，直接改不argue。
 §
-Mac SSH连不上（port 22 refused），不要尝试SSH到Mac。有需要直接看GitHub仓库（https://github.com/iankwan827/Hermes）。⚠️审核文案时必须严格按字数估算时长（粤语约4字/秒），超90秒的文案不能标"通过"。用户原话"这字那么多还能过"。
+Vercel CLI：`VERCEL_TOKEN=*** vercel --prod --yes`部署。⚠️域名不自动更新需`vercel promote`。bazi源码:E:\SD\bazi\bazi_new_web。
 §
 文案写作：用户给的比喻/故事是用来教我理解角度的，不是写进文案的。要区分"解释给我听"和"写进脚本"。用户说"我用XX故事讲解给你听，不是让你写出来"时，只取角度不取内容。
 §
-一人之下八奇技猜想（用户提供）：36贼结义≠八奇技。八奇技=远古天机第二次泄露。禁制=天道保护壳。无根生带8人去二十四节谷，可能为救已死女儿冯宝宝。追杀者不知有禁制，掌门知但说不出。详见：E:\Users\Administrator\一人之下八奇技猜想.md
+Vercel：CLI用VERCEL_TOKEN env var。⚠️部署后域名不自动更新需`vercel promote`。bazi项目:E:\SD\bazi\bazi_new_web，域名www.shiyibazi.top。
+§
+用户问"这是什么错误"时直接给答案，不要先搜项目文件再总结。简洁诊断 > 完整调查（除非用户明确要求调查）。

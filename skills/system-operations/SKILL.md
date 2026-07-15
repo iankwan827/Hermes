@@ -201,6 +201,88 @@ wmic process where "commandline like '%keyword%'" call terminate
 
 ---
 
+## 三、Vercel 部署管理
+
+用户有 5 个 Vercel 项目（bazi-new-web, sanbanfu, sanbanfu2, taigongqimen, 以及一个旧的 bazi）。大部分项目通过 Gemini 拖拽上传部署，非 Git 连接。
+
+### CLI Token 认证
+
+OAuth 在无头环境（hermes terminal）下经常失败。直接用 token：
+
+```bash
+# 用户在浏览器 https://vercel.com/account/tokens 创建 token
+VERCEL_TOKEN=<token> vercel whoami          # 验证
+VERCEL_TOKEN=<token> vercel projects ls     # 列项目
+VERCEL_TOKEN=<token> vercel --prod --yes --name <project>  # 部署
+```
+
+### ⚠️ 拖拽部署 vs CLI 部署的别名问题
+
+**拖拽部署**（用户常用方式）：上传文件夹到 Vercel 网站 → 构建成功 → 但自定义域名（如 shiyibazi.top）可能仍指向旧部署。
+
+**原因**：Vercel 的 domain alias 绑定到特定 deployment ID，拖拽上传产生新 deployment 但不一定更新 alias。
+
+**修复**：
+```bash
+VERCEL_TOKEN=<token> vercel promote <deployment-url> --yes
+```
+
+**验证当前指向**：
+```bash
+VERCEL_TOKEN=<token> vercel inspect https://<domain>
+# 看 Aliases 部分指向的 deployment URL 和创建时间
+```
+
+### CLI 首次部署流程
+
+```bash
+cd <project-dir>
+VERCEL_TOKEN=<token> vercel pull --yes      # 拉取项目设置
+VERCEL_TOKEN=<token> vercel --prod --yes    # 部署
+```
+
+### Vite + PWA manifest 路径陷阱
+
+当 Vite 项目部署在子路径（如 `/bazi/`）时，`vite-plugin-pwa` 生成的 manifest 中 icon 路径可能不带 base 前缀。
+
+**错误示例**：`vite.config.js` 中 `src: 'assets/icon.png'` → 构建后 manifest 写 `/assets/icon.png`（404）
+**正确写法**：`src: '/bazi/assets/icon.png'` → 绝对路径，不受 base 影响
+
+### JS 语法错误导致的级联 "undefined"
+
+**症状**：控制台报 `XXX is not a function` 或 `XXX is not defined`，但源码中明明定义了。
+
+**常见原因**：
+1. **孤立的 `*/`**（没有匹配的 `/*`）— 最常见，导致语法错误，后续所有代码不执行
+2. **函数缺少关闭 `}`** — IIFE 或嵌套函数没有正确关闭，导致后续代码在错误的作用域中
+3. **IIFE 中多余空格** — `}) ()` 可能被某些环境解析为语法错误，改为 `})()`
+
+**诊断**：
+```bash
+node --check <file.js>                    # 直接报语法错误位置
+node -e "require('fs').readFileSync('file.js','utf8')" | node --check  # 远程文件也可
+# 批量检查项目中所有 JS：
+grep 'src="js/' index.html | sed 's/.*src="\([^"]*\)".*/\1/' | sed 's/\?.*//' | while read f; do node --check "$f"; done
+```
+
+**深度诊断**（语法通过但运行时报错）：
+```bash
+# 检查括号匹配深度
+node -e "
+const code = require('fs').readFileSync('file.js','utf8');
+let d=0; code.split('\n').forEach((l,i) => {
+  for(const c of l){if(c==='{')d++;if(c==='}')d--}
+  if(d<0) console.log('L'+(i+1)+': NEGATIVE depth='+d);
+});
+console.log('Final depth:', d);
+"
+```
+最终 depth 不为 0 = 有未关闭的 `{`。
+
+**修复**：删除孤立 `*/`，补上缺失的 `}`，重新部署。
+
+---
+
 ## Pitfalls
 
 - ⚠️ Hermes agent = Python 进程，误杀会导致会话断开
@@ -209,3 +291,6 @@ wmic process where "commandline like '%keyword%'" call terminate
 - ⚠️ Windows 下不要用 `kill` 命令（那是 MSYS/Git Bash 的），用 `taskkill` 或 `wmic`
 - ⚠️ Git 同步时 merge 优于 rebase（自动合并更多）；但如果 cron 指定了 --rebase，可用按文件类型策略手动解决冲突
 - ⚠️ GitHub HTTPS 被墙时：ghfast.top 代理对 pull 生效但 push 会超时，必须 pull 后清理代理再 push
+- ⚠️ Vercel 拖拽部署后自定义域名可能仍指向旧 deployment → 用 `vercel promote` 更新别名
+- ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404
+- ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查

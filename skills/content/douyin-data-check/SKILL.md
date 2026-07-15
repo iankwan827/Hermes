@@ -260,6 +260,30 @@ opencli browser douyin eval "document.body.innerText"
 
 **⚠️ 强制验证步骤**：写完诊断文本后，对比诊断中的评论数/分享数与表格行中的对应值。如果表格说"评论0、分享2"但诊断说"评论2、分享0"，就是互换错误。
 
+**🔴🔴🔴 强制验证步骤（每次写入前必须执行）**
+
+**写入发展日志前，必须逐字对照页面数据和日志列顺序：**
+
+```
+页面列顺序（cells索引）:  点赞[8] → 分享[9] → 评论[10] → 收藏[11]
+日志列顺序:              点赞 → 评论 → 分享 → 收藏
+
+⚠️ 评论和分享的顺序是反的！
+```
+
+**逐条验证方法**：
+```bash
+# 1. 提取页面数据
+opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('table tbody tr'); var r = []; for (var i = 0; i < rows.length; i++) { var c = rows[i].querySelectorAll('td'); if (c.length >= 5) { r.push('ROW' + i + ': 点赞=' + c[8].textContent.trim() + ' 分享=' + c[9].textContent.trim() + ' 评论=' + c[10].textContent.trim() + ' 收藏=' + c[11].textContent.trim()); } } return r.join('\\n'); })()"
+
+# 2. 写入日志时，必须确认：
+# 页面"点赞=X 分享=Y 评论=Z 收藏=W"
+# → 日志写"点赞=X 评论=Z 分享=Y 收藏=W"
+# 即：日志评论=页面评论，日志分享=页面分享，不要交换！
+```
+
+**2026-07-14教训（回归式修复，2026-07-15发现）**：即使有上述文档，agent仍然在batch更新时把V23/V21的评论和分享搞反了。根因：写patch时凭直觉认为"评论应该在分享前面"，没有逐条对照页面数据。**每次写入前必须用上述方法逐条验证。**
+
 **⚠️ 表格列顺序映射（防止评论/分享互换，2026-07-06更新）**：数据中心投稿列表的表格有**15列**（不是16列），列顺序与发展日志**不同**，必须按以下映射转换：
 
 **⚠️ 实际列索引（2026-07-06实测验证）**：
@@ -1503,7 +1527,7 @@ python -c "print(1)"
 **terminal中直接用 `python -c "..."` 最简单**，无需写脚本文件。
 ⚠️ **绝对不要用 `uv run python`**，本机的 uv Python 版本与系统 Python 存在 SRE 模块版本冲突，每次都会报 `AssertionError: SRE module mismatch`。
 
-### ⚠️ 批量更新发展日志：Python脚本 vs 多次patch
+**⚠️ 批量更新发展日志：Python脚本 vs 多次patch**
 
 **当需要同时更新多个数据行（如新视频+多个已有视频数据微调）时，有两种方法：**
 
@@ -1511,8 +1535,8 @@ python -c "print(1)"
 ```python
 # ✅ 正确：Python脚本 + 实际中文字符串（不是Unicode转义）
 updates = [
-    ('| V28 | 我发现我们对... | 06-30 17:08 | 360 |', 
-     '| V28 | 我发现我们对... | 06-30 17:08 | 362 |'),
+    ('| V28 | 我们们对... | 06-30 17:08 | 360 |', 
+     '| V28 | 我们们对... | 06-30 17:08 | 362 |'),
     # ... 更多替换
 ]
 for old, new in updates:
@@ -1530,6 +1554,31 @@ patch(path="发展日志.md", old_string="| V21 | 脱碳甲醛...", new_string="
 **⚠️ Python脚本的坑（2026-07-08发现）**：
 1. `uv run python`（3.11）可能有SRE模块mismatch，用系统`python`（3.10）代替
 2. 批量修正评论/分享互换时，**必须逐条对照页面数据**验证每个视频的shares/comments值是否正确，不能只依赖列映射——因为有些视频在日志中已经是正确的，盲目swap会反而搞错
+
+**⚠️ 2026-07-14教训**：batch更新时没有逐条对照页面数据，导致V23/V21的评论和分享被错误交换。**每次batch更新后，必须用read_file重新读取相关行，逐条验证每个视频的评论/分享值是否与页面数据一致。**
+
+### ⚠️ patch 工具 escape drift（2026-07-15发现）
+
+**当 `old_string`/`new_string` 包含复杂中文+特殊字符（如 `\"已完成\"`）时，patch 工具会报 "Escape-drift detected" 错误。**
+
+**症状**：
+```
+Escape-drift detected: old_string and new_string contain the literal sequence '\\\"' 
+but the matched region of the file does not.
+```
+
+**根因**：tool-call serialization 会给引号加反斜杠，但文件中的引号没有反斜杠，导致不匹配。
+
+**解决方案**：用 `head`/`tail` 通过 terminal 操纵文件：
+```bash
+# 示例：在第440行后插入新条目
+cd "path/to/references" && head -440 发展日志.md > /tmp/new_log.md && echo '新条目内容' >> /tmp/new_log.md && tail -n +441 发展日志.md >> /tmp/new_log.md && cp /tmp/new_log.md 发展日志.md
+```
+
+**适用场景**：
+- patch 报 "Escape-drift detected" 错误
+- old_string 包含 `\"`、`\'` 等转义字符
+- 需要插入新行而非替换现有行
 
 ### ⚠️ patch 工具匹配失败的 Python 回退方案
 
@@ -1961,9 +2010,30 @@ terminal(command="uv run python -c 'print(1865/6*100)'")
 
 **根因**：每次添加新视频后，中位数被重新计算，但排序或取中间值的步骤出错。
 
+**🔴🔴🔴 中位数验证步骤（每次计算后必须执行）**
+
 **中位数正确公式**：
 - **N为偶数时**：取第 N/2 和第 N/2+1 位的平均值
 - **N为奇数时**：直接取第 (N+1)/2 位的值（不需要平均！）
+
+**逐条验证方法**：
+```bash
+# 计算中位数后，必须用以下代码验证：
+python -c "
+plays = [368,478,1211,1539,845,1602,1524,1970,2031,12,153,734,2044,1048,1479,2473,2020,1803,2291,310,1614,1880,1982]
+plays.sort()
+n = len(plays)
+if n % 2 == 1:
+    median = plays[n//2]
+else:
+    median = (plays[n//2-1] + plays[n//2]) / 2
+print(f'N={n}, median={median}, sorted[{n//2}]={plays[n//2]}')
+"
+```
+
+**⚠️ 常见错误**：对奇数N也用了偶数公式（取中间两个值平均），导致结果偏移。2026-07-14发现：日志写中位数1600，实际应为1539（sorted[11]），偏差+4.1%。
+
+**2026-07-14教训（回归式修复，2026-07-15发现）**：即使有上述文档和验证代码，agent仍然算错了中位数。根因：没有运行验证代码就直接写入日志。**每次计算中位数后必须运行上述验证代码确认结果。**
 
 **⚠️ Python代码陷阱（2026-07-13发现）**：
 ```python

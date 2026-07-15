@@ -259,3 +259,10 @@ opencli browser douyin eval "document.body.innerText"
 ### vision_analyze在Xiaomi上的问题
 - mimo-v2.5拒绝tool message中的图片格式
 - **绝对不要用截图+vision_analyze方案**，直接用eval提取文本
+
+### PWA/Manifest路径问题（子路径部署）
+- **症状**：浏览器报 `icon.png 404` + `Error while trying to use the following icon from the Manifest`
+- **原因**：站点部署在子路径（如 `/bazi/`）时，manifest.json 里的 icon src 写成了 `/assets/icon.png` 而不是 `/bazi/assets/icon.png`
+- **排查**：检查 manifest.json 中所有 `src` 路径是否包含完整的子路径前缀
+- **注意**：可能有多个 manifest.json（根目录 + public/），确认 HTML 引用的是哪个
+- **修复**：改 manifest 路径后重新部署（Vercel 等平台需 push 代码或重新上传）
