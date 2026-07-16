@@ -133,6 +133,33 @@ netsh winhttp show proxy
 
 - **Push 被拒绝**：远程有本地没有的 commit → 先 pull（merge）再 push
 - **.env 被 add**：`git reset HEAD .env` 然后加到 `.gitignore`
+- **GitHub Secret Scanning 拒绝推送**：文件中包含 token/密钥 → 见下方专项处理
+
+### ⚠️ GitHub Secret Scanning 拒绝推送
+
+GitHub Push Protection 会扫描提交内容，检测到密钥/token 时拒绝推送。即使 `.env` 没被同步，密钥也可能泄露在其他同步文件中（如 skills references、部署文档）。
+
+**触发条件**：push 返回 `remote rejected — Push cannot contain secrets` + 具体文件和行号
+
+**处理流程**：
+```bash
+# 1. 读取被标记的文件，定位 secret
+cat <被标记文件路径>
+
+# 2. 脱敏（替换为环境变量引用或占位符）
+#    ❌ VERCEL_TOKEN=vcp_xxx...
+#    ✅ VERCEL_TOKEN=$VERCEL_TOKEN  （引用环境变量）
+#    ✅ Token 存储在 .env 中（不入库）
+
+# 3. amend 提交
+git add <修改后的文件>
+git commit --amend -m "auto-sync: $(date +%Y-%m-%d) <设备名>更新"
+
+# 4. 重新推送
+git push origin main
+```
+
+**预防**：新建含部署信息的 reference 文件时，不要写入实际 token，只写环境变量名或「见 .env」。在 `git add` 之前用 `git diff --cached` 检查是否有敏感内容。
 - **GitHub 连接超时**：可能是防火墙阻断 443 端口 → 用 `ghfast.top` 代理绕过（见上方）
 
 ### 冲突解决实例
@@ -294,3 +321,4 @@ console.log('Final depth:', d);
 - ⚠️ Vercel 拖拽部署后自定义域名可能仍指向旧 deployment → 用 `vercel promote` 更新别名
 - ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404
 - ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查
+- ⚠️ GitHub Secret Scanning：密钥可能泄露在 skills references/部署文档中（不只是 .env） → push 前检查 `git diff --cached`，发现后 amend + 脱敏重推
