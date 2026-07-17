@@ -355,13 +355,13 @@
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
     "last_patched_at": "2026-07-16T03:16:13.433196+00:00",
-    "last_used_at": "2026-07-16T03:15:07.107065+00:00",
-    "last_viewed_at": "2026-07-16T03:15:07.090559+00:00",
+    "last_used_at": "2026-07-17T03:00:49.345153+00:00",
+    "last_viewed_at": "2026-07-17T03:00:49.330129+00:00",
     "patch_count": 223,
     "pinned": false,
     "state": "active",
-    "use_count": 316,
-    "view_count": 316
+    "use_count": 320,
+    "view_count": 320
   },
   "douyin-download": {
     "archived_at": null,
@@ -550,13 +550,13 @@
     "created_at": "2026-07-04T01:42:16.699812+00:00",
     "created_by": null,
     "last_patched_at": "2026-07-15T14:02:33.887535+00:00",
-    "last_used_at": "2026-07-15T14:02:16.045402+00:00",
-    "last_viewed_at": "2026-07-15T14:02:16.027402+00:00",
+    "last_used_at": "2026-07-17T14:00:25.103536+00:00",
+    "last_viewed_at": "2026-07-17T14:00:25.087521+00:00",
     "patch_count": 18,
     "pinned": false,
     "state": "active",
-    "use_count": 14,
-    "view_count": 14
+    "use_count": 15,
+    "view_count": 15
   },
   "tikhub-api": {
     "archived_at": null,
