@@ -182,10 +182,10 @@ description: |
 ---
 
 ## References（按需加载）
+## References（按需加载）
 
 | 文件 | 内容 | 何时加载 |
 |------|------|---------|
-| references/templates.md | 16个句式模板+原文案例 | 写文案时加载 |
 | references/templates.md | 16个句式模板+原文案例 | 写文案时加载 |
 | references/爆款开头库.md | 61条爆款开头（用户收集） | 阶段2选开头时加载 |
 | references/钩子库.md | 30个钩子+5种类型+使用方法 | 阶段2选开头时加载 |
@@ -193,6 +193,8 @@ description: |
 | references/expression-dna.md | 表达DNA+节奏控制 | 需要风格指导时加载 |
 | references/classic-themes.md | 经典主题素材库 | 选题时加载 |
 | references/sources.md | 调研来源+蒸馏技巧 | 需要找素材时加载 |
+
+**⚠️ 爆款库是内容基因库（2026-07-18 用户纠正）：** 用户说"都不是爆款库里面的开头啊"——写文案时每一个开头都必须从库里选公式再套用，不能凭感觉写。用户对比文案时，每一个"好"或"坏"的关键词都能在爆款库里找到出处。库=DNA，不是参考。
 
 ---
 

@@ -16,8 +16,32 @@ platforms: [windows]
 
 ### 1. 下载视频
 
+**优先方案：yt-dlp**
 ```bash
 mkdir -p D:/videos && unset PYTHONHOME && D:/temp-ytdl/Scripts/python.exe -m yt_dlp "抖音链接" -o "D:/videos/%(title)s.%(ext)s"
+```
+
+**备选方案：Python requests（yt-dlp被403时用）**
+
+yt-dlp报 "Fresh cookies are needed" 时，直接用Python requests带Referer头下载：
+```bash
+unset PYTHONHOME && /e/Python/python.exe -c "
+import requests
+url = '从浏览器console拿到的video.currentSrc'
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    'Referer': 'https://www.douyin.com/',
+}
+r = requests.get(url, headers=headers, stream=True, timeout=60)
+with open('D:/videos/视频标题.mp4', 'wb') as f:
+    for chunk in r.iter_content(chunk_size=8192):
+        f.write(chunk)
+"
+```
+
+获取video URL的方法（Chrome已打开抖音页面时）：
+```bash
+opencli browser douyin eval "document.querySelector('video').currentSrc"
 ```
 
 ### 2. 提取音频（ffmpeg）

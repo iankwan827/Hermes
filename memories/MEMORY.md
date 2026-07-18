@@ -19,7 +19,9 @@ Web系统：八字排盘三栏布局，Gateway API:8642，Node.js中转。性能
 §
 用户痛点：文案简洁；视频50秒-1分30秒。⚠️用户改完文案就是终版。
 §
-⚠️写skill前必须先加载skill-creator（E:/Users/Administrator/AppData/Local/hermes/skills/skill-creator/SKILL.md），按Claude标准写。⚠️改完skill/重要文件必须推GitHub同步Mac：cd /e/Users/Administrator/hermes-repo && git add . && git commit -m "xxx" && git push origin main（冲突时用--force）。Mac拉取：git pull。memory同步文件：docs/memory-sync.md。
+⚠️写skill前先加载skill-creator。改完文件推GitHub：先设代理`git config http.proxy http://127.0.0.1:7897`，再add/commit/push，用完unset。仓库：E:/Users/Administrator/AppData/Local/hermes。
+§
+⚠️用户发的素材/库必须当次session保存成文件（D:/hermes-agent/文案/），不能只在对话里用。发了3-4次爆款开头库都丢了，用户frustrated。"从库里选"→先搜文件是否存在。
 §
 ⚠️搜网页/热点用OpenCLI复用Chrome登录态。提到"热搜"默认抖音（API: douyin.com/aweme/v1/web/hot/search/list/，免登录）。OpenCLI default session已登录抖音可搜话题详情。用户做共鸣类内容，不追体育/娱乐热搜。站点适配器148个。
 §
