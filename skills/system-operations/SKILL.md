@@ -90,23 +90,43 @@ git rm <旧路径文件>    # 删除旧路径（如果存在）
 
 ### ⚠️ GitHub 连接问题：代理/防火墙绕过
 
-在某些网络环境下（如中国大陆），GitHub HTTPS (443端口) 可能被防火墙阻断，但 ICMP ping 正常。症状：`git pull/push` 超时，curl 也连不上 `github.com:443`。
+在某些网络环境下（如中国大陆），GitHub HTTPS (443端口) 可能被防火墙阻断。症状：`git pull/push` 超时，curl 也连不上 `github.com:443`。
 
-#### 解决方案：GitHub 加速代理
+#### 解决方案：本地代理（推荐）
+
+本机代理在 **7897 端口**（Clash），但 git 默认不走系统代理，需要手动设置：
 
 ```bash
-# 1. 设置代理（用于 pull/fetch，解决了连接问题）
+# 1. 设 git 代理
+git config http.proxy http://127.0.0.1:7897
+git config https.proxy http://127.0.0.1:7897
+
+# 2. 正常 push/pull
+git push origin main
+
+# 3. 用完清理（可选，避免影响局域网操作）
+git config --unset http.proxy
+git config --unset https.proxy
+```
+
+**⚠️ 关键发现**：系统代理开了 ≠ git 能走代理。git 不会自动读取系统代理设置，必须用 `git config http.proxy` 手动指定。报 "Connection was reset" / "Could not connect to server" 时，先检查代理端口是否通：
+
+```bash
+# 检查代理端口是否在监听
+netstat -an | grep 7897
+
+# 检查代理是否能通 GitHub
+curl -x http://127.0.0.1:7897 -s --connect-timeout 10 https://github.com | head -c 50
+```
+
+#### 备选方案：GitHub 加速代理
+
+```bash
 git config --global url."https://ghfast.top/https://github.com/".insteadOf "https://github.com/"
-
-# 2. 拉取
 git pull origin main --rebase
-
-# 3. 清理代理后推送（push 走代理反而超时）
 git config --global --unset url."https://ghfast.top/https://github.com/".insteadOf
 git push origin main
 ```
-
-**关键发现**：`ghfast.top` 代理对 pull 生效但 push 会超时。正确流程是：设置代理 → pull → 清理代理 → push。
 
 #### SSH 方案（备选）
 
@@ -117,16 +137,15 @@ git push origin main
 #### 诊断命令
 
 ```bash
-# 检查 HTTPS 连通性
+# 检查 git 代理配置
+git config --get http.proxy
+git config --get https.proxy
+
+# 检查 HTTPS 连通性（走代理）
+curl -x http://127.0.0.1:7897 -s -o /dev/null -w "%{http_code}" --connect-timeout 10 https://github.com
+
+# 检查 HTTPS 连通性（不走代理，通常会超时）
 curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 https://github.com
-
-# 检查 ICMP（ping 可能正常但 HTTPS 不通）
-ping -n 3 github.com
-
-# 检查当前代理设置
-git config --global --get http.proxy
-git config --global --get https.proxy
-netsh winhttp show proxy
 ```
 
 ### 常见问题
@@ -317,7 +336,7 @@ console.log('Final depth:', d);
 - ⚠️ 自动重启的进程：杀了子进程会重生，必须找到父进程
 - ⚠️ Windows 下不要用 `kill` 命令（那是 MSYS/Git Bash 的），用 `taskkill` 或 `wmic`
 - ⚠️ Git 同步时 merge 优于 rebase（自动合并更多）；但如果 cron 指定了 --rebase，可用按文件类型策略手动解决冲突
-- ⚠️ GitHub HTTPS 被墙时：ghfast.top 代理对 pull 生效但 push 会超时，必须 pull 后清理代理再 push
+- ⚠️ GitHub HTTPS 被墙时：git 默认不走系统代理，必须手动 `git config http.proxy http://127.0.0.1:7897` 设代理才能 push/pull。报 Connection reset/timeout 先查代理端口
 - ⚠️ Vercel 拖拽部署后自定义域名可能仍指向旧 deployment → 用 `vercel promote` 更新别名
 - ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404
 - ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查
