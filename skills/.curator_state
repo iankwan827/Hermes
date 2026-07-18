@@ -1,9 +1,9 @@
 {
-  "last_report_path": "E:\\Users\\Administrator\\AppData\\Local\\hermes\\logs\\curator\\20260711-021708",
-  "last_run_at": "2026-07-11T02:17:08.293838+00:00",
-  "last_run_duration_seconds": 28.973797,
-  "last_run_summary": "auto: no changes; llm: The analysis is straightforward: there is only **1 agent-created skill** (`ecommerce-image`) in the entire collection. There are no clusters to form, no siblings to absorb, and no consolidations to perform.\n\n`ecommerce-image` is itself a we…",
+  "last_report_path": "E:\\Users\\Administrator\\AppData\\Local\\hermes\\logs\\curator\\20260718-032248",
+  "last_run_at": "2026-07-18T03:22:48.694045+00:00",
+  "last_run_duration_seconds": 139.640688,
+  "last_run_summary": "auto: no changes; llm: ## Summary\n\n**Processed 1 cluster: Vercel/Web Deployment**\n\nThe agent-created skill collection had 3 skills. Two of them — `vercel-deploy` and `web-deployment` — were ~80% overlapping, covering the same domain: Vercel CLI auth/deploy, Vite …\narchived 1 skill(s):\n  • vercel-deploy → web-deployment\nfull report: hermes curator status\nkeep an umbrella stable: hermes curator pin web-deployment",
   "last_run_summary_shown_at": null,
   "paused": false,
-  "run_count": 6
+  "run_count": 7
 }

@@ -328,14 +328,14 @@
     "archived_at": null,
     "created_at": "2026-06-01T14:32:55.569801+00:00",
     "created_by": null,
-    "last_patched_at": "2026-07-13T09:55:24.082784+00:00",
-    "last_used_at": "2026-07-13T09:55:09.503787+00:00",
-    "last_viewed_at": "2026-07-13T09:55:09.491790+00:00",
-    "patch_count": 143,
+    "last_patched_at": "2026-07-18T03:53:53.532574+00:00",
+    "last_used_at": "2026-07-18T03:48:35.933736+00:00",
+    "last_viewed_at": "2026-07-18T03:48:35.921140+00:00",
+    "patch_count": 147,
     "pinned": false,
     "state": "active",
-    "use_count": 141,
-    "view_count": 141
+    "use_count": 142,
+    "view_count": 142
   },
   "douyin-author-scraper": {
     "archived_at": null,
@@ -354,14 +354,14 @@
     "archived_at": null,
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
-    "last_patched_at": "2026-07-16T03:16:13.433196+00:00",
-    "last_used_at": "2026-07-17T03:00:49.345153+00:00",
-    "last_viewed_at": "2026-07-17T03:00:49.330129+00:00",
-    "patch_count": 223,
+    "last_patched_at": "2026-07-17T15:06:56.992598+00:00",
+    "last_used_at": "2026-07-18T03:00:54.941531+00:00",
+    "last_viewed_at": "2026-07-18T03:00:54.875276+00:00",
+    "patch_count": 224,
     "pinned": false,
     "state": "active",
-    "use_count": 320,
-    "view_count": 320
+    "use_count": 325,
+    "view_count": 325
   },
   "douyin-download": {
     "archived_at": null,
@@ -381,13 +381,13 @@
     "created_at": "2026-06-01T03:35:09.512592+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-06-05T12:39:47.523693+00:00",
-    "last_used_at": "2026-07-11T02:17:33.653074+00:00",
-    "last_viewed_at": "2026-07-11T02:17:33.638100+00:00",
+    "last_used_at": "2026-07-18T03:23:10.687865+00:00",
+    "last_viewed_at": "2026-07-18T03:23:10.671350+00:00",
     "patch_count": 58,
     "pinned": false,
     "state": "active",
-    "use_count": 44,
-    "view_count": 44
+    "use_count": 45,
+    "view_count": 45
   },
   "feishu-integration": {
     "archived_at": null,
@@ -445,14 +445,14 @@
     "archived_at": null,
     "created_at": "2026-06-01T15:27:04.254921+00:00",
     "created_by": null,
-    "last_patched_at": "2026-06-22T09:56:59.567907+00:00",
-    "last_used_at": "2026-06-30T07:34:03.652963+00:00",
-    "last_viewed_at": "2026-06-30T07:34:03.640150+00:00",
-    "patch_count": 20,
+    "last_patched_at": "2026-07-18T03:53:59.264145+00:00",
+    "last_used_at": "2026-07-18T03:48:45.514696+00:00",
+    "last_viewed_at": "2026-07-18T03:48:45.502629+00:00",
+    "patch_count": 27,
     "pinned": false,
     "state": "active",
-    "use_count": 38,
-    "view_count": 38
+    "use_count": 42,
+    "view_count": 42
   },
   "huashu-nuwa": {
     "archived_at": null,
@@ -550,13 +550,13 @@
     "created_at": "2026-07-04T01:42:16.699812+00:00",
     "created_by": null,
     "last_patched_at": "2026-07-15T14:02:33.887535+00:00",
-    "last_used_at": "2026-07-17T14:00:25.103536+00:00",
-    "last_viewed_at": "2026-07-17T14:00:25.087521+00:00",
+    "last_used_at": "2026-07-17T14:07:31.071927+00:00",
+    "last_viewed_at": "2026-07-17T14:07:31.050897+00:00",
     "patch_count": 18,
     "pinned": false,
     "state": "active",
-    "use_count": 15,
-    "view_count": 15
+    "use_count": 16,
+    "view_count": 16
   },
   "tikhub-api": {
     "archived_at": null,
@@ -584,19 +584,6 @@
     "use_count": 13,
     "view_count": 13
   },
-  "vercel-deploy": {
-    "archived_at": null,
-    "created_at": "2026-07-15T08:20:24.385437+00:00",
-    "created_by": "agent",
-    "last_patched_at": "2026-07-15T08:56:30.641373+00:00",
-    "last_used_at": "2026-07-15T08:56:36.308512+00:00",
-    "last_viewed_at": "2026-07-15T08:56:36.294995+00:00",
-    "patch_count": 8,
-    "pinned": false,
-    "state": "active",
-    "use_count": 7,
-    "view_count": 7
-  },
   "video-content-audit": {
     "archived_at": null,
     "created_at": "2026-06-09T04:00:36.332179+00:00",
@@ -614,14 +601,14 @@
     "archived_at": null,
     "created_at": "2026-07-15T08:32:07.049798+00:00",
     "created_by": "agent",
-    "last_patched_at": "2026-07-15T08:50:10.399698+00:00",
-    "last_used_at": "2026-07-15T08:49:34.869716+00:00",
-    "last_viewed_at": "2026-07-15T08:49:34.857212+00:00",
-    "patch_count": 3,
+    "last_patched_at": "2026-07-18T03:23:52.732683+00:00",
+    "last_used_at": "2026-07-18T03:24:59.375485+00:00",
+    "last_viewed_at": "2026-07-18T03:24:59.356460+00:00",
+    "patch_count": 6,
     "pinned": false,
     "state": "active",
-    "use_count": 2,
-    "view_count": 2
+    "use_count": 5,
+    "view_count": 5
   },
   "windows-python-development": {
     "archived_at": null,

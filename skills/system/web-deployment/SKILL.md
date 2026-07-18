@@ -38,6 +38,20 @@ cd /path/to/project && vercel pull --yes
 vercel --prod --yes
 ```
 
+⚠️ **Deploy errors:**
+
+| 错误 | 原因 | 解决 |
+|------|------|------|
+| "No Project Settings found locally" | 没有 `.vercel/project.json` | 先跑 `vercel pull --yes` |
+| 部署到了错误的项目 | 从子目录 deploy，CLI 自动创建新项目 | 回到项目根目录，用 `--name` 指定 |
+| "Did you mean to deploy the subdirectory?" | CLI 检测到子目录有 build 输出 | 确认 cwd 是项目根目录 |
+
+### Delete Mis-created Project
+
+```bash
+echo "y" | VERCEL_TOKEN=<token> vercel project rm <project-name>
+```
+
 ### Custom Domain Alias Issue
 
 ⚠️ **Critical pitfall**: Drag-and-drop uploads and some CLI deploys do NOT automatically update the custom domain alias. The alias may point to an old deployment while `bazi-new-web.vercel.app` shows the latest.
@@ -92,6 +106,22 @@ After deploying new code, browsers may serve old cached SW files.
 **Fix**: Tell user to:
 1. `Ctrl + Shift + R` (hard refresh)
 2. Or: DevTools → Application → Service Workers → Unregister → refresh
+
+### Vercel SW Caching Headers
+
+In `vercel.json` set correct headers for SW files:
+
+```json
+{
+    "source": "/bazi/sw.js",
+    "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/bazi/" }
+    ]
+}
+```
+
+`Service-Worker-Allowed` tells the browser which path scope the SW controls.
 
 ### Workbox Precache Icon Exclusion
 
@@ -195,6 +225,15 @@ Deploying from `dist/` directory creates a new project called "dist" instead of 
 - `vercel build` only builds, doesn't deploy
 - `vercel --prod` builds AND deploys
 - Use `vercel --prod --yes` for non-interactive deployment
+
+### Browser OAuth ≠ CLI login
+⚠️ If `vercel login` times out or is interrupted in PowerShell, the browser may have authorized but CLI didn't receive the callback token. Must re-run `vercel login`.
+
+### Multiple manifest.json files
+Projects may have manifest.json in root, `public/`, and `dist/` (Vite-generated). Changing one is not enough — all must be consistent.
+
+### Agent preference: use CLI, not drag-and-drop
+When deploying, prefer Vercel CLI with token auth. Do not ask user to manually drag files to Vercel dashboard.
 
 ### Browser tool / OpenCLI may not be available
 Chrome CDP port 9222 may not be open, and OpenCLI Browser Bridge extension may be disconnected. Vercel CLI with token auth is the reliable fallback for Vercel operations.
