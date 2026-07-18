@@ -1,6 +1,6 @@
 # Hermes 使用经验日志
 
-## 2026-07-14 ~ 2026-07-17
+## 2026-07-14 ~ 2026-07-18
 
 ---
 
@@ -28,19 +28,25 @@
 6. **深色背景课件 vision_analyze 必定幻觉** — 深色背景的课件截图，vision_analyze 必然产生幻觉。**必须用 Tesseract + 反转颜色。**
    - 来源：skill: course-notes-fusion
 
-7. **录音设备冲突** — 录音进行中时，音量检测失败（设备被录音进程独占）。这是预期行为，不是录音故障。
+7. **子 agent vision_analyze 结果不可靠** — Lesson 21 处理中，Agent1（子agent）用 vision_analyze 读课件OCR后输出的JSON骨架内容不准确（幻觉），主agent需要自己逐片验证OCR内容再修正JSON。**教训：子agent的vision结果不能直接信任，必须主agent亲自验证。**
    - 来源：session_search 2026-07-17
 
-8. **record.py 首次保存延迟** — record.py 每5分钟保存一次文件。启动后目录为空是正常的，需等待第一个保存周期。
+8. **录音设备冲突** — 录音进行中时，音量检测失败（设备被录音进程独占）。这是预期行为，不是录音故障。
+   - 来源：session_search 2026-07-17
+
+9. **record.py 首次保存延迟** — record.py 每5分钟保存一次文件。启动后目录为空是正常的，需等待第一个保存周期。
    - 来源：session_search 2026-07-17
 
 #### 🟢 已验证的经验
 
-9. **调候优先于扶抑** — 夏季出生的八字，取用神时调候（季节性调整）优先级高于扶抑（日主强弱）。Lesson 17 Case 2 验证。
-   - 来源：skill: bazi-system
+10. **调候优先于扶抑** — 夏季出生的八字，取用神时调候（季节性调整）优先级高于扶抑（日主强弱）。Lesson 17 Case 2 验证。
+    - 来源：skill: bazi-system
 
-10. **等一天策略（Wait-one-day）** — 周二开盘价 87.5% 比周一便宜，平均多省5个百分点。
+11. **等一天策略（Wait-one-day）** — 周二开盘价 87.5% 比周一便宜，平均多省5个百分点。
     - 来源：skill: stock-screener
+
+12. **course-notes-fusion 五阶段流程验证** — Lesson 21 完整执行了5阶段流程（Agent1 JSON骨架→Agent7题外话→Agent2+3填充→Agent5校对+Agent6完整性检查→终稿三路合流），268个block上传飞书0失败。**流程可靠，可复用。**
+    - 来源：session_search 2026-07-17
 
 ---
 
@@ -49,12 +55,15 @@
 | 发现 | 来源 | 日期 |
 |------|------|------|
 | course-notes-fusion 架构升级：Agent1 输出 JSON 骨架，Agent2+3 按"合同"填充内容，解决多页幻灯片编号混乱问题 | session_search | 2026-07-15 |
-| 子 agent 的 vision_analyze 结果不可靠，必须自己逐片验证 | skill: course-notes-fusion | 2026-07-15 |
+| 子 agent 的 vision_analyze 结果不可靠，必须自己逐片验证 | session_search | 2026-07-17 |
 | 财经类话题标题必须用悬念钩子，不能科普式平铺直叙（视频7数据验证） | skill: video-content-audit | 2026-07-14 |
 | 开头前2秒决定生死（2s跳出率>30%算法不推），推荐页<60%说明算法不感兴趣 | skill: video-content-audit | 2026-07-14 |
-| lesson 20 笔记处理：课件含前一课内容时需小心去重 | session_search | 2026-07-16 |
+| Lesson 20 笔记处理：课件含前一课内容时需小心去重 | session_search | 2026-07-16 |
+| Lesson 21 OCR直接调Xiaomi API绕过vision_analyze（深色背景课件专用方案） | session_search | 2026-07-17 |
+| Agent5校对+Agent6完整性检查并行执行效率高，Lesson 21中Agent5修正10处+标记12处⚠️，Agent6发现4项遗漏 | session_search | 2026-07-17 |
 | ffmpeg avfoundation 假录——计时器显示录了N秒但文件只有几秒，macOS 已知问题 | skill: macos-audio-recording | — |
 | akshare 安装到 --user 不被 venv 的 python 看到，必须在 venv 内安装 | skill: stock-screener | — |
+| 八字课语录管理：Day94-99新增5条（食伤旺挑老板、便秘组合、羊刃查法、地支自刑、找不到女朋友原因） | session_search | 2026-07-18 |
 
 ---
 
@@ -69,16 +78,19 @@
 - **配置修改用 hermes config set**：不要直接编辑 yaml
 - **飞书笔记必须忠实讲师原话**：不能AI改写课件原文
 - **不要自作主张修改笔记文件**：用户对未经许可的修改极度敏感
+- **课件无案例但转录稿有时，笔记必须包含转录稿案例**：不能因为课件没写就跳过
 
 ---
 
 ### Skill 更新
 
-#### course-notes-fusion（课程笔记融合）— 架构重大升级
+#### course-notes-fusion（课程笔记融合）— 架构重大升级 + 流程验证
 - Agent1 从输出 markdown 改为输出 JSON 骨架（`课件结构.json`）
 - Agent2+3 按 JSON"合同"填充 📋/🎙️ 内容
 - 每张幻灯片的章节独立编号，解决跨页编号混乱
 - 新增：子 agent vision_analyze 结果不可靠的警告
+- **Lesson 21 验证**：五阶段流程完整跑通，268个block上传飞书0失败
+- **新增OCR方案**：深色背景课件直接调Xiaomi API OCR，绕过vision_analyze
 
 #### video-content-audit（视频文案审核）— 新增数据驱动规则
 - 财经类标题必须用悬念钩子
@@ -97,6 +109,9 @@
 - 粤语转录用 `--language zh` 不要用 `yue`
 - 录完必须写 skill（防止下次失忆）
 - 必须加载本 skill 再录音
+
+#### bazi-yulu（八字语录管理）— Day94-99新增
+- 新增5条课程语录：食伤旺挑老板、便秘组合、羊刃查法与身强弱、地支自刑、找不到女朋友原因
 
 #### dingtalk-live（钉钉直播）— 新增避坑
 - Finder 窗口挡住钉钉，必须先用 AppleScript 强制前台
