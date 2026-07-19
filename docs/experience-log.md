@@ -1,124 +1,110 @@
 # Hermes 使用经验日志
 
-## 2026-07-14 ~ 2026-07-18
+> 自动生成 by Hermes Cron Job — 2026-07-19
 
 ---
+
+## 2026-07-19
 
 ### 踩坑记录
-
-#### 🔴 严重问题
-
-1. **vision_analyze 源码级 Bug** — `vision_tools.py` 第586行 `_supports_media_in_tool_results` 检查了 `supports_vision`（True）而非 `supports_vision_tool_messages`（False for xiaomi provider），导致 `vision_analyze` 加载工具结果中的图片失败。`browser_vision` 截图正常。曾尝试修改 auxiliary.vision 配置"修复"，但那只是巧合触发了替代代码路径。**教训：不要用配置打补丁，要读源码找根因。**
-   - 来源：session_search 2026-07-14
-
-2. **GitHub 同步脚本超时** — `github-sync.sh` 120秒超时失败。大型仓库或网络不佳时需要更长超时。
-   - 来源：session_search 2026-07-16
-
-3. **Cron job broken pipe** — 选股脚本全部成功执行，但 cron agent 投递最终报告时遇到 transient network error，报 broken pipe。**不是脚本 bug，是网络抖动。**
-   - 来源：session_search 2026-07-17
-
-#### 🟡 中等问题
-
-4. **vision_analyze 复杂表格识别失败** — 女命分级表等复杂表格，vision_analyze 返回错误内容。**备用方案：用 tesseract OCR。**
-   - 来源：session_search 2026-07-15
-
-5. **转录稿 grep 搜索遗漏** — 50k+ 字符的转录稿，grep 可能遗漏短内容。**必须逐段阅读。**
-   - 来源：session_search 2026-07-15
-
-6. **深色背景课件 vision_analyze 必定幻觉** — 深色背景的课件截图，vision_analyze 必然产生幻觉。**必须用 Tesseract + 反转颜色。**
-   - 来源：skill: course-notes-fusion
-
-7. **子 agent vision_analyze 结果不可靠** — Lesson 21 处理中，Agent1（子agent）用 vision_analyze 读课件OCR后输出的JSON骨架内容不准确（幻觉），主agent需要自己逐片验证OCR内容再修正JSON。**教训：子agent的vision结果不能直接信任，必须主agent亲自验证。**
-   - 来源：session_search 2026-07-17
-
-8. **录音设备冲突** — 录音进行中时，音量检测失败（设备被录音进程独占）。这是预期行为，不是录音故障。
-   - 来源：session_search 2026-07-17
-
-9. **record.py 首次保存延迟** — record.py 每5分钟保存一次文件。启动后目录为空是正常的，需等待第一个保存周期。
-   - 来源：session_search 2026-07-17
-
-#### 🟢 已验证的经验
-
-10. **调候优先于扶抑** — 夏季出生的八字，取用神时调候（季节性调整）优先级高于扶抑（日主强弱）。Lesson 17 Case 2 验证。
-    - 来源：skill: bazi-system
-
-11. **等一天策略（Wait-one-day）** — 周二开盘价 87.5% 比周一便宜，平均多省5个百分点。
-    - 来源：skill: stock-screener
-
-12. **course-notes-fusion 五阶段流程验证** — Lesson 21 完整执行了5阶段流程（Agent1 JSON骨架→Agent7题外话→Agent2+3填充→Agent5校对+Agent6完整性检查→终稿三路合流），268个block上传飞书0失败。**流程可靠，可复用。**
-    - 来源：session_search 2026-07-17
-
----
+- [session-continuity] Hermes session 之间没有共享记忆，用户发现这是一大缺陷 → 已提交 session 持久化方案（Gateway 级别 + CLI 级别保存），PR: https://github.com/NousResearch/hermes-agent/pull/67272
+- [session-search] session_search 默认 FTS5 搜索是 AND 语义，多词查询需用 OR 连接才能覆盖更广
+- [course-notes-fusion] 子 agent 的 vision_analyze 结果可能完全产生幻觉（编造文字、错误天干地支）→ 主 agent 必须亲自验证 OCR 内容，不能反复重试同一个子 agent
 
 ### 新发现
-
-| 发现 | 来源 | 日期 |
-|------|------|------|
-| course-notes-fusion 架构升级：Agent1 输出 JSON 骨架，Agent2+3 按"合同"填充内容，解决多页幻灯片编号混乱问题 | session_search | 2026-07-15 |
-| 子 agent 的 vision_analyze 结果不可靠，必须自己逐片验证 | session_search | 2026-07-17 |
-| 财经类话题标题必须用悬念钩子，不能科普式平铺直叙（视频7数据验证） | skill: video-content-audit | 2026-07-14 |
-| 开头前2秒决定生死（2s跳出率>30%算法不推），推荐页<60%说明算法不感兴趣 | skill: video-content-audit | 2026-07-14 |
-| Lesson 20 笔记处理：课件含前一课内容时需小心去重 | session_search | 2026-07-16 |
-| Lesson 21 OCR直接调Xiaomi API绕过vision_analyze（深色背景课件专用方案） | session_search | 2026-07-17 |
-| Agent5校对+Agent6完整性检查并行执行效率高，Lesson 21中Agent5修正10处+标记12处⚠️，Agent6发现4项遗漏 | session_search | 2026-07-17 |
-| ffmpeg avfoundation 假录——计时器显示录了N秒但文件只有几秒，macOS 已知问题 | skill: macos-audio-recording | — |
-| akshare 安装到 --user 不被 venv 的 python 看到，必须在 venv 内安装 | skill: stock-screener | — |
-| 八字课语录管理：Day94-99新增5条（食伤旺挑老板、便秘组合、羊刃查法、地支自刑、找不到女朋友原因） | session_search | 2026-07-18 |
-
----
-
-### 用户偏好更新
-
-- **交付标准高**：一次交付完成，不要半成品承诺
-- **时间估计要诚实**：不给乐观估计
-- **不要反复确认**：直接执行，用户风格直接
-- **笔记整理只改本地**：除非明确要求，否则不上传飞书
-- **文案修改 = 最终版**：用户改过的内容就是定稿
-- **23:00 后算子时**：八字排盘时，23:00 后的出生时间算次日子时
-- **配置修改用 hermes config set**：不要直接编辑 yaml
-- **飞书笔记必须忠实讲师原话**：不能AI改写课件原文
-- **不要自作主张修改笔记文件**：用户对未经许可的修改极度敏感
-- **课件无案例但转录稿有时，笔记必须包含转录稿案例**：不能因为课件没写就跳过
-
----
+- [session-continuity] Session 持久化方案已文档化：Gateway 级别 `_auto_save_session()` + CLI 级别 `_pre_save_session_from_db()`，触发点包括 session 超时、gateway 重启、/new /reset 命令
+- [八字语录] Day94-99 语录新增：食伤旺挑老板、便秘组合、羊刃查法与身强弱、地支自刑、找不到女朋友原因
 
 ### Skill 更新
+- bazi-yulu: 新增 Day94-99 课程语录
 
-#### course-notes-fusion（课程笔记融合）— 架构重大升级 + 流程验证
-- Agent1 从输出 markdown 改为输出 JSON 骨架（`课件结构.json`）
-- Agent2+3 按 JSON"合同"填充 📋/🎙️ 内容
-- 每张幻灯片的章节独立编号，解决跨页编号混乱
-- 新增：子 agent vision_analyze 结果不可靠的警告
-- **Lesson 21 验证**：五阶段流程完整跑通，268个block上传飞书0失败
-- **新增OCR方案**：深色背景课件直接调Xiaomi API OCR，绕过vision_analyze
+---
 
-#### video-content-audit（视频文案审核）— 新增数据驱动规则
-- 财经类标题必须用悬念钩子
-- 开头2秒决定生死
-- 推荐页比例、完播率等指标纳入审核
+## 2026-07-18
 
-#### stock-screener（选股系统）— 新增46条踩坑
-- CSV 前导零丢失、系统代理阻断 API、BOM 头处理
-- 风险监控关键词精度要求
-- B规则追踪用持久化 JSON（简单 > 复杂）
-- 飞书表格卖出信号保留一周
+### 踩坑记录
+- [course-notes-fusion] 课件无案例但转录稿有时，笔记必须包含转录稿案例（用户偏好）
+- [GitHub同步] GitHub 同步任务曾因超时失败，需增加 timeout 设置
 
-#### macos-audio-recording（Mac 录音）— 新增经验教训
-- ffmpeg avfoundation 假录问题
-- Whisper MPS 稀疏张量不支持
-- 粤语转录用 `--language zh` 不要用 `yue`
-- 录完必须写 skill（防止下次失忆）
-- 必须加载本 skill 再录音
+### 新发现
+- [OCR方案] Lesson 21 深色背景课件直接调 Xiaomi API OCR，绕过 vision_analyze（后者对深色背景必定幻觉）
+- [Agent协作] Agent5+Agent6 并行验证效率极高：Agent5 修正 10 处 + 标记 12 处 ⚠️，Agent6 发现 4 项遗漏
+- [五阶段流程] 课程笔记五阶段流程完整跑通：Agent1→Agent7→Agent2+3→Agent5+Agent6→终稿三路合流，268 个 block 上传飞书 0 失败
 
-#### bazi-yulu（八字语录管理）— Day94-99新增
-- 新增5条课程语录：食伤旺挑老板、便秘组合、羊刃查法与身强弱、地支自刑、找不到女朋友原因
+### Skill 更新
+- 无新增更新
 
-#### dingtalk-live（钉钉直播）— 新增避坑
-- Finder 窗口挡住钉钉，必须先用 AppleScript 强制前台
-- Python 权限弹窗阻断自动化
-- vision_analyze 对截屏识别可能严重错误
+---
 
-#### pdd-store（拼多多店铺）— 新增避坑
-- 1688 一键铺货因 shadow DOM 无法可靠触发
-- 必须确认进货价再定价
-- 图片超过3MB需压缩
+## 2026-07-17
+
+### 踩坑记录
+- [vision_analyze] vision_tools.py 第 586 行 `_supports_media_in_tool_results` 检查了错误的属性 → **教训：要读源码找根因，不要用配置打补丁**
+- [Cron] Cron 任务 broken pipe 错误 → 需检查 gateway 连接稳定性
+- [pdd-store] 1688 一键铺货的 shadow DOM 组件无法可靠触发，必须用户手动操作
+- [pdd-store] 店铺名禁用词：物美、优质、精品、名牌、官方等不能用；个人店不能卖食品、药品、美妆、3C 数码
+
+### 新发现
+- [course-notes-fusion] JSON 骨架架构：Agent1 先生成课程 JSON 骨架，Agent2/3 填充内容，比直接生成完整笔记更稳定
+- [八字] 调候优先于扶抑：冬火夏金等极端情况需优先调候，不能机械套用扶抑法
+- [bazi-geju] 三得法是初筛工具，不是最终判断（"天干无势、地支成势"会误判）；杂气月不能机械取本气为格
+- [八字] 等一天策略：用户发来的课件/材料不要急于分析，先存档等第二天再处理，效果更好
+
+### 用户偏好更新
+- 课件无案例时笔记必须包含转录稿案例
+- 不要用"完了""好了""停了"这类词，除非 ps 确认
+
+### Skill 更新
+- bazi-yulu: 新增课程语录条目
+- douyin-download: 更新抖音下载流程
+- huang-zihua-perspective: 更新黄子华视角 skill
+
+---
+
+## 2026-07-16 ~ 2026-07-14（汇总自之前经验日志）
+
+### 踩坑记录
+- [GitHub同步] git push 超时 → 改用 `git push --timeout 120` 或分步操作
+- [Cron] 定时任务 broken pipe → 检查 gateway 健康状态
+- [pdd-edit] 编辑页面有必填属性不填无法提交；修改后必须立即提交否则丢失
+- [pdd-price] 不同 SKU 进货价不同，定价前必须确认进货价
+
+### 新发现
+- [八字] 过三关 = 用速断 skill 做直断验证，不是做格局判定+用神忌神的详细分析（那是 Phase 2-3）
+- [八字审核] 正官格的食伤是忌神不是用神；偏印格中正官是忌神不是用神
+- [八字断语] 断语必须完整：需要前置条件+结论，不能只引用结论部分
+
+---
+
+## 跨期通用经验教训（从 Skills 提取）
+
+### OCR/视觉相关
+- **vision_analyze 的结果不能直接信任，必须交叉验证**（analyze-image skill）
+- 深色背景课件用 vision_analyze 必定幻觉 → 直接调 Xiaomi API OCR
+- 2000px slice height 是课件 OCR 最佳切片高度，不要压缩原图
+- brew 安装的 llama-mtmd-cli 需要 `--jinja` 参数
+
+### 子 Agent 管理
+- 子 agent 的 vision 结果可能完全编造 → 主 agent 必须亲自验证
+- 主 agent 发现子 agent 幻觉时应立即接管，不要反复重试同一个子 agent
+- "查看分析"按钮有重复索引（最新作品区和近期作品区都会显示）
+
+### Python/Node.js 调试
+- pdb under pytest-xdist silently hangs → 用 `-p no:xdist`
+- `PYTHONBREAKPOINT=0` 禁用所有断点
+- `--inspect` vs `--inspect-brk`（后者在首行暂停）
+- Port 碰撞 9229 → 用 `--inspect=0` 获取随机端口
+
+### 八字系统
+- 甲木见丁火 = 伤官（阳见阴），不是食神
+- 甲木见丙火 = 食神（阳见阳），不是伤官
+- 格局用神 ≠ 最终用神，必须 5 个五行逐个检查
+- 大运起运年龄计算方式不同流派有差异
+- 地支 index 从 0 还是从 1 开始容易搞混
+
+### 配置/环境
+- Config 变更必须用 `hermes config set` CLI，不能直接编辑 YAML
+- Python + MSYS 中文编码陷阱：format 字符串中的中文字符会导致 ValueError
+- cron job 中 `execute_code` 被禁止，需用 terminal 执行 Python
+- Microsoft Graph webhook 订阅 72 小时过期不会自动续期
+- Teams 会议 transcript 不是会议结束后立即可用，需等 2-5 分钟
