@@ -1,6 +1,25 @@
 # Hermes 使用经验日志
 
-> 自动生成 by Hermes Cron Job — 2026-07-19
+> 自动生成 by Hermes Cron Job — 2026-07-20
+
+---
+
+## 2026-07-20
+
+### 踩坑记录
+- [course-notes-fusion] 笔记中八字排盘写成了复杂表格（四柱+藏干+十神+五行力量），用户明确只要一行简单格式「壬午 癸卯 丁丑 壬寅」→ **教训：记笔记只写一行八字，不搞花里胡哨的表格**（来源：session 20260720_075850）
+- [browser-cdp] 访问政府网站（hrss.zhaoqing.gov.cn）需要用 Chrome CDP 模式，先杀已有 Chrome 再用临时 profile 启动 → 来源：session 20260720
+
+### 新发现
+- [执行价采集] 2026-07-20（周一）执行价采集：平均滑点 +2.18%，星宸科技 +20% 异常高开。第一池（稳健）整体表现优于第二池（成长），跨周末持有放大滑点
+- [八字语录] Day96-99 语录新增：食伤人口才好但需七杀约束逻辑、官杀的威慑逻辑、食伤追星心态、印星食神佛系 vs 伤官急躁、偏印旺容易偏科
+
+### 用户偏好更新
+- **笔记格式**：八字案例只写一行（天干地支），不要做四柱表格、藏干、十神、五行力量等复杂排版。用户原话「就让你写这么简单一行，浪费了我那么多tokens」
+- **肇庆一次性创业资助**：用户关注1万元资助政策，需要查具体金额和条件
+
+### Skill 更新
+- bazi-yulu: 追加 Day96-99 语录（5条）
 
 ---
 
@@ -10,9 +29,11 @@
 - [session-continuity] Hermes session 之间没有共享记忆，用户发现这是一大缺陷 → 已提交 session 持久化方案（Gateway 级别 + CLI 级别保存），PR: https://github.com/NousResearch/hermes-agent/pull/67272
 - [session-search] session_search 默认 FTS5 搜索是 AND 语义，多词查询需用 OR 连接才能覆盖更广
 - [course-notes-fusion] 子 agent 的 vision_analyze 结果可能完全产生幻觉（编造文字、错误天干地支）→ 主 agent 必须亲自验证 OCR 内容，不能反复重试同一个子 agent
+- [hermes-gateway-restart] `hermes gateway restart` 直接杀进程，不触发 graceful shutdown hooks → CLI 层面需在发 SIGTERM 前先保存 session（已实现 `_pre_save_session_from_db()`）
 
 ### 新发现
 - [session-continuity] Session 持久化方案已文档化：Gateway 级别 `_auto_save_session()` + CLI 级别 `_pre_save_session_from_db()`，触发点包括 session 超时、gateway 重启、/new /reset 命令
+- [session-continuity] 完整文档 `session-continuity-changes.md` 已推到个人同步仓库 `iankwan827/Hermes`，供 macOS ↔ Windows 通讯
 - [八字语录] Day94-99 语录新增：食伤旺挑老板、便秘组合、羊刃查法与身强弱、地支自刑、找不到女朋友原因
 
 ### Skill 更新
@@ -30,9 +51,6 @@
 - [OCR方案] Lesson 21 深色背景课件直接调 Xiaomi API OCR，绕过 vision_analyze（后者对深色背景必定幻觉）
 - [Agent协作] Agent5+Agent6 并行验证效率极高：Agent5 修正 10 处 + 标记 12 处 ⚠️，Agent6 发现 4 项遗漏
 - [五阶段流程] 课程笔记五阶段流程完整跑通：Agent1→Agent7→Agent2+3→Agent5+Agent6→终稿三路合流，268 个 block 上传飞书 0 失败
-
-### Skill 更新
-- 无新增更新
 
 ---
 
@@ -61,21 +79,6 @@
 
 ---
 
-## 2026-07-16 ~ 2026-07-14（汇总自之前经验日志）
-
-### 踩坑记录
-- [GitHub同步] git push 超时 → 改用 `git push --timeout 120` 或分步操作
-- [Cron] 定时任务 broken pipe → 检查 gateway 健康状态
-- [pdd-edit] 编辑页面有必填属性不填无法提交；修改后必须立即提交否则丢失
-- [pdd-price] 不同 SKU 进货价不同，定价前必须确认进货价
-
-### 新发现
-- [八字] 过三关 = 用速断 skill 做直断验证，不是做格局判定+用神忌神的详细分析（那是 Phase 2-3）
-- [八字审核] 正官格的食伤是忌神不是用神；偏印格中正官是忌神不是用神
-- [八字断语] 断语必须完整：需要前置条件+结论，不能只引用结论部分
-
----
-
 ## 跨期通用经验教训（从 Skills 提取）
 
 ### OCR/视觉相关
@@ -87,7 +90,6 @@
 ### 子 Agent 管理
 - 子 agent 的 vision 结果可能完全编造 → 主 agent 必须亲自验证
 - 主 agent 发现子 agent 幻觉时应立即接管，不要反复重试同一个子 agent
-- "查看分析"按钮有重复索引（最新作品区和近期作品区都会显示）
 
 ### Python/Node.js 调试
 - pdb under pytest-xdist silently hangs → 用 `-p no:xdist`
