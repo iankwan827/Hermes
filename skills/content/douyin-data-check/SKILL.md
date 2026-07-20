@@ -238,7 +238,7 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 **如果行数不足（仍受虚拟滚动限制）**：
 1. 对于cron job（只关注新视频+近期变化）：前10-20行足够——新视频在最前面
 2. 如果需要全部视频数据：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动
-3. **滚动加载 workaround（2026-07-17验证）**：先提取前10行数据，然后执行 `window.scrollTo(0, document.body.scrollHeight)` + `sleep 2`，再次提取——页面会渲染更多行。实测从10行加载到全部26行。注意：此方法依赖页面实现，可能在版本更新后失效
+3. **滚动加载 workaround（2026-07-17验证，2026-07-19不可靠）**：尝试滚动表格父容器 `container.scrollTop = container.scrollHeight` + `sleep 2`，再次提取——页面可能渲染更多行。**⚠️ 此方法不可靠**：2026-07-17实测可加载全部26行，但2026-07-19实测仅显示11行（10视频+1空行），滚动后行数不变。行为随页面版本变化，不要依赖此方法
 
 ```bash
 # Step 4：提取视频列表数据
