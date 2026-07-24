@@ -266,6 +266,24 @@ opencli browser douyin eval "document.body.innerText"
 
 **🔴🔴🔴 强制验证步骤（每次写入前必须执行）**
 
+### 🔴 Cron Job Patch Verification Protocol（每次patch后必须执行）
+
+Cron job中写update entry ≠ 完成修复。**每次用patch修改表格后，必须执行以下验证：**
+
+```bash
+# 1. patch修改表格行后，立即grep验证
+grep "V21" 发展日志.md | head -1
+# 确认输出中评论列和分享列与页面数据一致
+
+# 2. 对比页面数据（已在eval中获取）
+# 页面: V21 likes=13 shares=0 comments=1 fav=2
+# 日志: V21 ... | 13 | 0 | 1 | 2 |  ← 必须一致
+
+# 3. 如果patch返回success但grep显示旧值，用head/tail直接修改文件行
+```
+
+**铁律**：`patch`返回success ≠ 修改生效。必须grep验证。
+
 **写入发展日志前，必须逐字对照页面数据和日志列顺序：**
 
 ```
