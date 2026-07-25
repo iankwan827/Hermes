@@ -1,9 +1,9 @@
 {
-  "last_report_path": "E:\\Users\\Administrator\\AppData\\Local\\hermes\\logs\\curator\\20260718-032248",
-  "last_run_at": "2026-07-18T03:22:48.694045+00:00",
-  "last_run_duration_seconds": 139.640688,
-  "last_run_summary": "auto: no changes; llm: ## Summary\n\n**Processed 1 cluster: Vercel/Web Deployment**\n\nThe agent-created skill collection had 3 skills. Two of them — `vercel-deploy` and `web-deployment` — were ~80% overlapping, covering the same domain: Vercel CLI auth/deploy, Vite …\narchived 1 skill(s):\n  • vercel-deploy → web-deployment\nfull report: hermes curator status\nkeep an umbrella stable: hermes curator pin web-deployment",
+  "last_report_path": "E:\\Users\\Administrator\\AppData\\Local\\hermes\\logs\\curator\\20260725-033837",
+  "last_run_at": "2026-07-25T03:38:37.039181+00:00",
+  "last_run_duration_seconds": 144.043413,
+  "last_run_summary": "auto: no changes; llm: ## Summary\n\nAfter thorough analysis of the complete skill landscape:\n\n**Candidate Skills Analyzed:** 2 agent-created skills\n1. **ecommerce-image** - Highly specialized ecommerce product image generation workflow (Gemini/MiniMax)\n2. **web-de…",
   "last_run_summary_shown_at": null,
   "paused": false,
-  "run_count": 7
+  "run_count": 8
 }

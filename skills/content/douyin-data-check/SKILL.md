@@ -1619,9 +1619,34 @@ patch(path="发展日志.md", old_string="旧内容", new_string="新内容")
    ```
 4. **如果patch失败（escape-drift等），用head/tail或Python直接修改文件行**，不能因为patch失败就跳过表格修改
 
+### ⚠️ 文件重建操作可能丢失已应用的patches（2026-07-24发现）
+
+**当用 `echo + cat + mv` 重建文件（如在文件末尾追加新行）时，同一session中已用patch工具修改的内容可能丢失。**
+
+**症状**：patch返回success，grep验证也显示新值，但执行 `head -N file > /tmp/new && cat file >> /tmp/new && mv /tmp/new file` 后，grep显示旧值。
+
+**根因**：`cat`命令读取的是磁盘上的文件，但patch工具可能在内存中缓存了修改，或者重建操作的时序导致读取了patch前的版本。
+
+**解决方案**：重建文件后，**必须重新应用所有patches**，并用grep逐条验证。
+
+**正确流程**：
+```bash
+# 1. 先应用所有patches
+patch(path="发展日志.md", old_string="...", new_string="...")
+
+# 2. 再执行文件重建操作（如追加新行）
+head -N 发展日志.md > /tmp/new.md && echo '新条目' >> /tmp/new.md && cp /tmp/new.md 发展日志.md
+
+# 3. 重新应用所有patches（因为步骤2可能丢失了步骤1的修改）
+patch(path="发展日志.md", old_string="...", new_string="...")
+
+# 4. grep验证每条修改
+grep "V21" 发展日志.md | head -1
+```
+
 ### ⚠️ patch 工具 escape drift（2026-07-15发现）
 
-**当 `old_string`/`new_string` 包含复杂中文+特殊字符（如 `\"已完成\"`）时，patch 工具会报 "Escape-drift detected" 错误。**
+**当 `old_string`/`new_string` 包含复杂中文+特殊字符（如 `\\\"已完成\\\"`）时，patch 工具会报 "Escape-drift detected" 错误。**
 
 **症状**：
 ```
