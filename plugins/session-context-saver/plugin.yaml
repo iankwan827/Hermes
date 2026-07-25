@@ -1,0 +1,6 @@
+name: session-context-saver
+version: 1.0.0
+description: "Saves the last 100 messages of an expired session to a JSON file, so the next session can read it for context continuity."
+author: "guanmian"
+hooks:
+  - on_session_finalize
