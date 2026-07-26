@@ -1,0 +1,672 @@
+{
+  "domain": "婚姻感情",
+  "description": "八字看婚姻感情的完整知识库",
+  "core_logic": "八字看婚姻以配偶星特质、夫妻宫稳定度、日支同五行风险、五行神煞、日柱空亡四个维度为核心，配偶星反映理想伴侣，夫妻宫决定实际缘分，日支刑冲克害预示婚灾风险，中年空亡易有变化。",
+
+  "section_1_sexual_intimacy_judgment": {
+    "title": "婚恋核心判断 - 性亲密度分析",
+
+    "subsection_1_sexual_coldness": {
+      "title": "感情敏感程度（性冷淡/性热）（第1-16行）",
+      "items": [
+        {
+          "line": 4,
+          "gender": "男命",
+          "condition": "水弱或无水",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['劫财','比肩']).presence + pillars[] (filter: zhi in ['子','亥'])",
+          "meaning": "肾水不足，阳痿早泄，性欲减退",
+          "accuracy": "90%"
+        },
+        {
+          "line": 5,
+          "gender": "男命",
+          "condition": "印星过旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang === true",
+          "meaning": "理性压制欲望，道德感过强，对性兴趣不大",
+          "accuracy": "85%"
+        },
+        {
+          "line": 6,
+          "gender": "男命",
+          "condition": "比劫重重",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).presence.in_stems === true AND .presence.in_branches === true",
+          "meaning": "对女性兴趣缺乏，性关系自私",
+          "accuracy": "80%"
+        },
+        {
+          "line": 7,
+          "gender": "男命",
+          "condition": "官杀混杂",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官').presence AND ten_gods[] (filter: name === '七杀').presence",
+          "meaning": "压力过大，性焦虑",
+          "accuracy": "80%"
+        },
+        {
+          "line": 8,
+          "gender": "男命",
+          "condition": "日坐正印",
+          "data_source": "bazi_result.json → pillars[5].hidden_gans[] (filter: shishen === '正印')",
+          "meaning": "对伴侣缺乏性冲动，婚姻平淡",
+          "accuracy": "85%"
+        },
+        {
+          "line": 11,
+          "gender": "女命",
+          "condition": "水弱水寒",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).presence OR pillars[] (filter: zhi in ['子','亥'])",
+          "meaning": "宫寒，性冷淡，月经不调",
+          "accuracy": "90%"
+        },
+        {
+          "line": 12,
+          "gender": "女命",
+          "condition": "印星过旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang === true",
+          "meaning": "情感冷漠，对性持羞耻感",
+          "accuracy": "85%"
+        },
+        {
+          "line": 13,
+          "gender": "女命",
+          "condition": "财星空亡",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).presence === false AND dynamics.features[] (filter: contains '空亡')",
+          "meaning": "对男女之事无欲望",
+          "accuracy": "80%"
+        },
+        {
+          "line": 14,
+          "gender": "女命",
+          "condition": "日坐正印",
+          "data_source": "bazi_result.json → pillars[5].hidden_gans[] (filter: shishen === '正印')",
+          "meaning": "对丈夫缺乏性热情",
+          "accuracy": "85%"
+        }
+      ]
+    },
+
+    "subsection_2_sexual_position_preference": {
+      "title": "性爱姿势偏好（第18-37行）",
+      "core_formula": "核心公式计算性观念开放程度",
+      "items": [
+        {
+          "line": 21,
+          "formula_element": "伤官旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官' AND is_wang === true)",
+          "result": "性观念开放，喜欢创新姿势"
+        },
+        {
+          "line": 22,
+          "formula_element": "正官旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官' AND is_wang === true)",
+          "result": "偏好传统姿势"
+        },
+        {
+          "line": 23,
+          "formula_element": "日支坐桃花+沐浴",
+          "data_source": "bazi_result.json → pillars[5].shen_sha[] (filter: contains '桃花' OR contains '沐浴')",
+          "result": "姿势多样，性观念开放"
+        },
+{
+          "line": 24,
+          "formula_element": "日支坐偏财",
+          "data_source": "bazi_result.json → pillars[5].hidden_gans[] (filter: shishen === '偏财')",
+          "result": "喜欢尝试新姿势"
+        },
+        {
+          "line": 25,
+          "formula_element": "时柱劫财旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '劫财' AND is_wang === true AND occurrences[].pillar in [6,7])",
+          "result": "欲望强烈"
+        }
+      ],
+      "mnemonic": "五行金主导木保守，水多变火热烈土稳重；官杀强食伤开，财星实用印星温柔；桃花浪漫沐浴开放，夫妻宫定核心姿势"
+    },
+
+    "subsection_3_sexual_sensitivity": {
+      "title": "性敏感程度（第39-63行）",
+      "items": [
+        {
+          "line": 42,
+          "sensitivity_formula": "高敏感公式（男命）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强'",
+          "data_check": "food_injury_旺 AND 桃花神煞 AND 偏财 AND 身强",
+          "result": "高敏感体质"
+        },
+        {
+          "line": 45,
+          "sensitivity_zone": "木旺（甲乙寅卯）",
+          "data_source": "bazi_result.json → (ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强') AND (day_master.element === '木')",
+          "sensitive_areas": "阴毛浓密，腿部、手臂敏感"
+        },
+        {
+          "line": 46,
+          "sensitivity_zone": "火旺（丙丁巳午）",
+          "data_source": "bazi_result.json → (ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强') AND (day_master.element === '火')",
+          "sensitive_areas": "胸部、乳头敏感"
+        },
+        {
+          "line": 47,
+          "sensitivity_zone": "金旺（庚辛申酉）",
+          "data_source": "bazi_result.json → (ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强') AND (day_master.element === '金')",
+          "sensitive_areas": "背部、腰部敏感，耐力好"
+        },
+        {
+          "line": 48,
+          "sensitivity_zone": "水旺（壬癸子亥）",
+          "data_source": "bazi_result.json → (ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强') AND (day_master.element === '水')",
+          "sensitive_areas": "耳后、颈部敏感，易兴奋"
+        },
+        {
+          "line": 49,
+          "sensitivity_zone": "土旺（戊己辰戌丑未）",
+          "data_source": "bazi_result.json → (ten_gods[] (filter: name in ['食神','伤官'] AND is_wang === true) + dynamics.features[] (filter: contains '桃花') + ten_gods[] (filter: name === '偏财') + dynamics.body_strength === '身强') AND (day_master.element === '土')",
+          "sensitive_areas": "腹部、臀部敏感，持久力强"
+        }
+      ]
+    }
+  },
+
+  "section_2_spouse_type_judgment": {
+    "title": "配偶类型判断",
+
+    "subsection_1_male_looking_at_wealth": {
+      "title": "男命看财星（第66-82行）",
+      "items": [
+        {
+          "line": 68,
+          "wealth_type": "正财为用（理想型）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正财').utility === '用'",
+          "spouse_traits": "贤惠持家、务实稳重、重视家庭",
+          "element_meanings": {
+            "木": "身材好、正直",
+            "火": "热情有口碑",
+            "土": "稳重靠谱",
+            "金": "精致果断",
+            "水": "聪明体贴"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 73,
+          "wealth_type": "偏财为用（理想型）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财').utility === '用'",
+          "spouse_traits": "颜值高、性格活泼、懂情趣",
+          "warning": "偏财为忌 → 易遇拜金、不稳定的异性",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_2_female_looking_at_official": {
+      "title": "女命看官杀（第85-102行）",
+      "items": [
+        {
+          "line": 87,
+          "official_type": "正官为用（理想型）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官').utility === '用'",
+          "spouse_traits": "人品好、性格稳重、有稳定职业",
+          "element_meanings": {
+            "金": "挺拔果断",
+            "木": "正直温和",
+            "水": "聪明体贴",
+            "火": "热情有口碑",
+            "土": "踏实可靠"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 92,
+          "official_type": "七杀为用（理想型）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').utility === '用'",
+          "spouse_traits": "有魄力、有社会地位，慕强属性",
+          "warning": "七杀为忌 → 易遇控制欲强、脾气差的异性",
+          "accuracy": "90%"
+        }
+      ]
+    }
+  },
+
+  "section_3_marriage_risk_judgment": {
+    "title": "婚恋风险判断",
+
+    "subsection_1_day_pillar_same_five_elements": {
+      "title": "日柱同五行婚姻风险（第105-116行）",
+      "items": [
+        {
+          "line": 107,
+          "risk_condition": "日干身旺 + 日支为忌神",
+          "data_source": "bazi_result.json → dynamics.body_strength === '身强' + pillars[5].hidden_gans[] (存在) AND ten_gods[] (filter: name in [hidden_gans的十神] AND utility === '忌')",
+          "risk": "婚姻不稳定",
+          "accuracy": "90%"
+        },
+        {
+          "line": 108,
+          "risk_condition": "日支被刑冲克害",
+          "data_source": "bazi_result.json → (pillars[3].zhi 与 pillars[5].zhi 存在刑冲克害) OR (pillars[7].zhi 与 pillars[5].zhi 存在刑冲克害)",
+          "risk": "婚姻有摩擦",
+          "accuracy": "85%"
+        },
+        {
+          "line": 109,
+          "risk_condition": "孤鸾煞、八专淫欲煞",
+          "data_source": "bazi_result.json → dynamics.features[] (filter: contains ['孤鸾煞','八专淫欲煞'])",
+          "risk": "婚姻多波折",
+          "accuracy": "80%"
+        }
+      ]
+    },
+
+    "subsection_2_heaven_earth_clash": {
+      "title": "天克地冲与婚灾（第118-125行）",
+      "items": [
+        {
+          "line": 121,
+          "signal": "流年/大运冲克日支（夫妻宫）",
+          "data_source": "bazi_result.json → dayun_and_liunian + dynamics.technical_interactions (filter: targets_pillars[5])",
+          "consequence": "婚姻变动",
+          "accuracy": "95%"
+        },
+        {
+          "line": 122,
+          "signal": "天克地冲冲克配偶星",
+          "data_source": "bazi_result.json → dayun_and_liunian + ten_gods[] (filter: name in ['正财','偏财','正官','七杀'])",
+          "consequence": "配偶健康危机",
+          "accuracy": "90%"
+        },
+        {
+          "line": 123,
+          "signal": "冲克用神",
+          "data_source": "bazi_result.json → dayun_and_liunian + ten_gods[] (filter: utility === '用')",
+          "consequence": "核心利益受损，凶性最强",
+          "accuracy": "95%"
+        }
+      ]
+    }
+  },
+
+  "section_4_marriage_statements_summary": {
+    "title": "婚恋断语汇总（第128-158行）",
+    "items": [
+      {
+        "line": 131,
+        "statement": "日支是羊刃，另处再有一羊刃",
+        "data_source": "bazi_result.json → pillars[5].shen_sha (filter: contains '羊刃') AND pillars[] (filter: shen_sha contains '羊刃')",
+        "data_check": "count(羊刃) >= 2 AND pillars[5].shen_sha contains '羊刃'",
+        "consequence": "配偶早丧"
+      },
+      {
+        "line": 132,
+        "statement": "日坐羊刃逢冲",
+        "data_source": "bazi_result.json → pillars[5].shen_sha (filter: contains '羊刃') + dynamics.technical_interactions (filter: targets_pillars[5])",
+        "consequence": "配偶必见血光手术，严重者早亡"
+      },
+      {
+        "line": 133,
+        "statement": "财星被比劫重重包围（男）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] AND ten_gods[] (filter: name in ['比肩','劫财']).occurrences[]",
+        "condition": "比劫同时在天干和地支出现且邻近财星",
+        "consequence": "配偶易有意外之灾"
+      },
+      {
+        "line": 134,
+        "statement": "官星被伤官贴身相克（女）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']).occurrences[] AND ten_gods[] (filter: name === '伤官').occurrences[]",
+        "condition": "伤官邻近官星",
+        "consequence": "配偶易有意外之灾"
+      },
+      {
+        "line": 135,
+        "statement": "日支被月支、时支双冲",
+        "data_source": "bazi_result.json → dynamics.technical_interactions (filter: all(pillars[3]冲pillars[5], pillars[7]冲pillars[5]))",
+        "consequence": "婚姻必破，配偶健康堪忧"
+      },
+      {
+        "line": 136,
+        "statement": "日刃时见偏印",
+        "data_source": "bazi_result.json → pillars[5].shen_sha (filter: contains '羊刃') + pillars[6,7] (filter: ten_god_gan === '偏印')",
+        "consequence": "妻必有病灾"
+      },
+      {
+        "line": 137,
+        "statement": "日坐华盖合驿马",
+        "data_source": "bazi_result.json → pillars[5].shen_sha (filter: contains ['华盖','驿马'])",
+        "consequence": "同床异梦"
+      },
+      {
+        "line": 138,
+        "statement": "时日两对冲",
+        "data_source": "bazi_result.json → dynamics.technical_interactions (filter: pillars[4]冲pillars[6] AND pillars[5]冲pillars[7])",
+        "consequence": "分道扬镳"
+      },
+      {
+        "line": 139,
+        "statement": "二财争合日主干（男）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] (filter: gan相合day_master)",
+        "data_check": "count(wealth_he_day_master) >= 2",
+        "consequence": "三妻四妾命里安"
+      },
+      {
+        "line": 140,
+        "statement": "二官争合日主干（女）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']).occurrences[] (filter: gan相合day_master)",
+        "data_check": "count(official_he_day_master) >= 2",
+        "consequence": "重婚再嫁命不凡"
+      },
+      {
+        "line": 141,
+        "statement": "无财+比劫旺（男）/无官+伤官羊刃旺（女）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).presence === false + ten_gods[] (filter: name in ['比肩','劫财']).is_wang === true",
+        "consequence": "孤独命，终生无嫁娶"
+      }
+    ]
+  },
+
+  "section_5_ideal_type_and_actual_fate": {
+    "title": "理想型与实际缘分（第160-181行）",
+    "items": [
+      {
+        "line": 163,
+        "concept": "配偶星 = 主观理想；夫妻宫 = 实际缘分",
+        "meaning": "两者需结合分析"
+      },
+      {
+        "line": 166,
+        "step": "先找配偶星（男正偏财，女正官杀）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财','正官','七杀'])",
+        "purpose": "确定理想型"
+      },
+      {
+        "line": 167,
+        "step": "再看夫妻宫（日支）",
+        "data_source": "bazi_result.json → pillars[5]",
+        "purpose": "修正实际缘分"
+      },
+      {
+        "line": 168,
+        "step": "查天干五合",
+        "data_source": "bazi_result.json → dynamics.technical_interactions (filter: contains '合')",
+        "purpose": "锁定核心特质"
+      },
+      {
+        "line": 169,
+        "step": "断年龄差距",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官','正官','正印'])",
+        "rule": "食伤生财 → 倾向小；官印旺 → 倾向大; 年柱配偶星 → 年龄差大；时柱 → 年龄差小"
+      }
+    ]
+  },
+
+  "section_6_day_pillar_same_elements_risk": {
+    "title": "日柱同五行婚姻风险详解（第183-197行）",
+    "definition": "日柱天干地支五行相同（甲寅/乙卯/丙午/丁巳/戊辰/己未/庚申/辛酉/壬子/癸亥）",
+    "risk_conditions": [
+      {
+        "rank": 1,
+        "condition": "日干身旺（最重要）",
+        "data_source": "bazi_result.json → dynamics.body_strength === '身强' + pillars[4].gan === day_master.name",
+        "risk": "婚姻不稳定风险高",
+        "accuracy": "95%"
+      },
+      {
+        "rank": 2,
+        "condition": "日支为忌神",
+        "data_source": "bazi_result.json → pillars[5].hidden_gans[] (存在) AND ten_gods[] (filter: name in [hidden_gans的十神] AND utility === '忌')",
+        "risk": "夫妻感情不好，易离婚二婚",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_13_day_pillar_empty_void": {
+    "title": "日柱空亡（第400-485行）",
+
+    "subsection_1_core_definition": {
+      "title": "核心定义与速查表",
+      "definition": "日支（夫妻宫）是日柱所在旬的空亡地支",
+      "total_pillars": "共12个日柱",
+      "essence": "夫妻宫有名无实，象征中年（33-48岁）易有波动，婚姻缘分较薄，需后天努力弥补",
+      "empty_void_pillars": ["壬戌", "癸亥", "丙申", "丁酉", "戊午", "己未", "庚辰", "辛巳", "壬寅", "癸卯", "壬子", "癸丑"],
+      "quick_reference": [
+        {
+          "jia": "甲子旬",
+          "empty_zhi": ["戌", "亥"],
+          "pillars": ["壬戌", "癸亥"]
+        },
+        {
+          "jia": "甲戌旬",
+          "empty_zhi": ["申", "酉"],
+          "pillars": ["丙申", "丁酉"]
+        },
+        {
+          "jia": "甲申旬",
+          "empty_zhi": ["午", "未"],
+          "pillars": ["戊午", "己未"]
+        },
+        {
+          "jia": "甲午旬",
+          "empty_zhi": ["辰", "巳"],
+          "pillars": ["庚辰", "辛巳"]
+        },
+        {
+          "jia": "甲辰旬",
+          "empty_zhi": ["寅", "卯"],
+          "pillars": ["壬寅", "癸卯"]
+        },
+        {
+          "jia": "甲寅旬",
+          "empty_zhi": ["子", "丑"],
+          "pillars": ["壬子", "癸丑"]
+        }
+      ]
+    },
+
+    "subsection_2_marriage_impact": {
+      "title": "婚姻与感情影响（第415-421行）",
+      "items": [
+        {
+          "line": 415,
+          "condition": "空亡日支为喜用神",
+          "data_source": "bazi_result.json → pillars[5].zhi_kong_wang === true AND ten_gods[] (filter: utility === '用')",
+          "consequence": "婚姻质量差，配偶健康/事业易有问题，需特别注意",
+          "accuracy": "90%"
+        },
+        {
+          "line": 416,
+          "condition": "空亡日支为忌神",
+          "data_source": "bazi_result.json → pillars[5].zhi_kong_wang === true AND ten_gods[] (filter: utility === '忌')",
+          "consequence": "婚姻反而稳定，配偶对自己无负面影响，甚至有暗中助力",
+          "accuracy": "85%"
+        }
+      ]
+    },
+
+    "subsection_3_career_health_impact": {
+      "title": "事业、财运与健康影响（第423-445行）",
+      "career_wealth": {
+        "line": 425,
+        "timing": "中年（33-48岁）",
+        "implication": "是人生关键期，需提前规划，主动应对可能的波动",
+        "data_source": "bazi_result.json → dayun_and_liunian (filter: 岁数 in [33-48])"
+      },
+      "health_warnings": [
+        {
+          "empty_void": "寅卯空（壬寅、癸卯）",
+          "warning": "注意肝胆、神经系统问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['壬寅','癸卯'])"
+        },
+        {
+          "empty_void": "辰巳空（庚辰、辛巳）",
+          "warning": "注意脾胃、消化系统问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['庚辰','辛巳'])"
+        },
+        {
+          "empty_void": "午未空（戊午、己未）",
+          "warning": "注意心脏、血液循环问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['戊午','己未'])"
+        },
+        {
+          "empty_void": "申酉空（丙申、丁酉）",
+          "warning": "注意肺、呼吸系统问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['丙申','丁酉'])"
+        },
+        {
+          "empty_void": "戌亥空（壬戌、癸亥）",
+          "warning": "注意肾、泌尿系统问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['壬戌','癸亥'])"
+        },
+        {
+          "empty_void": "子丑空（壬子、癸丑）",
+          "warning": "注意生殖系统、内分泌问题",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: in ['壬子','癸丑'])"
+        }
+      ]
+    },
+
+    "subsection_4_resolution_methods": {
+      "title": "化解方法（第447-472行）",
+      "items": [
+        {
+          "dimension": "命理层面",
+          "principle": "利用八字全局解空，核心原则冲合填实最为先，贵人相助可解空"
+        },
+        {
+          "dimension": "婚姻感情化解",
+          "methods": [
+            "主动择偶：扩大社交圈，通过亲友介绍、婚恋平台等主动寻找伴侣",
+            "婚前磨合：延长恋爱期（1-2年），深入了解对方，减少婚后矛盾",
+            "婚后经营：建立共同兴趣爱好，定期旅行，创造二人世界，财务透明"
+          ]
+        },
+        {
+          "dimension": "事业财运化解",
+          "methods": [
+            "职业选择：优先考虑自由职业、远程工作、创业等弹性工作模式",
+            "人脉建设：主动结交行业前辈，加入专业社群，提升个人影响力",
+            "理财策略：正财为主偏财为辅，分散投资，降低风险"
+          ]
+        },
+        {
+          "dimension": "健康养生化解",
+          "methods": [
+            "根据空亡地支对应脏腑调整饮食和生活习惯",
+            "规律作息，每天保证7-8小时睡眠，避免熬夜",
+            "适度运动（瑜伽、太极等），增强体质"
+          ]
+        }
+      ]
+    },
+
+    "subsection_5_twelve_pillars_profiles": {
+      "title": "12个日柱专属解读（第474-485行）",
+      "items": [
+        {
+          "pillar": "壬戌",
+          "empty_zhi": "戌土",
+          "marriage": "夫妻宫为财库空，主配偶财运起伏，中年易有财务压力",
+          "health": "注意脾胃健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '壬戌')"
+        },
+        {
+          "pillar": "癸亥",
+          "empty_zhi": "亥水",
+          "marriage": "夫妻宫为劫财空，主配偶性格独立，与自己竞争意识强",
+          "health": "注意肾脏健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '癸亥')"
+        },
+        {
+          "pillar": "丙申",
+          "empty_zhi": "申金",
+          "marriage": "夫妻宫为偏财空，主配偶事业心强，易忽略家庭",
+          "health": "注意肺部健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '丙申')"
+        },
+        {
+          "pillar": "丁酉",
+          "empty_zhi": "酉金",
+          "marriage": "夫妻宫为正财空，主配偶收入稳定但不高，对自己助力有限",
+          "health": "注意呼吸系统健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '丁酉')"
+        },
+        {
+          "pillar": "戊午",
+          "empty_zhi": "午火",
+          "marriage": "夫妻宫为正印空，主配偶体贴但能力一般，难在事业上提供帮助",
+          "health": "注意心脏健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '戊午')"
+        },
+        {
+          "pillar": "己未",
+          "empty_zhi": "未土",
+          "marriage": "夫妻宫为偏印空，主配偶思想独特，与自己有代沟",
+          "health": "加强沟通；注意血液循环健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '己未')"
+        },
+        {
+          "pillar": "庚辰",
+          "empty_zhi": "辰土",
+          "marriage": "夫妻宫为食神空，主配偶厨艺好但子女缘薄",
+          "health": "注意脾胃健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '庚辰')"
+        },
+        {
+          "pillar": "辛巳",
+          "empty_zhi": "巳火",
+          "marriage": "夫妻宫为伤官空，主配偶聪明但爱挑剔，易有口舌之争",
+          "health": "注意消化系统健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '辛巳')"
+        },
+        {
+          "pillar": "壬寅",
+          "empty_zhi": "寅木",
+          "marriage": "夫妻宫为七杀空，主配偶强势，对自己要求严格",
+          "health": "注意肝胆健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '壬寅')"
+        },
+        {
+          "pillar": "癸卯",
+          "empty_zhi": "卯木",
+          "marriage": "夫妻宫为正官空，主配偶稳重但缺乏情趣，婚姻平淡",
+          "health": "注意神经系统健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '癸卯')"
+        },
+        {
+          "pillar": "壬子",
+          "empty_zhi": "子水",
+          "marriage": "夫妻宫为劫财空，主配偶性格活泼但花钱大手大脚",
+          "health": "注意生殖系统健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '壬子')"
+        },
+        {
+          "pillar": "癸丑",
+          "empty_zhi": "丑土",
+          "marriage": "夫妻宫为比肩空，主配偶与自己能力相当，易有竞争关系",
+          "health": "注意内分泌健康",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: === '癸丑')"
+        }
+      ]
+    },
+
+    "subsection_6_common_misconceptions": {
+      "title": "常见误区澄清（第475-480行）",
+      "items": [
+        {
+          "misconception": "❌空亡必离婚",
+          "truth": "错误！约80%日柱坐空亡者婚姻稳定，关键在后天经营"
+        },
+        {
+          "misconception": "❌空亡无贵人",
+          "truth": "错误！空亡者贵人运特殊，常在困境中出现"
+        },
+        {
+          "misconception": "❌空亡事业无成",
+          "truth": "错误！大器晚成是普遍规律，35岁后成功率更高"
+        },
+        {
+          "misconception": "✅喜用神空亡才需重点化解，忌神空亡反为吉",
+          "truth": "正确！",
+          "accuracy": "95%"
+        }
+      ]
+    }
+  }
+}

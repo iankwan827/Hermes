@@ -1,0 +1,375 @@
+{
+  "domain": "子女",
+  "description": "八字看子女的完整知识库",
+  "core_logic": "八字看子女以子女星旺衰、子女宫吉凶、子女星与子女宫关系、缘分判断五个维度为核心，星宫同旺则子女优秀，星宫相克则缘分薄，空亡则聚少离多，生育应期由大运流年引动确定。",
+
+  "section_1_children_star_and_palace": {
+    "title": "子女星与子女宫（第1-13行）",
+    "children_star": {
+      "male": {
+        "data_source": "bazi_result.json → ten_gods",
+        "daughter": {"name": "正官", "meaning": "女儿"},
+        "son": {"name": "七杀", "meaning": "儿子"}
+      },
+      "female": {
+        "data_source": "bazi_result.json → ten_gods",
+        "daughter": {"name": "食神", "meaning": "女儿"},
+        "son": {"name": "伤官", "meaning": "儿子"}
+      }
+    },
+    "children_palace": {
+      "name": "时柱",
+      "data_source": "bazi_result.json → pillars[6,7]",
+      "components": {
+        "time_stem": {"index": 6, "meaning": "长子长女外在表现"},
+        "time_branch": {"index": 7, "meaning": "次子次女内在性格"}
+      }
+    }
+  },
+
+  "section_2_children_affinity": {
+    "title": "子女缘分判断（第15-29行）",
+    "items": [
+      {
+        "condition": "星宫同旺",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star).is_wang + pillars[6,7].utility === '用'",
+        "consequence": "子女优秀孝顺，晚年幸福",
+        "accuracy": "95%"
+      },
+      {
+        "condition": "星宫相克",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star) + dynamics.interactions (filter: affects pillars[6,7])",
+        "consequence": "缘分薄，关系不和睦",
+        "accuracy": "90%"
+      },
+      {
+        "condition": "星宫空亡",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star).presence === false OR pillars[6,7].kong_wang",
+        "consequence": "子女可能夭折、流产，或聚少离多",
+        "accuracy": "85%"
+      }
+    ]
+  },
+
+  "section_3_children_quantity_health": {
+    "title": "子女数量与健康（第31-42行）",
+    "items": [
+      {
+        "line": 34,
+        "indicator": "食神旺相",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神').is_wang === true",
+        "meaning": "子女健康孝顺"
+      },
+      {
+        "line": 35,
+        "indicator": "伤官旺透",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + .presence.in_stems",
+        "meaning": "子女才华出众"
+      },
+      {
+        "line": 36,
+        "indicator": "时支长生",
+        "data_source": "bazi_result.json → pillars[7].zhi (check: changsheng_of_day_master)",
+        "meaning": "子女多且健康"
+      },
+      {
+        "line": 37,
+        "indicator": "时支墓绝",
+        "data_source": "bazi_result.json → pillars[7].zhi (check: tomb_or_death_of_day_master)",
+        "meaning": "子女少且体弱"
+      },
+      {
+        "line": 38,
+        "indicator": "印星旺克食伤（女命）",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang + 克 ten_gods[] (filter: name in ['食神','伤官'])",
+        "meaning": "易无子或子女夭折"
+      }
+    ]
+  },
+
+  "section_4_firstborn_gender_judgement": {
+    "title": "头胎性别判断（第44-56行）",
+    "items": [
+      {
+        "line": 48,
+        "statement": "男命时干食神，月令再有食神，头胎为女孩",
+        "data_source": "bazi_result.json → pillars[6].gan === '食神' + pillars[2,3] (filter: contains '食神')",
+        "accuracy": "90%",
+        "warning": "若为男孩不能存活"
+      },
+      {
+        "line": 49,
+        "statement": "男命时柱偏财旺",
+        "data_source": "bazi_result.json → pillars[6,7] (filter: ten_god_gan === '偏财' AND is_wang)",
+        "result": "头胎多为男孩",
+        "accuracy": "90%"
+      },
+      {
+        "line": 50,
+        "statement": "女命时柱正官旺",
+        "data_source": "bazi_result.json → pillars[6,7] (filter: ten_god_gan === '正官' AND is_wang)",
+        "result": "头胎多为男孩",
+        "accuracy": "90%"
+      },
+      {
+        "line": 51,
+        "statement": "反之",
+        "result": "则为女孩",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_5_children_quality_achievement": {
+    "title": "子女品质与成就（第58-78行）",
+    "items": [
+      {
+        "line": 62,
+        "indicator": "时柱为喜用神",
+        "data_source": "bazi_result.json → pillars[6,7].ten_god_gan.utility === '用'",
+        "outcome": "子女优秀孝顺"
+      },
+      {
+        "line": 63,
+        "indicator": "时上七杀有制",
+        "data_source": "bazi_result.json → pillars[6,7] (filter: contains '七杀') AND 制化力 > 0",
+        "outcome": "晚年生贵子"
+      },
+      {
+        "line": 64,
+        "indicator": "食神生财",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神') + ten_gods[] (filter: name in ['正财','偏财'])",
+        "outcome": "子女富贵双全"
+      },
+      {
+        "line": 65,
+        "indicator": "伤官佩印",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + ten_gods[] (filter: name in ['正印','偏印'])",
+        "outcome": "子女才华横溢"
+      },
+      {
+        "line": 66,
+        "indicator": "财官双美",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang + ten_gods[] (filter: name in ['正官','七杀']).is_wang",
+        "outcome": "子女高官厚禄"
+      },
+      {
+        "line": 67,
+        "indicator": "时柱合日柱",
+        "data_source": "bazi_result.json → dynamics.interactions (filter: pillars[4,5]合pillars[6,7])",
+        "outcome": "子女孝顺贴心"
+      },
+      {
+        "line": 68,
+        "indicator": "时柱刑冲日柱",
+        "data_source": "bazi_result.json → dynamics.interactions (filter: pillars[4,5]刑冲pillars[6,7])",
+        "outcome": "子女叛逆难管"
+      },
+      {
+        "line": 69,
+        "indicator": "子女星被合",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star) + 被合",
+        "outcome": "子女外迁或过继"
+      },
+      {
+        "line": 70,
+        "indicator": "子女宫空亡",
+        "data_source": "bazi_result.json → pillars[6,7].kong_wang === true",
+        "outcome": "子女聚少离多"
+      }
+    ]
+  },
+
+  "section_6_children_birth_timing": {
+    "title": "子女生育应期（第80-94行）",
+    "items": [
+      {
+        "line": 84,
+        "statement": "女命大运走食伤，流年逢财星",
+        "data_source": "bazi_result.json → dayun_and_liunian (filter: contains食伤大运) + dayun_and_liunian.liuNian (filter: contains财星)",
+        "outcome": "必生贵子",
+        "accuracy": "95%"
+      },
+      {
+        "line": 85,
+        "statement": "男命大运走官杀，流年逢印星",
+        "data_source": "bazi_result.json → dayun_and_liunian (filter: contains官杀大运) + dayun_and_liunian.liuNian (filter: contains印星)",
+        "outcome": "易生子女",
+        "accuracy": "95%"
+      },
+      {
+        "line": 86,
+        "statement": "子女星逢长生，流年引动",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star) + dayun_and_liunian (filter: 长生位置)",
+        "outcome": "易怀孕",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_7_optimal_childbearing": {
+    "title": "优生优育（第96-199行）",
+
+    "subsection_1_optimal_childbearing_age": {
+      "title": "最佳生育年龄",
+      "items": [
+        {
+          "pattern": "食伤旺相（女命）",
+          "optimal_age": "23-30岁",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).is_wang",
+          "reason": "食伤为子女星，旺则子女健康；30岁前生育质量最佳"
+        },
+        {
+          "pattern": "官杀清（男命）",
+          "optimal_age": "28-35岁",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']).is_wang",
+          "reason": "官杀为子女星，清纯有力；子女优秀"
+        },
+        {
+          "pattern": "印星过旺（男女命）",
+          "optimal_age": "30-38岁",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang",
+          "reason": "印星克食伤/官杀，早年易流产；晚育可规避"
+        },
+        {
+          "pattern": "子女宫为喜用",
+          "optimal_age": "25-33岁",
+          "data_source": "bazi_result.json → pillars[6,7].utility === '用'",
+          "reason": "子女宫为喜用神，子女缘分好；此阶段生育子女孝顺"
+        }
+      ]
+    },
+
+    "subsection_2_preconception_conditioning": {
+      "title": "孕前调理建议",
+      "items": [
+        {
+          "pattern": "印星旺克食伤（女命）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang + 克 ten_gods[] (filter: name in ['食神','伤官'])",
+          "advice": "补气血，暖宫驱寒；少吃生冷食物"
+        },
+        {
+          "pattern": "官杀旺克食伤（女命）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']).is_wang + 克 ten_gods[] (filter: name in ['食神','伤官'])",
+          "advice": "疏肝解郁，调理气血；保持心情舒畅"
+        },
+        {
+          "pattern": "日坐阳刃（男女命）",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: shen_sha contains '羊刃')",
+          "advice": "孕前检查子宫/前列腺；注意安胎"
+        },
+        {
+          "pattern": "子女宫空亡",
+          "data_source": "bazi_result.json → pillars[6,7].kong_wang === true",
+          "advice": "备孕期间积德行善；床头放贵人照片"
+        }
+      ]
+    },
+
+    "subsection_3_caesarean_selection": {
+      "title": "剖腹产选择时机",
+      "items": [
+        {
+          "pattern": "日坐阳刃+子午卯酉冲",
+          "data_source": "bazi_result.json → pillars[4,5] (filter: shen_sha contains '羊刃' AND zhi in ['午','卯','酉','子'])",
+          "recommendation": "倾向剖腹产",
+          "reason": "胎位不正概率高，剖腹产可避开冲克"
+        },
+        {
+          "pattern": "子女宫逢冲+克",
+          "data_source": "bazi_result.json → pillars[6,7] (filter: 被冲被克)",
+          "recommendation": "考虑剖腹产",
+          "reason": "顺产风险大，剖腹产可择时避开凶时"
+        },
+        {
+          "pattern": "羊刃重重+无制化",
+          "data_source": "bazi_result.json → dynamics.features[] (filter: contains '羊刃') AND count >= 2",
+          "recommendation": "建议剖腹产",
+          "reason": "产厄风险高，择时生产更安全"
+        },
+        {
+          "pattern": "食伤旺+无刑冲",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).is_wang + NOT(dynamics.interactions)",
+          "recommendation": "可顺产",
+          "reason": "子女缘分好，产程顺利"
+        }
+      ]
+    },
+
+    "subsection_4_birth_timing_principles": {
+      "title": "择时生产原则",
+      "principles": [
+        "尽量避开与命局形成天克地冲的时辰",
+        "选择子女宫为喜用神的时辰",
+        "避开三刑（寅巳申、丑未戌）、六冲（子午、卯酉等）时辰"
+      ]
+    }
+  },
+
+  "section_8_28_theories_complete_statements": {
+    "title": "28式子女篇完整断语（第201-226行）",
+    "items": [
+      {
+        "line": 203,
+        "statement": "男命时干食神，月令再有食神，头胎为女孩",
+        "data_source": "bazi_result.json → pillars[6].gan === '食神' + pillars[2,3] (filter: contains '食神')",
+        "warning": "若为男孩不能存活"
+      },
+      {
+        "line": 204,
+        "statement": "女命时支正印，它处再有正印",
+        "data_source": "bazi_result.json → pillars[7].ten_god_gan === '正印' + pillars[] (filter: contains '正印')",
+        "consequence": "克子，或者有女儿没男孩（印克食伤）"
+      },
+      {
+        "line": 205,
+        "statement": "食神入墓子必损",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神').is_tomb === true",
+        "consequence": "子女夭折或流产"
+      },
+      {
+        "line": 206,
+        "statement": "官星入墓女难存",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官').is_tomb === true",
+        "condition": "女命",
+        "consequence": "女儿难存活"
+      },
+      {
+        "line": 207,
+        "statement": "时柱空亡",
+        "data_source": "bazi_result.json → pillars[6,7].kong_wang === true",
+        "consequence": "子女缘薄，易有流产堕胎"
+      },
+      {
+        "line": 208,
+        "statement": "女命七杀旺而无制，时柱再逢七杀",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').is_wang + NOT(制化) + pillars[6,7] (filter: contains '七杀')",
+        "consequence": "头胎易流产或夭折"
+      },
+      {
+        "line": 210,
+        "statement": "女命无食伤，无财星",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).presence === false + ten_gods[] (filter: name in ['正财','偏财']).presence === false",
+        "consequence": "易无子"
+      },
+      {
+        "line": 211,
+        "statement": "男命无官杀，无财星",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']).presence === false + ten_gods[] (filter: name in ['正财','偏财']).presence === false",
+        "consequence": "易无子"
+      },
+      {
+        "line": 212,
+        "statement": "子女星被克绝",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in children_star) + 被克绝",
+        "consequence": "子女夭折或流产"
+      },
+      {
+        "line": 213,
+        "statement": "时柱逢孤辰寡宿",
+        "data_source": "bazi_result.json → pillars[6,7].shen_sha (filter: contains ['孤辰','寡宿'])",
+        "consequence": "晚年孤独"
+      }
+    ]
+  }
+}

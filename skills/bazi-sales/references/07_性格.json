@@ -1,0 +1,45 @@
+{
+  "domain": "性格",
+  "description": "八字看性格与为人的完整知识库",
+  "core_logic": "八字看性格以两头挂配置、十干日元、五行属性、十神倾向为四个维度，两头挂反映最强特质，日元反映本性，五行反映气质，十神反映行为倾向。",
+  "section_1_two_head_hanging": {
+    "title": "两头挂命理断语",
+    "definition": "年干和时干出现同一十神",
+    "statements": [
+      {"ten_god": "正印/偏印", "statement": "印绶两头挂，必定慈善人", "traits": "善良有爱心，适合文化/教育/宗教/慈善", "data_source": "bazi_result.json → (pillars[0].ten_god_gan === pillars[3].ten_god_gan) && ['正印','偏印'].includes(pillars[0].ten_god_gan)"},
+      {"ten_god": "伤官", "statement": "伤官两头挂，亲情剩不下", "traits": "聪明口才好，但六亲缘薄", "data_source": "bazi_result.json → pillars[0].ten_god_gan === pillars[3].ten_god_gan === '伤官'"},
+      {"ten_god": "食神", "statement": "食神两头挂，吃喝走天下", "traits": "口福好，多才多艺，人缘佳", "data_source": "bazi_result.json → pillars[0].ten_god_gan === pillars[3].ten_god_gan === '食神'"},
+      {"ten_god": "七杀", "statement": "七杀两头挂，到老无后", "traits": "一生多灾，易有官非诉讼", "data_source": "bazi_result.json → pillars[0].ten_god_gan === pillars[3].ten_god_gan === '七杀'"},
+      {"ten_god": "财星", "statement": "财星两头挂，慷慨离家人", "traits": "慷慨大方，易为朋友破财", "data_source": "bazi_result.json → (pillars[0].ten_god_gan === pillars[3].ten_god_gan) && ['正财','偏财'].includes(pillars[0].ten_god_gan)"},
+      {"ten_god": "比劫", "statement": "比劫两头挂，损财是非来", "traits": "财来财去，与人竞争激烈", "data_source": "bazi_result.json → (pillars[0].ten_god_gan === pillars[3].ten_god_gan) && ['比肩','劫财'].includes(pillars[0].ten_god_gan)"},
+      {"ten_god": "正官", "statement": "正官两头挂，富贵又绵长", "traits": "事业稳定，社会地位高", "data_source": "bazi_result.json → pillars[0].ten_god_gan === pillars[3].ten_god_gan === '正官'"},
+      {"ten_god": "枭神", "statement": "枭神两头挂，寡言人狡诈", "traits": "寡言少语，计谋多", "data_source": "bazi_result.json → pillars[0].ten_god_gan === pillars[3].ten_god_gan === '偏印'"}
+    ],
+    "mnemonic": "印绶慈善人，伤官亲情疏；食神吃天下，七杀灾无后；财星慷慨离，比劫是非来；正官富贵久，枭神多计谋。"
+  },
+  "section_2_ten_stem_personality": {
+    "title": "十干日元性格",
+    "stems": [
+      {"stem": "甲木", "type": "阳木", "traits": "参天大树，向阳生长", "data_source": "bazi_result.json → day_master.name === '甲'"},
+      {"stem": "乙木", "type": "阴木", "traits": "藤蔓花草，柔韧纠缠", "data_source": "bazi_result.json → day_master.name === '乙'"},
+      {"stem": "丙火", "type": "阳火", "traits": "太阳之火，热烈坦率", "data_source": "bazi_result.json → day_master.name === '丙'"},
+      {"stem": "丁火", "type": "阴火", "traits": "灯火之火，温柔内敛", "data_source": "bazi_result.json → day_master.name === '丁'"},
+      {"stem": "戊土", "type": "阳土", "traits": "高山厚重，敦厚踏实", "data_source": "bazi_result.json → day_master.name === '戊'"},
+      {"stem": "己土", "type": "阴土", "traits": "田园柔土，细心谨慎", "data_source": "bazi_result.json → day_master.name === '己'"},
+      {"stem": "庚金", "type": "阳金", "traits": "刀剑之金，刚直有主见", "data_source": "bazi_result.json → day_master.name === '庚'"},
+      {"stem": "辛金", "type": "阴金", "traits": "珠宝之金，精致敏感", "data_source": "bazi_result.json → day_master.name === '辛'"},
+      {"stem": "壬水", "type": "阳水", "traits": "江河之水，聪慧流动", "data_source": "bazi_result.json → day_master.name === '壬'"},
+      {"stem": "癸水", "type": "阴水", "traits": "雨露之水，柔和包容", "data_source": "bazi_result.json → day_master.name === '癸'"}
+    ]
+  },
+  "section_3_five_elements_temperament": {
+    "title": "五行气质",
+    "elements": [
+      {"element": "木", "temperament": "生机活力，进取心强", "data_source": "bazi_result.json → day_master.element === '木'"},
+      {"element": "火", "temperament": "热情坦率，易激动", "data_source": "bazi_result.json → day_master.element === '火'"},
+      {"element": "土", "temperament": "踏实厚重，诚实守信", "data_source": "bazi_result.json → day_master.element === '土'"},
+      {"element": "金", "temperament": "坚毅严谨，冷静理性", "data_source": "bazi_result.json → day_master.element === '金'"},
+      {"element": "水", "temperament": "聪慧包容，善于变通", "data_source": "bazi_result.json → day_master.element === '水'"}
+    ]
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "domain": "十干",
+  "description": "十干特征与性质的完整知识库",
+  "core_logic": "十干分为五对阴阳，每对代表同一五行的不同表现形式：阳干外向主动，阴干内敛被动；阳干力量强硕，阴干力量细腻。十干本身具有独立的性质、能力、特征，是八字分析的基础。",
+  "section_1_ten_stems_basic": {
+    "title": "十干基础特征",
+    "stems": [
+      {
+        "stem": "甲",
+        "type": "阳木",
+        "element": "木",
+        "nature": "直立向上，参天大树",
+        "personality": "直率、有主见、进取心强、领导力强",
+        "strength": "刚直有力",
+        "weakness": "固执、过于强势",
+        "data_source": "bazi_result.json → day_master.name === '甲' OR pillars[].gan === '甲'"
+      },
+      {
+        "stem": "乙",
+        "type": "阴木",
+        "element": "木",
+        "nature": "柔韧缠绕，藤蔓花草",
+        "personality": "柔和、聪慧、适应力强、善于变通",
+        "strength": "柔中有刚，善于合作",
+        "weakness": "优柔寡断、缺乏主见",
+        "data_source": "bazi_result.json → day_master.name === '乙' OR pillars[].gan === '乙'"
+      },
+      {
+        "stem": "丙",
+        "type": "阳火",
+        "element": "火",
+        "nature": "太阳之火，热烈灿烂",
+        "personality": "热情、坦率、外向、乐观向上",
+        "strength": "光芒四射，感染力强",
+        "weakness": "易激动、不够深沉、肤浅",
+        "data_source": "bazi_result.json → day_master.name === '丙' OR pillars[].gan === '丙'"
+      },
+      {
+        "stem": "丁",
+        "type": "阴火",
+        "element": "火",
+        "nature": "灯火之火，温柔内敛",
+        "personality": "内敛、敏感、温柔、有艺术气质",
+        "strength": "温暖有深度，细心体贴",
+        "weakness": "易钻牛角尖、缺乏行动力",
+        "data_source": "bazi_result.json → day_master.name === '丁' OR pillars[].gan === '丁'"
+      },
+      {
+        "stem": "戊",
+        "type": "阳土",
+        "element": "土",
+        "nature": "高山之土，厚重稳实",
+        "personality": "踏实、诚恳、稳重、保守",
+        "strength": "可靠厚重，值得信赖",
+        "weakness": "固执己见、缺乏灵活性",
+        "data_source": "bazi_result.json → day_master.name === '戊' OR pillars[].gan === '戊'"
+      },
+      {
+        "stem": "己",
+        "type": "阴土",
+        "element": "土",
+        "nature": "田园之土，细腻谨慎",
+        "personality": "细心、谨慎、有计划、缺乏冒险精神",
+        "strength": "细致周密，善于理财",
+        "weakness": "优柔寡断、执行力差",
+        "data_source": "bazi_result.json → day_master.name === '己' OR pillars[].gan === '己'"
+      },
+      {
+        "stem": "庚",
+        "type": "阳金",
+        "element": "金",
+        "nature": "刀剑之金，刚直锋利",
+        "personality": "直爽、有主见、刚强、好胜",
+        "strength": "刚直不阿，有原则",
+        "weakness": "易伤人、太绝对、不通融",
+        "data_source": "bazi_result.json → day_master.name === '庚' OR pillars[].gan === '庚'"
+      },
+      {
+        "stem": "辛",
+        "type": "阴金",
+        "element": "金",
+        "nature": "珠宝之金，精致光亮",
+        "personality": "精致、敏感、聪慧、虚荣心强",
+        "strength": "聪慧敏锐，审美好",
+        "weakness": "敏感玻璃心、计较",
+        "data_source": "bazi_result.json → day_master.name === '辛' OR pillars[].gan === '辛'"
+      },
+      {
+        "stem": "壬",
+        "type": "阳水",
+        "element": "水",
+        "nature": "江河之水，奔流不息",
+        "personality": "聪慧、机智、热情、社交能力强",
+        "strength": "聪明好动，有冲劲",
+        "weakness": "不够深入、善变、缺乏定力",
+        "data_source": "bazi_result.json → day_master.name === '壬' OR pillars[].gan === '壬'"
+      },
+      {
+        "stem": "癸",
+        "type": "阴水",
+        "element": "水",
+        "nature": "雨露之水，柔和润物",
+        "personality": "温柔、包容、敏感、有同情心",
+        "strength": "温柔体贴，善于倾听",
+        "weakness": "软弱、缺乏主见、过度退缩",
+        "data_source": "bazi_result.json → day_master.name === '癸' OR pillars[].gan === '癸'"
+      }
+    ]
+  },
+  "section_2_ten_stems_relationships": {
+    "title": "十干之间的关系",
+    "five_he": {
+      "definition": "天干五合，指甲己合、乙庚合等，代表两种力量的融合与契合",
+      "pairs": [
+        {"pair": "甲己", "meaning": "甲阳木与己阴土相合，形成柔和与稳定的结合"},
+        {"pair": "乙庚", "meaning": "乙阴木与庚阳金相合，形成刚柔相济的结合"},
+        {"pair": "丙辛", "meaning": "丙阳火与辛阴金相合，形成热情与精致的结合"},
+        {"pair": "丁壬", "meaning": "丁阴火与壬阳水相合，形成温柔与聪慧的结合"},
+        {"pair": "戊癸", "meaning": "戊阳土与癸阴水相合，形成稳定与柔和的结合"}
+      ],
+      "data_source": "bazi_result.json → dynamics.interactions (filter: contains '合')"
+    }
+  },
+  "section_3_ten_stems_compatibility": {
+    "title": "十干与婚配",
+    "compatibility": [
+      {"stem_pair": "甲木配乙木", "compatibility": "同性相斥，易有竞争，婚姻不顺"},
+      {"stem_pair": "甲木配己土", "compatibility": "甲己五合，相合相配，婚姻和谐（90%兼容度）"},
+      {"stem_pair": "丙火配辛金", "compatibility": "丙辛五合，热情与精致相融，婚姻美满"},
+      {"stem_pair": "丁火配壬水", "compatibility": "丁壬五合，温柔与聪慧相融，婚姻和睦"}
+    ],
+    "principle": "同性相斥，异性相吸；五合之配最为契合",
+    "data_source": "bazi_result.json → day_master + spouse_star (配偶十干)"
+  }
+}

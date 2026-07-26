@@ -1,0 +1,110 @@
+{
+  "layer": 4,
+  "name": "六亲关系层",
+  "skills_used": [
+    "bazi-sizhu",
+    "bazi-shishen",
+    "bazi-peiou",
+    "bazi-duanpeifu",
+    "bazi-gongchuan",
+    "bazi-hunyin-cishu",
+    "bazi-dizhi",
+    "bazi-hunyin-tongwuxing"
+  ],
+  "content": {
+    "liuqin": {
+      "nianzhu": {
+        "pillar": "丁卯",
+        "shishen_gan": "伤官",
+        "shishen_zhi": "劫财（乙木）",
+        "liuqin": "祖辈",
+        "jie_du": "丁火伤官透干，祖上有人从事文艺/技艺/表达类工作，有才华但与家族缘分偏薄"
+      },
+      "yuezhu": {
+        "pillar": "己酉",
+        "shishen_gan": "正财",
+        "shishen_zhi": "正官（辛金）",
+        "liuqin": "父母兄弟",
+        "jie_du": "月柱正财+正官，父母务实有官职或稳定工作，父亲有社会地位；月柱为父母宫，财官双全主父母条件不错"
+      },
+      "rizhu": {
+        "pillar": "甲子",
+        "shishen_gan": "日主",
+        "shishen_zhi": "正印（癸水）",
+        "liuqin": "自己配偶",
+        "jie_du": "日支坐正印，夫妻宫坐印星，配偶温柔体贴有学识，能包容命主缺点"
+      },
+      "shizhu": {
+        "pillar": "丁卯",
+        "shishen_gan": "伤官",
+        "shishen_zhi": "劫财（乙木）",
+        "liuqin": "子女",
+        "jie_du": "时柱伤官+劫财，子女有才华但性格叛逆，与命主观念易冲突，晚年需注意子女关系"
+      }
+    },
+    "liangtou_gua": {
+      "year_gan": "丁火（伤官）",
+      "hour_gan": "丁火（伤官）",
+      "result": "伤官两头挂",
+      "phrase": "伤官两头挂，亲情剩不下（男命通用版）",
+      "meaning": "表里如一的伤官特质，与亲人缘分薄，与祖辈、子女关系均偏疏远"
+    },
+    "peiou": {
+      "fuqigong_wuxing": "子水",
+      "fuqigong_wuxing_tezhi": "配偶聪明灵活、体型微圆润、皮肤偏黑、灵动飘逸",
+      "fuqigong_shishen": "正印（子中癸水对甲木为正印）",
+      "fuqigong_shishen_tezhi": "配偶温柔体贴、会照顾人、知性文静、有书卷气，能包容命主缺点，提供情绪价值",
+      "wuhe": {
+        "day_gan": "甲木",
+        "he_gan": "己土",
+        "lixiangxing": "丰腴厚重、有内在美、贤内助型"
+      },
+      "zonghe_huaxiang": "配偶聪明灵活、温柔体贴、知性有学识，有书卷气，体型微圆润。命主理想型为丰腴厚重、有内在美型。配偶在婚姻中扮演包容照顾的角色，正印特质使其重视精神共鸣",
+      "nianling": "同龄或略小（0-3岁）"
+    },
+    "duanpeifu": {
+      "peixing_star": "正财己土（月干透出）",
+      "peixing_position": "月柱天干",
+      "peixing_status": "正财有根但被酉金泄气，身强有财可担",
+      "hunyin_monogamy": true,
+      "hunyin_monogamy_reason": "仅有正财无偏财混杂，感情专一，对配偶忠诚度较高",
+      "bi_jie_impact": "比劫重重（卯中乙木×2），比劫克财→婚姻中易有竞争压力，同辈或朋友可能对配偶关系产生干扰",
+      "shishen_sheng_cai": "丁火伤官生己土正财→对配偶有吸引力，擅长表达爱意，主动追求型",
+      "geju_influence": "正官格+正财=配偶端庄务实，重视家庭稳定",
+      "peixing_leixing": "务实端庄型，正财格配偶，重视物质基础和家庭稳定，朴素大方"
+    },
+    "gongchuan": {
+      "chuanhai": false,
+      "chuanhai_detail": "日支子水的六害为子未害，八字地支卯酉子卯中无未土，无六害穿害",
+      "xinghai": {
+        "zi_mao_xing_count": 2,
+        "xing_type": "子卯相刑（无礼之刑）",
+        "xing_detail": "年支卯刑日支子 + 时支卯刑日支子，夫妻宫被双卯同时刑伤",
+        "xing_effect": "无礼之刑主冒犯礼法、桃花是非，夫妻宫受损严重，无合可解"
+      },
+      "liuchong": [
+        "年支卯与月支酉=卯酉六冲（冲月柱父母宫，主父母关系动荡或搬迁）",
+        "月支酉与时支卯=酉卯六冲（冲时柱子女宫，主子女缘分薄或晚育）"
+      ],
+      "fuqigong_damage": "夫妻宫子水被两卯木同时刑伤，子卯刑为无礼之刑，主婚姻中是非不断、桃花纠纷。虽无六害穿害（第三者介入风险低），但双刑叠加使夫妻宫极不稳定",
+      "he_jie": "无六合解刑（子丑合可解，但八字无丑土），刑伤无解"
+    },
+    "hunyin_cishu": {
+      "tongwuxing_check": {
+        "applies": false,
+        "reason": "甲子日柱，甲木子水五行不同，不适用同五行多婚格局判断"
+      },
+      "gonghuai_shuliang": 2,
+      "gonghuai_detail": "子卯相刑×2（年支卯+时支卯刑日支子）",
+      "other_xiong": [
+        "伤官两头挂→与亲人缘薄，婚姻中情绪表达激烈",
+        "比劫重重→争夺配偶星，婚姻中竞争压力大",
+        "卯酉六冲×2→四柱内部冲突多，婚姻环境动荡"
+      ],
+      "yuduan_hunyin_cishu": "可能2段婚姻或重要感情（宫坏数量=2，但无六害穿害，未达直接离婚格局）",
+      "yingyan_shijian": "大运流年引动子卯刑时最易应验（酉年、卯年、子年），尤其酉年卯年冲刑并发时",
+      "confidence": "中等偏高——双刑无合解+伤官两头挂+比劫克财，婚姻稳定性差，但无六害穿害使第三者介入风险相对较低"
+    }
+  },
+  "summary": "配偶聪明知性温柔体贴（正印坐夫妻宫），命主对丰腴厚重型有好感；但子卯相刑×2夫妻宫受损严重且无合可解，比劫克财+伤官两头挂叠加，可能经历2段婚姻或重要感情，酉年卯年子年最需注意婚姻变动。"
+}

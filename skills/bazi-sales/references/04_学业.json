@@ -1,0 +1,620 @@
+{
+  "domain": "学业",
+  "description": "八字看学业与考试的完整知识库",
+  "core_logic": "八字看学业以印星状态、食伤配合、官杀制约、格局高低、神煞助力五个维度为核心，印星旺相得地主学历高，食伤泄秀主成绩顶尖，官印相生主自律学霸，伤官配印主叛逆成才，文昌学堂主考试助力。",
+
+  "section_1_basic_foundations": {
+    "title": "学业核心基础",
+
+    "subsection_1_ten_gods_association": {
+      "title": "十神与学业关联（第1-8行）",
+      "items": [
+        {
+          "line": 4,
+          "ten_god": "正印/偏印",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印'])",
+          "association": "知识吸收、记忆、理解",
+          "meaning": "掌管学习的基础能力"
+        },
+        {
+          "line": 5,
+          "ten_god": "食神/伤官",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官'])",
+          "association": "才智发挥、创新、创造力",
+          "meaning": "掌管学习的表现力"
+        },
+        {
+          "line": 6,
+          "ten_god": "官杀",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀'])",
+          "association": "自律、认证、压力转化",
+          "meaning": "掌管学习的约束力"
+        }
+      ]
+    }
+  },
+
+  "section_2_high_education_markers": {
+    "title": "高学历标志（本科及以上）（第11-27行）",
+    "accuracy_level": "应验率95%",
+    "items": [
+      {
+        "line": 14,
+        "statement": "财官印俱全，流通有情",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财','正官','七杀','正印','偏印'])",
+        "data_check": "all_three_present AND 相生关系",
+        "consequence": "必上好大学",
+        "accuracy": "95%"
+      },
+      {
+        "line": 15,
+        "statement": "官印相生，透干清纯",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官' AND presence.in_stems === true) + ten_gods[] (filter: name in ['正印','偏印'] AND presence.in_stems === true)",
+        "condition": "官印都透干且相生关系",
+        "consequence": "学业自觉，考试必成",
+        "accuracy": "95%"
+      },
+      {
+        "line": 16,
+        "statement": "伤官配印，有制化",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + ten_gods[] (filter: name in ['正印','偏印'])",
+        "condition": "伤官和印星同时出现且印星克制伤官",
+        "consequence": "学术研究能力强",
+        "accuracy": "95%"
+      },
+      {
+        "line": 17,
+        "statement": "七杀化印，旺而有力",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').is_wang + ten_gods[] (filter: name in ['正印','偏印']).presence",
+        "condition": "七杀被印星化制且力量强",
+        "consequence": "越有压力越努力，早年学业成",
+        "accuracy": "95%"
+      },
+      {
+        "line": 20,
+        "statement": "木火通明",
+        "data_source": "bazi_result.json → pillars[] (filter: zhi in ['寅','卯']) + pillars[] (filter: zhi in ['巳','午'])",
+        "meaning": "文思泉涌，顶尖文科人才",
+        "accuracy": "90%"
+      },
+      {
+        "line": 21,
+        "statement": "金水伤官，日主强",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + (gan in ['庚','辛'] OR zhi in ['申','酉'] OR gan in ['壬','癸'] OR zhi in ['子','亥']) + dynamics.body_strength === '身强'",
+        "meaning": "逻辑思维强，顶尖理科人才",
+        "accuracy": "90%"
+      },
+      {
+        "line": 22,
+        "statement": "印星为用，旺相得地",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).utility === '用' + .is_wang === true",
+        "consequence": "学历必高",
+        "accuracy": "90%"
+      },
+      {
+        "line": 23,
+        "statement": "七杀受制 + 偏印受制",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').is_constrained === true + ten_gods[] (filter: name === '偏印').is_constrained === true",
+        "consequence": "读书很好，能上硕士",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_3_low_education_markers": {
+    "title": "低学历标志（专科及以下）（第29-43行）",
+    "accuracy_level": "应验率95%",
+    "items": [
+      {
+        "line": 32,
+        "statement": "财星旺而无制，直接克破印星",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang === true + NOT(official克制) + 破印星",
+        "consequence": "学习分心，难获高学历",
+        "accuracy": "95%"
+      },
+      {
+        "line": 36,
+        "statement": "偏印当权，多学少成",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印').utility === '用' + .is_wang === true",
+        "accuracy": "90%"
+      },
+      {
+        "line": 37,
+        "statement": "伤官无制，官星被伤",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + NOT(印星克制) + 克official",
+        "consequence": "不爱学习，成绩差",
+        "accuracy": "90%"
+      },
+      {
+        "line": 38,
+        "statement": "身旺无印，厌学懒惰",
+        "data_source": "bazi_result.json → dynamics.body_strength === '身强' + ten_gods[] (filter: name in ['正印','偏印']).presence === false",
+        "accuracy": "90%"
+      },
+      {
+        "line": 39,
+        "statement": "官杀混杂无制",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官').presence + ten_gods[] (filter: name === '七杀').presence + NOT(制化关系)",
+        "consequence": "学习自律性差",
+        "accuracy": "90%"
+      },
+      {
+        "line": 40,
+        "statement": "印星为忌，旺而无制",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).utility === '忌' + .is_wang === true",
+        "consequence": "厌学懒惰",
+        "accuracy": "90%"
+      },
+      {
+        "line": 41,
+        "statement": "偏印不受制 + 七杀旺",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印').is_constrained === false + ten_gods[] (filter: name === '七杀').is_wang === true",
+        "consequence": "偏印不服管教，叛逆，容易辍学",
+        "accuracy": "90%"
+      },
+      {
+        "line": 43,
+        "statement": "七杀旺而无制 + 偏印旺而无制",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').is_wang === true + NOT(制化) + ten_gods[] (filter: name === '偏印').is_wang === true + NOT(制化)",
+        "consequence": "七杀压头带来压力太大，偏印因压力过大而叛逆内耗→初中辍学",
+        "accuracy": "95%"
+      }
+    ]
+  },
+
+  "section_4_academic_pattern_principles": {
+    "title": "学业格局核心原则（第45-77行）",
+
+    "subsection_1_core_principles": {
+      "title": "核心原则与应验率",
+      "items": [
+        {
+          "line": 48,
+          "principle": "印星为用",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).utility === '用'",
+          "effect": "学习能力强，学历高",
+          "accuracy": "95%"
+        },
+        {
+          "line": 49,
+          "principle": "食伤泄秀",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).presence",
+          "effect": "聪明外露，成绩顶尖",
+          "accuracy": "90%"
+        },
+        {
+          "line": 50,
+          "principle": "官印相生",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官' AND presence.in_stems === true) + ten_gods[] (filter: name in ['正印','偏印'] AND presence.in_stems === true)",
+          "condition": "都透干且相生关系",
+          "effect": "自律+学习力结合",
+          "accuracy": "95%"
+        },
+        {
+          "line": 51,
+          "principle": "伤官配印",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + ten_gods[] (filter: name in ['正印','偏印'])",
+          "effect": "聪明+规矩结合",
+          "accuracy": "90%"
+        },
+        {
+          "line": 52,
+          "principle": "财星破印",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).presence + ten_gods[] (filter: name in ['正印','偏印']).presence",
+          "effect": "学习分心，成绩下滑",
+          "accuracy": "90%"
+        },
+        {
+          "line": 53,
+          "principle": "比劫夺食",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).presence + ten_gods[] (filter: name in ['食神','伤官']).presence",
+          "effect": "资源被抢，成绩波动",
+          "accuracy": "85%"
+        }
+      ]
+    },
+
+    "subsection_2_subject_bias_judgement": {
+      "title": "偏科判断",
+      "items": [
+        {
+          "line": 55,
+          "bias_type": "偏文科",
+          "rule_1": "木火通明，透干旺相",
+          "data_source": "bazi_result.json → (pillars[] (filter: gan in ['甲','乙'] OR zhi in ['寅','卯'])) + (pillars[] (filter: gan in ['丙','丁'] OR zhi in ['巳','午']))",
+          "subjects": "语文/英语/历史突出",
+          "accuracy": "90%"
+        },
+        {
+          "line": 57,
+          "bias_type": "偏文科",
+          "rule_2": "正印旺相透干为用",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正印' AND is_wang === true AND presence.in_stems === true AND utility === '用')",
+          "strength": "擅长背诵",
+          "accuracy": "90%"
+        },
+        {
+          "line": 59,
+          "bias_type": "偏理科",
+          "rule_1": "金水伤官，透干旺相",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官' AND is_wang === true AND presence.in_stems === true) + (day_master.element in ['金','水'])",
+          "subjects": "数学/物理/化学突出",
+          "accuracy": "90%"
+        },
+        {
+          "line": 61,
+          "bias_type": "偏理科",
+          "rule_2": "偏印旺相透干为用",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印' AND is_wang === true AND presence.in_stems === true AND utility === '用')",
+          "strength": "擅长逻辑推理",
+          "accuracy": "90%"
+        },
+        {
+          "line": 65,
+          "bias_type": "偏艺术",
+          "rule_1": "伤官旺而有印透干",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官' AND is_wang === true AND presence.in_stems === true) + ten_gods[] (filter: name in ['正印','偏印'])",
+          "gift": "艺术天赋",
+          "accuracy": "90%"
+        },
+        {
+          "line": 67,
+          "bias_type": "偏艺术",
+          "rule_2": "日主坐伤官为用",
+          "data_source": "bazi_result.json → pillars[4].ten_god_gan === '伤官' + ten_gods[] (filter: name === '伤官').utility === '用'",
+          "sensitivity": "对艺术天生敏感",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_3_exam_luck": {
+      "title": "考试运",
+      "items": [
+        {
+          "line": 70,
+          "luck_type": "考试运好",
+          "signal_1": "岁运文昌星动",
+          "data_source": "bazi_result.json → dayun_and_liunian (filter: 文昌星出现)",
+          "effect": "逢考必过",
+          "accuracy": "85%"
+        },
+        {
+          "line": 72,
+          "luck_type": "考试运好",
+          "signal_2": "岁运官印相生",
+          "data_source": "bazi_result.json → dayun_and_liunian (filter: 官印相生关系)",
+          "effect": "升学顺利",
+          "accuracy": "85%"
+        },
+        {
+          "line": 74,
+          "luck_type": "考试运差",
+          "signal_1": "岁运财星破印",
+          "data_source": "bazi_result.json → dayun_and_liunian (filter: 财克印)",
+          "effect": "注意力不集中",
+          "accuracy": "85%"
+        },
+        {
+          "line": 76,
+          "luck_type": "考试运差",
+          "signal_2": "岁运枭神夺食",
+          "data_source": "bazi_result.json → dayun_and_liunian (filter: 偏印克食神)",
+          "effect": "发挥失常",
+          "accuracy": "85%"
+        }
+      ]
+    }
+  },
+
+  "section_5_six_step_analysis": {
+    "title": "学业分析六步法（第88-125行）",
+    "items": [
+      {
+        "line": 91,
+        "step": 1,
+        "title": "判断印星状态（旺衰、喜忌、有无刑冲克破）",
+        "positive": "印星为用且旺相得地 → 学历必高",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).utility + .is_wang + dynamics.technical_interactions",
+        "negative": "印星为忌且旺而无制 → 厌学懒惰",
+        "accuracy": "95%"
+      },
+      {
+        "line": 95,
+        "step": 2,
+        "title": "看食伤与印星配合",
+        "case_1": "伤官配印（伤官为喜用+印星制约）→ 学业有成",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').utility === '用' + ten_gods[] (filter: name in ['正印','偏印']).presence",
+        "case_2": "食神生财 → 靠技艺谋利"
+      },
+      {
+        "line": 99,
+        "step": 3,
+        "title": "查官杀与印星关系",
+        "case_1": "官印相生（官星生印星，印星生身）→ 自律+学习力结合",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官') + ten_gods[] (filter: name in ['正印','偏印'])",
+        "case_2": "七杀化印（七杀被印星转化）→ 越有压力越努力",
+        "accuracy": "95%"
+      },
+      {
+        "line": 103,
+        "step": 4,
+        "title": "判断格局高低",
+        "positive": "财官印俱全，流通有情 → 必上好大学",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财','正官','七杀','正印','偏印'])",
+        "negative": "偏印当权，多学少成 → 学历受限",
+        "accuracy": "90%"
+      },
+      {
+        "line": 107,
+        "step": 5,
+        "title": "查考试助力神煞",
+        "indicator_1": "文昌星动 → 逢考必过",
+        "data_source": "bazi_result.json → dynamics.features[] (filter: contains '文昌') OR pillars[] (filter: shen_sha contains '文昌')",
+        "indicator_2": "学堂星入命 → 学业天赋高",
+        "accuracy": "85%"
+      },
+      {
+        "line": 111,
+        "step": 6,
+        "title": "定学业阶段",
+        "stage_1": "起步期（少年6-15岁）：看年柱印星+月柱食伤",
+        "stage_2": "发展期（青年15-25岁）：看日主强弱+官印配合",
+        "stage_3": "稳定期（成年后25岁以后）：看时柱子女星（子女学业）"
+      }
+    ]
+  },
+
+  "section_6_pattern_academic_judgement": {
+    "title": "各格局学业判断（第127-180行）",
+
+    "subsection_1_printing_star_for_use": {
+      "title": "印星为用（学业最佳格局）",
+      "items": [
+        {
+          "line": 130,
+          "pattern": "印星旺相得地，无刑冲克破",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).is_wang + NOT(dynamics.technical_interactions)",
+          "consequence": "学历必高",
+          "accuracy": "95%"
+        },
+        {
+          "line": 131,
+          "pattern": "正印旺相透干",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正印' AND is_wang === true AND presence.in_stems === true)",
+          "strength": "擅长背诵，学业自觉"
+        },
+        {
+          "line": 132,
+          "pattern": "偏印旺相透干",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印' AND is_wang === true AND presence.in_stems === true)",
+          "strength": "擅长逻辑推理，理科思维强"
+        },
+        {
+          "line": 134,
+          "warning": "印星为忌且旺而无制",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印','偏印']).utility === '忌' + .is_wang",
+          "consequence": "厌学懒惰，学历反而低"
+        }
+      ]
+    },
+
+    "subsection_2_food_injury_revealing_talent": {
+      "title": "食伤泄秀（聪明顶尖格局）",
+      "items": [
+        {
+          "line": 137,
+          "pattern": "食神旺相透干",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神' AND is_wang === true AND presence.in_stems === true)",
+          "strength": "各科均衡，答题规范"
+        },
+        {
+          "line": 138,
+          "pattern": "伤官旺而有制",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + (制化力 > 0)",
+          "strength": "才华出众，创新能力强"
+        },
+        {
+          "line": 140,
+          "warning": "伤官无制、官星被伤",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + NOT(制化) + 克official",
+          "consequence": "不爱学习，成绩差"
+        }
+      ]
+    },
+
+    "subsection_3_official_printing_generation": {
+      "title": "官印相生（自律学霸格局）",
+      "items": [
+        {
+          "line": 144,
+          "pattern": "官印相生透干清纯",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官' AND presence.in_stems === true) + ten_gods[] (filter: name in ['正印','偏印'] AND presence.in_stems === true)",
+          "consequence": "学习自觉，师长助力，考试必成功",
+          "accuracy": "95%"
+        },
+        {
+          "line": 145,
+          "pattern": "七杀化印旺而有力",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀').is_wang + ten_gods[] (filter: name in ['正印','偏印']).presence",
+          "consequence": "越有压力越努力，早年学业成",
+          "accuracy": "90%"
+        },
+        {
+          "line": 147,
+          "warning": "官杀混杂无制",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官').presence + ten_gods[] (filter: name === '七杀').presence + NOT(制化)",
+          "consequence": "自律性差，时好时坏"
+        }
+      ]
+    },
+
+    "subsection_4_wound_officer_with_printing": {
+      "title": "伤官配印（叛逆成才格局）",
+      "items": [
+        {
+          "line": 151,
+          "pattern": "伤官（聪明）被印星（规矩）制约",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + ten_gods[] (filter: name in ['正印','偏印'])",
+          "combination": "聪明+规范组合，适合深入研究",
+          "accuracy": "95%"
+        },
+        {
+          "line": 152,
+          "warning": "伤官无制",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + NOT(制化)",
+          "consequence": "叛逆不爱学习，成绩差",
+          "accuracy": "90%"
+        }
+      ]
+    }
+  },
+
+  "section_7_academic_support_deities": {
+    "title": "考试助力神煞（第182-207行）",
+
+    "subsection_1_auspicious_deities": {
+      "title": "学业吉神",
+      "items": [
+        {
+          "line": 186,
+          "deity": "文昌贵人",
+          "check_method": "甲见巳、乙见午、丙见申、丁见酉、戊见申、己见酉、庚见亥、辛见子、壬见寅、癸见卯",
+          "data_source": "bazi_result.json → pillars[] (filter: 文昌关系匹配)",
+          "function": "学业考试，必过",
+          "accuracy": "85%"
+        },
+        {
+          "line": 188,
+          "deity": "学堂星",
+          "check_method": "以年干查",
+          "function": "天生喜欢读书",
+          "accuracy": "85%"
+        },
+        {
+          "line": 190,
+          "deity": "天德贵人",
+          "check_method": "以月支查",
+          "data_source": "bazi_result.json → pillars[3]",
+          "function": "福寿加持",
+          "accuracy": "80%"
+        },
+        {
+          "line": 192,
+          "deity": "月德贵人",
+          "check_method": "以月支查",
+          "data_source": "bazi_result.json → pillars[3]",
+          "function": "学业顺利",
+          "accuracy": "80%"
+        }
+      ]
+    },
+
+    "subsection_2_wenchang_quick_reference": {
+      "title": "文昌星速查表（第195-205行）",
+      "reference_table": [
+        { "day_stem": "甲", "wenchang": "巳", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '巳')" },
+        { "day_stem": "乙", "wenchang": "午", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '午')" },
+        { "day_stem": "丙", "wenchang": "申", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '申')" },
+        { "day_stem": "丁", "wenchang": "酉", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '酉')" },
+        { "day_stem": "戊", "wenchang": "申", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '申')" },
+        { "day_stem": "己", "wenchang": "酉", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '酉')" },
+        { "day_stem": "庚", "wenchang": "亥", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '亥')" },
+        { "day_stem": "辛", "wenchang": "子", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '子')" },
+        { "day_stem": "壬", "wenchang": "寅", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '寅')" },
+        { "day_stem": "癸", "wenchang": "卯", "data_source": "bazi_result.json → pillars[4,6] (filter: zhi === '卯')" }
+      ]
+    },
+
+    "subsection_3_wenchang_xuetang_entry": {
+      "title": "文昌学堂入命标志",
+      "items": [
+        {
+          "line": 208,
+          "marker": "八字中文昌星或学堂星为喜用神",
+          "data_source": "bazi_result.json → pillars[] (filter: shen_sha contains ['文昌','学堂']) + utility === '用'",
+          "effect": "考试运特别好，逢考必过",
+          "accuracy": "95%"
+        },
+        {
+          "line": 209,
+          "marker": "日坐文昌（出生日地支是文昌星）",
+          "data_source": "bazi_result.json → pillars[5].zhi === wenchang_star",
+          "effect": "天生喜欢读书，主动钻研，不用督促",
+          "accuracy": "90%"
+        }
+      ]
+    }
+  },
+
+  "section_8_academic_recommendations_by_pattern": {
+    "title": "不同命格学业推荐（第212-226行）",
+    "items": [
+      {
+        "pattern": "印星为用+正印旺",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '正印').utility === '用' + .is_wang === true",
+        "recommended_major": "学术研究、教育、文化",
+        "suitable_industries": "教师、学者、图书管理员"
+      },
+      {
+        "pattern": "食伤泄秀+木火通明",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']) + 木火五行",
+        "recommended_major": "文科（语文/英语/历史）",
+        "suitable_industries": "作家、编辑、媒体"
+      },
+      {
+        "pattern": "金水伤官+日主旺",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + (金水五行) + dynamics.body_strength === '身强'",
+        "recommended_major": "理科（数学/物理/化学）",
+        "suitable_industries": "科研、工程、IT、金融"
+      },
+      {
+        "pattern": "伤官配印+火土伤官",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang + ten_gods[] (filter: name in ['正印','偏印']).presence",
+        "recommended_major": "艺术创作",
+        "suitable_industries": "设计师、艺术家、音乐家"
+      },
+      {
+        "pattern": "官印相生+七杀化印",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官','七杀']) + ten_gods[] (filter: name in ['正印','偏印'])",
+        "recommended_major": "管理/法律",
+        "suitable_industries": "公务员、律师、管理层"
+      },
+      {
+        "pattern": "食神生财+比劫帮身",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神') + ten_gods[] (filter: name in ['正财','偏财']) + ten_gods[] (filter: name in ['比肩','劫财'])",
+        "recommended_major": "技术/技艺",
+        "suitable_industries": "厨师、技师、工程师"
+      }
+    ]
+  },
+
+  "section_9_academic_stage_judgement": {
+    "title": "学业阶段判断（第229-241行）",
+    "items": [
+      {
+        "stage": "起步期",
+        "age": "6-15岁",
+        "key_pillars": "年柱+月柱",
+        "positive_indicator": "印星在年/月，基础扎实",
+        "data_source": "bazi_result.json → pillars[0,1,2,3] (filter: 印星)",
+        "negative_indicator": "印星被克，学业不稳"
+      },
+      {
+        "stage": "发展期",
+        "age": "15-25岁",
+        "key_pillars": "月柱+日柱",
+        "positive_indicator": "官印相生=学业认证顺利",
+        "data_source": "bazi_result.json → pillars[2,3,4,5] (filter: 官印相生)",
+        "negative_indicator": "伤官见官=学业受阻"
+      },
+      {
+        "stage": "稳定期",
+        "age": "25岁以后",
+        "key_pillars": "日柱+时柱",
+        "focus": "看子女星（子女学业）；自身事业+学习并进",
+        "data_source": "bazi_result.json → pillars[4,5,6,7]"
+      }
+    ]
+  }
+}

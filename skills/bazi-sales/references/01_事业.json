@@ -1,0 +1,534 @@
+{
+  "domain": "事业",
+  "description": "八字看事业的完整知识库",
+  "core_logic": "八字看事业以日主旺衰、官杀格局、喜用方向、十神组合为四大支柱，正五行主行业属性，十神主职业定位，格局主事业高度，大运流年主发展时机，高应验率集中在官印相生、财官相辅、喜用得令、格局清贵四大维度。",
+
+  "section_1_basic_concepts": {
+    "title": "事业基础概念",
+    "subsection_1_core_correspondence": {
+      "title": "事业与八字核心对应关系（第17-24行）",
+      "items": [
+        {
+          "line": 17,
+          "element_name": "日主旺衰",
+          "data_source": "bazi_result.json → dynamics.body_strength",
+          "possible_values": ["身强", "身弱"],
+          "interpretations": {
+            "身强": "确定个人能力强、能独当一面，适合创业、管理",
+            "身弱": "需辅助、适合团队协作"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 18,
+          "element_name": "官杀星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正官', '七杀'])",
+          "description": "主事业地位、权力与机遇",
+          "interpretations": {
+            "正官存在且为用": "正官主稳定职业，事业有成",
+            "七杀存在且为用": "七杀主挑战性职业，事业有成",
+            "官杀为忌": "多竞争、多波折"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 19,
+          "element_name": "印星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印', '偏印'])",
+          "description": "主智慧、才华与贵人运",
+          "interpretations": {
+            "印星存在且为用": "事业助力，学习能力强、易得贵人相助",
+            "印星为忌": "压力大、事业受阻"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 20,
+          "element_name": "财星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财', '偏财'])",
+          "description": "主事业动力与财富回报",
+          "interpretations": {
+            "财星存在且为用": "追求财富的动力强，为事业提供物质基础",
+            "财星为忌": "易因财破事"
+          },
+          "accuracy": "95%"
+        },
+        {
+          "line": 21,
+          "element_name": "食伤星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神', '伤官'])",
+          "description": "主创新能力与事业突破",
+          "interpretations": {
+            "食伤存在且为用": "创造力、表达力强，适合技术、艺术、营销等领域",
+            "食伤为忌": "创意受限、表达受阻"
+          },
+          "accuracy": "90%"
+        },
+        {
+          "line": 22,
+          "element_name": "比劫星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩', '劫财'])",
+          "description": "主团队协作与竞争关系",
+          "interpretations": {
+            "比劫旺": "竞争激烈",
+            "比劫弱": "团队和睦"
+          },
+          "accuracy": "90%"
+        },
+        {
+          "line": 23,
+          "element_name": "格局高低",
+          "data_source": "bazi_result.json → dynamics.geshi (格局) 或通过十神相邻判断",
+          "interpretations": {
+            "格局清贵": "事业层次高、步步高升",
+            "格局混杂": "事业起伏大、波折多"
+          },
+          "accuracy": "95%"
+        }
+      ]
+    },
+
+    "subsection_2_ten_god_positioning": {
+      "title": "事业核心十神定位（第28-51行）",
+      "items": [
+        {
+          "line": "28-31",
+          "ten_god_name": "正官",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官')",
+          "occupation_type": "稳定型职业",
+          "suitable_occupations": ["公务员", "国企职员", "教师", "医生", "学术研究者", "法律顾问"],
+          "interpretation": "正官得用→仕途平稳，易得上级赏识，适合按部就班发展",
+          "accuracy": "95%"
+        },
+        {
+          "line": "33-36",
+          "ten_god_name": "七杀",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '七杀')",
+          "occupation_type": "挑战型职业",
+          "suitable_occupations": ["企业家", "管理者", "军人", "警察", "运动员", "风险投资", "销售高管"],
+          "interpretation": "七杀有制化为权→权力欲强，适合有挑战性、高回报的领域；无制则为祸→事业波折",
+          "accuracy": "95%"
+        },
+        {
+          "line": "38-41",
+          "ten_god_name": "印星（正印/偏印）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正印', '偏印'])",
+          "occupation_type": "知识型职业",
+          "suitable_occupations": ["科研人员", "教师", "培训师", "图书管理员", "心理咨询师", "技术专家"],
+          "interpretation": "印星得用→智慧过人，易得贵人相助，适合专业技术与学术领域",
+          "accuracy": "95%"
+        },
+        {
+          "line": "43-46",
+          "ten_god_name": "财星（正财/偏财）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财', '偏财'])",
+          "occupation_type": "财富型职业",
+          "suitable_occupations": ["金融", "投资", "贸易", "房地产", "销售", "企业家"],
+          "interpretation": "财星生官→追求财富的动力强，适合以财富为导向的职业",
+          "accuracy": "95%"
+        },
+        {
+          "line": "48-51",
+          "ten_god_name": "食伤（食神/伤官）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神', '伤官'])",
+          "occupation_type": "创意型职业",
+          "suitable_occupations": ["艺术", "设计", "媒体", "营销", "技术研发", "演艺", "作家"],
+          "interpretation": "食伤生财→创造力强，适合需要表达与创新的领域",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_3_pattern_classification": {
+      "title": "事业格局分类（第53-69行）",
+      "patterns": [
+        {
+          "line": "56",
+          "pattern_name": "官印相生格",
+          "pattern_class": "清贵格局",
+          "description": "官星得印星生扶，主事业稳定、步步高升，适合公职、国企",
+          "accuracy": "95%",
+          "judgment_steps": {
+            "step1": "查找十神名为'正官'或'七杀'的数据→ten_gods[].name",
+            "step2": "查找十神名为'正印'或'偏印'的数据→ten_gods[].name",
+            "step3": "检查官杀和印星的occurrences[].pillar是否相邻（相邻对：[0,1][2,3][4,5][6,7][0,2][2,4][4,6][1,3][3,5][5,7]）",
+            "step4": "验证五行相生关系（印生官）"
+          }
+        },
+        {
+          "line": "57",
+          "pattern_name": "财官相辅格",
+          "pattern_class": "清贵格局",
+          "description": "财星生官杀，主事业有动力、财富与地位双丰收，适合企业管理",
+          "accuracy": "95%",
+          "judgment_steps": {
+            "step1": "查找十神名为'正财'或'偏财'的数据",
+            "step2": "查找十神名为'正官'或'七杀'的数据",
+            "step3": "检查财星和官杀的occurrences[].pillar是否相邻",
+            "step4": "验证五行相生关系（财生官）"
+          }
+        },
+        {
+          "line": "58",
+          "pattern_name": "食伤生财格",
+          "pattern_class": "清贵格局",
+          "description": "食伤生财星，主靠技艺、创意赚钱，适合技术、艺术领域",
+          "accuracy": "95%",
+          "judgment_steps": {
+            "step1": "查找十神名为'食神'或'伤官'的数据",
+            "step2": "查找十神名为'正财'或'偏财'的数据",
+            "step3": "检查食伤和财星的occurrences[].pillar是否相邻",
+            "step4": "验证五行相生关系（食伤生财）"
+          }
+        },
+        {
+          "line": "59",
+          "pattern_name": "专旺格",
+          "pattern_class": "清贵格局",
+          "description": "如炎上格（火旺）、稼穑格（土旺），主专注某一领域，成为行业专家",
+          "accuracy": "90%",
+          "judgment_logic": "检查 dynamics.five_element_balance 中某个五行是否明显偏高"
+        },
+        {
+          "line": "62",
+          "pattern_name": "官杀混杂格",
+          "pattern_class": "普通格局",
+          "description": "正官与七杀同现，主事业方向多变，需中年后稳定",
+          "accuracy": "90%",
+          "judgment_logic": "ten_gods 中同时存在 name='正官' 和 name='七杀'"
+        },
+        {
+          "line": "63",
+          "pattern_name": "财星旺相格",
+          "pattern_class": "普通格局",
+          "description": "财星旺而生官，主追求财富，适合销售、贸易等领域",
+          "accuracy": "90%",
+          "judgment_logic": "查找财星 ten_gods[] (name in ['正财','偏财']), 检查 is_wang=true"
+        },
+        {
+          "line": "64",
+          "pattern_name": "印星旺相格",
+          "pattern_class": "普通格局",
+          "description": "印星旺而护官，主靠专业技能立足，适合技术、教育领域",
+          "accuracy": "90%",
+          "judgment_logic": "查找印星 ten_gods[] (name in ['正印','偏印']), 检查 is_wang=true"
+        },
+        {
+          "line": "67",
+          "pattern_name": "无官无财格",
+          "pattern_class": "格局低下",
+          "description": "命局缺官杀与财星，主事业格局小，适合安稳工作",
+          "accuracy": "90%",
+          "judgment_logic": "ten_gods 中不存在官杀(正官、七杀) 且不存在财星(正财、偏财)"
+        },
+        {
+          "line": "68",
+          "pattern_name": "比劫夺财格",
+          "pattern_class": "格局低下",
+          "description": "比劫旺而克财，主竞争激烈，财富难聚，适合固定薪资工作",
+          "accuracy": "90%",
+          "judgment_logic": "查找比劫 is_wang=true，且财星存在，两者有克制关系"
+        },
+        {
+          "line": "69",
+          "pattern_name": "伤官见官格",
+          "pattern_class": "格局低下",
+          "description": "伤官克官杀，主事业多波折，需调整心态、晚发为宜",
+          "accuracy": "90%",
+          "judgment_logic": "ten_gods 中同时存在伤官和官杀(正官或七杀)，位置相邻或相冲"
+        }
+      ]
+    }
+  },
+
+  "section_2_six_step_method": {
+    "title": "事业分析六步法（第73-127行）",
+
+    "preparation": {
+      "line": "75-80",
+      "description": "准备工作：排盘→定位→定喜用"
+    },
+
+    "step_1": {
+      "line": "82-88",
+      "title": "第一步：判日主，定能力",
+      "data_source": "bazi_result.json → dynamics.body_strength",
+      "possible_values": ["身强", "身弱"],
+      "interpretation": {
+        "body_strength_身强": "能力强，适合创业、管理",
+        "body_strength_身弱": "适合团队、辅助岗位"
+      },
+      "accuracy": "95%"
+    },
+
+    "step_2": {
+      "line": "90-95",
+      "title": "第二步：看官杀，定方向",
+      "checks": [
+        {
+          "check": "命局是否有官杀",
+          "data_source": "ten_gods[] (filter: name in ['正官', '七杀'])",
+          "if_exist": "查看喜用情况",
+          "if_not_exist": "看大运流年"
+        },
+        {
+          "check": "官杀是否为喜用神",
+          "data_source": "ten_gods[].utility",
+          "possible_values": ["用", "忌"],
+          "if_用": "事业顺",
+          "if_忌": "多波折"
+        },
+        {
+          "check": "官杀是否有根、有生扶",
+          "data_source": "ten_gods[].occurrences 和 ten_gods[].technical_metrics",
+          "if_有根": "事业稳固",
+          "if_无根": "易变动"
+        }
+      ],
+      "accuracy": "95%"
+    },
+
+    "step_3": {
+      "line": "97-102",
+      "title": "第三步：查印星，看助力",
+      "checks": [
+        {
+          "check": "印星是否生扶官杀或日主",
+          "data_source": "ten_gods[] (filter: name in ['正印', '偏印'])"
+        },
+        {
+          "check": "印星是否为喜用神",
+          "data_source": "ten_gods[].utility",
+          "if_用": "有贵人",
+          "if_忌": "多压力"
+        },
+        {
+          "check": "印星是否透干",
+          "data_source": "ten_gods[].presence.in_stems",
+          "if_true": "贵人明显",
+          "if_false": "暗中相助"
+        }
+      ],
+      "accuracy": "95%"
+    },
+
+    "step_4": {
+      "line": "104-112",
+      "title": "第四步：定喜用，选行业",
+      "description": "根据喜用神五行选择对应行业",
+      "data_source": "需要先确定喜用神五行（可能来自 dynamics 或通过十神分析）",
+      "industry_mapping": [
+        {
+          "five_element": "木",
+          "industries": ["教育", "文化", "出版", "林业", "中医", "服装设计"]
+        },
+        {
+          "five_element": "火",
+          "industries": ["娱乐", "传媒", "能源", "电力", "餐饮", "美容", "心理学"]
+        },
+        {
+          "five_element": "土",
+          "industries": ["房地产", "建筑", "农业", "矿产", "仓储", "人力资源"]
+        },
+        {
+          "five_element": "金",
+          "industries": ["金融", "法律", "机械", "五金", "珠宝", "证券"]
+        },
+        {
+          "five_element": "水",
+          "industries": ["物流", "旅游", "水产", "运输", "通讯", "互联网"]
+        }
+      ],
+      "accuracy": "95%"
+    },
+
+    "step_5": {
+      "line": "114-120",
+      "title": "第五步：观大运，看时机",
+      "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[]",
+      "description": "遍历大运列表，找出与日主喜用神配合的大运，该大运十年为事业的重要发展期"
+    },
+
+    "step_6": {
+      "line": "122-127",
+      "title": "第六步：察流年，找机遇",
+      "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[]",
+      "description": "在大运框架下，查看每年流年的五行变化，找出引动喜用神或官印的流年为事业突破之年"
+    }
+  },
+
+  "section_3_industry_and_career": {
+    "title": "行业选择与职业定位（第131-163行）",
+    "note": "此部分依赖第四步的喜用神五行判断"
+  },
+
+  "section_4_success_and_obstacles": {
+    "line": "167-188",
+    "title": "事业成功与阻碍",
+
+    "success_conditions": [
+      {
+        "line": 170,
+        "condition": "官印相生",
+        "outcome": "步步高升，宜公职管理",
+        "data_check": "通过格局判断得出"
+      },
+      {
+        "line": 171,
+        "condition": "财官相辅",
+        "outcome": "财富地位双丰收",
+        "data_check": "通过格局判断得出"
+      },
+      {
+        "line": 172,
+        "condition": "食伤生财",
+        "outcome": "靠技艺创意赚大钱，格局清纯则事业无波折",
+        "data_check": "通过格局判断得出"
+      },
+      {
+        "line": 173,
+        "condition": "格局清纯",
+        "outcome": "事业无波折",
+        "data_check": "通过特征分析"
+      }
+    ],
+
+    "obstacles": [
+      {
+        "line": 176,
+        "obstacle": "官杀混杂",
+        "impact": "事业方向乱",
+        "data_check": "ten_gods 中同时存在正官和七杀",
+        "accuracy": "90%"
+      },
+      {
+        "line": 177,
+        "obstacle": "伤官见官",
+        "impact": "事业多波折",
+        "data_check": "ten_gods 中同时存在伤官和官杀",
+        "accuracy": "90%"
+      },
+      {
+        "line": 178,
+        "obstacle": "比劫夺财",
+        "impact": "竞争压力大",
+        "data_check": "比劫 is_wang=true，财星存在",
+        "accuracy": "90%"
+      },
+      {
+        "line": 179,
+        "obstacle": "无官无财",
+        "impact": "事业格局小",
+        "data_check": "ten_gods 中不存在官杀和财星",
+        "accuracy": "90%"
+      },
+      {
+        "line": 180,
+        "obstacle": "印星为忌",
+        "impact": "压力大、事业受阻",
+        "data_check": "印星 utility='忌'",
+        "accuracy": "90%"
+      },
+      {
+        "line": 181,
+        "obstacle": "正官为墓",
+        "impact": "事业受阻，易有口舌官司",
+        "data_check": "正官 is_sitting_on_tomb=true",
+        "accuracy": "85%"
+      },
+      {
+        "line": 182,
+        "obstacle": "月柱为墓",
+        "impact": "事业发展受阻，同辈竞争激烈",
+        "data_check": "检查 pillars[1] 的十神是否入墓",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_5_different_populations": {
+    "title": "不同人群事业要点（第192-216行）",
+
+    "population_1_public_servants": {
+      "line": "194-198",
+      "core_judgment": "官印相生 AND 正官得用 AND 无官杀混杂",
+      "data_check": {
+        "check1": "ten_gods 中正官 utility='用'",
+        "check2": "ten_gods 中印星存在",
+        "check3": "不同时存在正官和七杀"
+      },
+      "accuracy": "95%"
+    },
+
+    "population_2_entrepreneurs": {
+      "line": "200-204",
+      "core_judgment": "财官相辅 AND 食伤生财 AND 身强 AND 比劫有制",
+      "data_check": {
+        "check1": "dynamics.body_strength = '身强'",
+        "check2": "财星和官杀相邻",
+        "check3": "食伤和财星相邻",
+        "check4": "比劫存在但受制"
+      },
+      "accuracy": "95%"
+    },
+
+    "population_3_technical_professionals": {
+      "line": "206-210",
+      "core_judgment": "印星旺 AND 食伤旺 AND 身弱 AND 官杀有制",
+      "data_check": {
+        "check1": "印星 is_wang=true",
+        "check2": "食伤 is_wang=true",
+        "check3": "dynamics.body_strength = '身弱'",
+        "check4": "官杀存在但受约束"
+      },
+      "accuracy": "95%"
+    },
+
+    "population_4_sales_professionals": {
+      "line": "212-216",
+      "core_judgment": "食伤旺 AND 财星旺 AND 比劫旺 AND 身主中和",
+      "data_check": {
+        "check1": "食伤 is_wang=true",
+        "check2": "财星 is_wang=true",
+        "check3": "比劫 is_wang=true"
+      },
+      "accuracy": "95%"
+    }
+  },
+
+  "section_6_pitfall_guide": {
+    "title": "避坑指南（第220-241行）",
+    "faqs": [
+      {
+        "line": "222-223",
+        "question": "八字无官杀星，事业就一定不好吗？",
+        "answer": "不一定！适合自由职业、创业或技术领域；大运流年出现官杀时有机遇；若有印星、财星辅助，事业同样能成功",
+        "accuracy": "90%"
+      },
+      {
+        "line": "225-226",
+        "question": "官杀混杂的人，事业如何发展？",
+        "answer": "事业方向多变，早年多波折，中年后逐渐稳定；建议先专注某一领域（靠印星），积累经验后再拓展",
+        "accuracy": "90%"
+      },
+      {
+        "line": "228-229",
+        "question": "伤官见官，事业多波折如何化解？",
+        "answer": "事业多竞争、多变动，建议晚发为宜；多学习专业技能（印星），提升自身实力",
+        "accuracy": "90%"
+      },
+      {
+        "line": "231-232",
+        "question": "如何判断自己适合创业还是打工？",
+        "answer": "创业适合财官相辅、食伤生财、身强的命格；打工适合官印相生、印星旺、身弱的命格",
+        "accuracy": "95%"
+      }
+    ]
+  },
+
+  "section_7_core_motto": {
+    "line": "245-253",
+    "title": "事业核心口诀",
+    "motto": "事业先看日主强，官杀印星不可忘；喜用方向定行业，格局清浊定高度；官印相生公职稳，财官相辅老板命；食伤生财技术兴，比劫有制事业成；大运走喜事业顺，流年合喜有机遇；官杀混杂多调整，伤官见官晚发宜；事业成功靠努力，八字只是助力器。"
+  }
+}

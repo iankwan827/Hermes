@@ -1,0 +1,144 @@
+{
+  "domain": "父母",
+  "description": "八字看父母的完整知识库（理华千山派28式·父母篇）",
+  "core_logic": "八字看父母以年柱（父母宫）+ 财星（父亲）+ 印星（母亲）+ 纳音生克 + 刑冲合害为核心依据，高应验率集中在财星旺衰、印星强弱、纳音生克、岁运引动四大维度。",
+
+  "section_1_parental_star": {
+    "title": "父母星判断",
+    "father_star": {
+      "name": "偏财",
+      "element": "戊土（对甲木日主而言）",
+      "description": "偏财代表父亲，偏财旺而得用则父亲能力强、父子缘深",
+      "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财')"
+    },
+    "mother_star": {
+      "name": "正印",
+      "element": "癸水（对甲木日主而言）",
+      "description": "正印代表母亲，正印旺而得用则母亲贤惠、母子情深",
+      "data_source": "bazi_result.json → ten_gods[] (filter: name === '正印')"
+    },
+    "note": "偏财为父、正印为母是男命视角；女命以正财为父、偏印为母。需结合具体流派。"
+  },
+
+  "section_2_six_secrets": {
+    "title": "父母篇六大秘诀（理华千山派28式）",
+
+    "secret_1_father_early_death": {
+      "title": "秘诀一：父亲早逝",
+      "pattern": "年干比肩 + 月干比肩 + 偏财不显",
+      "interpretation": "年干比肩为父之同类，月干比肩亦为同党，偏财（父亲星）不显，则父星无立身之地，主父亲早亡",
+      "accuracy": "90%"
+    },
+
+    "secret_2_mother_early_death": {
+      "title": "秘诀二：母亲早丧或父母早离异",
+      "pattern": "年支正财 + 月支正财",
+      "interpretation": "年支正财和月支正财双重伏吟，父亲星旺而无制化，主母亲早丧或父母分离",
+      "accuracy": "85%"
+    },
+
+    "secret_3_father_mother_ill": {
+      "title": "秘诀三：父亲早逝，母亲身体差",
+      "pattern": "年干伤官 + 月干偏印（枭神）",
+      "interpretation": "年干伤官克官杀（父星），月干枭神夺食神（福气），两者皆凶，主父亲早逝且母亲身体不好",
+      "accuracy": "90%"
+    },
+
+    "secret_4_father_must_die": {
+      "title": "秘诀四：父亲必亡",
+      "pattern": "年柱纳音被月柱纳音所克 + 岁运再遇同克",
+      "interpretation": "纳音代表祖辈根基，年柱纳音被月柱纳音所克，祖上根基被动摇，岁运再遇同克，则父亲必亡",
+      "accuracy": "90%"
+    },
+
+    "secret_5_father_death_timing": {
+      "title": "秘诀五：父亲寿终",
+      "patterns": [
+        "财星入墓又见冲，岁运见库父寿终",
+        "天克地冲见偏财，父亡之期提前来"
+      ],
+      "interpretation": "财星（父星）入墓为被困，被冲则动，岁运见库则冲开墓库，主父亲寿终；天干地支同时冲克偏财星，更加速父亲死亡时间",
+      "accuracy": "90%"
+    },
+
+    "secret_6_parents_death_order": {
+      "title": "秘诀六：父母先后亡推断",
+      "patterns": [
+        "刑冲破印 → 母走他乡",
+        "二重亡神 → 母先丧",
+        "时杀带花 → 父先亡"
+      ],
+      "interpretation": "印星（母亲）被刑冲破，则母亲离家或健康出问题；亡神为凶星，重重出现主母亲先亡；时柱七杀带桃花（花酒杀），主父亲先亡",
+      "accuracy": "85%"
+    }
+  },
+
+  "section_3_father_analysis": {
+    "title": "父亲星象分析",
+    "items": [
+      {"condition": "偏财旺而得用", "outcome": "父亲能力强，财运佳，父子缘深", "accuracy": "90%"},
+      {"condition": "偏财弱而无根", "outcome": "父亲能力一般，父子缘薄", "accuracy": "85%"},
+      {"condition": "偏财被比劫克", "outcome": "因朋友或同事损害父亲运势", "accuracy": "90%"},
+      {"condition": "偏财入库逢冲", "outcome": "父亲发财或父亲有重大变化", "accuracy": "90%"},
+      {"condition": "偏财被合走", "outcome": "父亲有外遇或父亲与他人合作破财", "accuracy": "85%"}
+    ]
+  },
+
+  "section_4_mother_analysis": {
+    "title": "母亲星象分析",
+    "items": [
+      {"condition": "正印旺而得用", "outcome": "母亲贤惠，身体健康，母子情深", "accuracy": "90%"},
+      {"condition": "正印弱而无根", "outcome": "母亲身体差或与母亲缘薄", "accuracy": "85%"},
+      {"condition": "正印被财星克", "outcome": "因经济问题损害母亲健康", "accuracy": "90%"},
+      {"condition": "偏印旺而无制", "outcome": "母亲固执、刻薄，与子女有代沟", "accuracy": "85%"},
+      {"condition": "正印入库逢冲", "outcome": "母亲有喜庆或母亲环境有重大改变", "accuracy": "85%"}
+    ]
+  },
+
+  "section_5_timing": {
+    "title": "父母应期判断",
+    "father_timing": [
+      {"signal": "财星入库逢冲（岁运）", "outcome": "父亲发财或父亲健康出问题"},
+      {"signal": "比劫克财（岁运）", "outcome": "父亲事业或财运受损"},
+      {"signal": "偏财被合（岁运）", "outcome": "父亲有重大决策或外遇风险"},
+      {"signal": "财星入墓（岁运）", "outcome": "父亲健康下滑或父亲运势停滞"}
+    ],
+    "mother_timing": [
+      {"signal": "印星入库逢冲（岁运）", "outcome": "母亲有变动或健康转好/转坏"},
+      {"signal": "财星克印（岁运）", "outcome": "因财致母生病或母亲心情不佳"},
+      {"signal": "印星被合（岁运）", "outcome": "母亲有重要决定或被他人影响"},
+      {"signal": "枭神夺食（岁运）", "outcome": "母亲健康或子女健康双重受损"}
+    ]
+  },
+
+  "section_6_wealth_status": {
+    "title": "断父母富贫贵贱",
+    "items": [
+      {"condition": "年柱财星旺而得用", "outcome": "祖上富裕，出身条件好", "accuracy": "90%"},
+      {"condition": "年柱印星旺而得用", "outcome": "祖上有文化或有权势", "accuracy": "90%"},
+      {"condition": "年柱财印皆弱", "outcome": "祖上普通，出身平凡", "accuracy": "85%"},
+      {"condition": "年柱被月柱纳音克", "outcome": "祖业难守，早年家道中落", "accuracy": "90%"},
+      {"condition": "年柱与日柱天克地冲", "outcome": "与祖上缘分薄，早年离开原生家庭", "accuracy": "90%"}
+    ]
+  },
+
+  "section_7_pitfalls": {
+    "title": "避坑指南",
+    "qa": [
+      {
+        "question": "偏财一定代表父亲吗？",
+        "answer": "偏财为父是男命视角；女命以正财为父。但年柱宫位（祖辈宫）始终代表父母根基，需结合星象与宫位综合判断。"
+      },
+      {
+        "question": "父母早逝一定能在原局看出来吗？",
+        "answer": "不一定！原局有信号是前提（如偏财不显、财星入墓），需岁运引动才应验。原局凶但岁运无触发，父母未必早逝。"
+      },
+      {
+        "question": "父母离婚如何从八字判断？",
+        "answer": "看年柱与月柱关系：年支正财月支正财双重见，女命父母早离；年月柱天克地冲且带桃花，父母易有婚变。"
+      }
+    ]
+  },
+
+  "source": "理华千山派28式·父母篇（6条秘诀）+ 兄弟姐妹篇（4条秘诀）"
+}

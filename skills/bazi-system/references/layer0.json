@@ -1,0 +1,26 @@
+{
+  "layer": 0,
+  "name": "过三关/快速验证",
+  "skills_loaded": [
+    "bazi-xingge", "bazi-zhi", "bazi-xiongbu", "bazi-xinglengdan",
+    "bazi-haose", "bazi-shencai", "bazi-daogui", "bazi-lanyin",
+    "bazi-hunyin-tongwuxing", "bazi-gongchuan", "bazi-hunyin-cishu",
+    "bazi-dinghuo", "bazi-duanpeifu"
+  ],
+  "gender": "M",
+  "result": {
+    "xingge": "甲木参天大树，正直有主见，伤官重重聪明但恃才傲物",
+    "zhi": "甲木→背部有痣；丁火在年干时干→肩膀附近有痣",
+    "xiongbu": "无乙木透干，胸部一般",
+    "xinglengdan": "甲木身强+伤官旺，性欲较强，不冷淡",
+    "haose": "伤官重重，好色指数中等偏高",
+    "shencai": "甲木高大挺拔，木旺偏瘦，四肢修长",
+    "daogui": "甲木身强+伤官旺+丁火有情调，容易被倒追",
+    "lanyin": "正印旺相有懒的倾向，但伤官重重有动力",
+    "hunyin_tongwuxing": "日柱甲子，木+水不同五行，无干支同气",
+    "gongchuan": "日支子水，六害=子未穿；无未土→无穿害",
+    "dinghuo": "天干有丁火→必熬夜迟睡或抽烟；丁火坐卯木→背部有痣"
+  },
+  "zhongzhong": ["伤官重重", "劫财重重", "卯酉六冲", "子卯相刑", "官印相生"],
+  "summary": "甲木身强，伤官重重+劫财重重，卯酉冲+子卯刑，官印相生。性格正直固执，好色指数中等偏高，容易被倒追，背部有痣，必熬夜。"
+}

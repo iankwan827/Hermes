@@ -1,0 +1,51 @@
+{
+  "domain": "健康",
+  "description": "八字看健康的完整知识库",
+  "core_logic": "八字看健康以五行平衡、十神组合、枭神夺食、羊刃逢冲、官杀混杂为五个风险维度，五行对应脏腑，十神反映体质，特殊组合预示疾病或生死危险，大运流年引动应期。",
+  "section_1_body_shape": {
+    "title": "身材好坏判断",
+    "five_elements_body": [
+      {"element": "木", "good": "身高偏高，四肢修长", "bad": "身高偏矮，四肢纤细", "data_source": "bazi_result.json → day_master.element === '木'"},
+      {"element": "土", "good": "体型丰满", "bad": "偏瘦，脾胃弱", "data_source": "bazi_result.json → day_master.element === '土'"},
+      {"element": "火", "good": "体型紧致不松散", "bad": "过旺则偏瘦；过弱则松散", "data_source": "bazi_result.json → day_master.element === '火'"},
+      {"element": "金", "good": "身材挺拔，骨骼清晰", "bad": "偏瘦或佝偻", "data_source": "bazi_result.json → day_master.element === '金'"},
+      {"element": "水", "good": "体型圆润有肉", "bad": "虚胖或干瘪", "data_source": "bazi_result.json → day_master.element === '水'"}
+    ],
+    "ten_god_body": [
+      {"indicator": "食神旺", "effect": "心宽体胖，三围饱满", "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神' AND is_wang === true)"},
+      {"indicator": "正印旺为用", "effect": "体型匀称", "data_source": "bazi_result.json → ten_gods[] (filter: name === '正印' AND utility === '用')"},
+      {"indicator": "财星旺为用", "effect": "肌肉结实", "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财'] AND utility === '用')"},
+      {"indicator": "枭神夺食", "effect": "消化差，体型干瘪", "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印' AND is_wang === true) + 存在 ten_gods[] (filter: name === '食神' AND is_constrained === true)"},
+      {"indicator": "伤官过旺", "effect": "体型纤瘦", "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官' AND is_wang === true)"}
+    ]
+  },
+  "section_2_life_death_assessment": {
+    "title": "断生死铁口直断",
+    "warning": "单一断语不可定论，必须结合原局+大运+流年综合判断",
+    "core_combinations": [
+      {"combination": "枭神夺食", "meaning": "死神信号", "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印' AND is_wang === true AND utility === '忌') + ten_gods[] (filter: name === '食神')"},
+      {"combination": "羊刃逢冲", "meaning": "血光重重", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '羊刃') AND pillars[].shen_sha (filter: contains '冲')"},
+      {"combination": "官杀混杂", "meaning": "生死信号", "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官' AND is_wang === true) + ten_gods[] (filter: name === '七杀' AND is_wang === true)"},
+      {"combination": "食伤入墓", "meaning": "生死信号", "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官'] AND technical_metrics.is_sitting_on_tomb === true)"}
+    ]
+  },
+  "section_3_blood_light_injury": {
+    "title": "血光/意外伤害",
+    "male_general_arrow": "酉戌辰时春不旺，未卯子时夏中亡，寅午丑时秋并忌，冬季亥申巳为殃",
+    "female_yanluo_gate": "主生死婚灾",
+    "key_indicators": [
+      {"rule": "有箭有弓方为凶；有箭无弓不伤人", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '煞' OR contains '刃')"},
+      {"rule": "有煞有冲为真煞，有煞无冲为假煞", "data_source": "bazi_result.json → pillars[].shen_sha[] (存在) + pillars[].shen_sha (filter: contains '冲' OR contains '击')"}
+    ]
+  },
+  "section_4_organ_health": {
+    "title": "脏腑健康判断（五行对应）",
+    "organs": [
+      {"element": "木", "organ": "肝胆", "risk": "金木交战→肝硬化、肝损伤", "data_source": "bazi_result.json → day_master.element === '木' + dynamics.five_element_balance['金'] > dynamics.five_element_balance['木']"},
+      {"element": "火", "organ": "心脑血管", "risk": "水火相克→心脑病", "data_source": "bazi_result.json → day_master.element === '火' + dynamics.five_element_balance['水'] > dynamics.five_element_balance['火']"},
+      {"element": "土", "organ": "脾胃消化", "risk": "木土相克→脾胃病", "data_source": "bazi_result.json → day_master.element === '土' + dynamics.five_element_balance['木'] > dynamics.five_element_balance['土']"},
+      {"element": "金", "organ": "肺呼吸", "risk": "火金相克→肺部病", "data_source": "bazi_result.json → day_master.element === '金' + dynamics.five_element_balance['火'] > dynamics.five_element_balance['金']"},
+      {"element": "水", "organ": "肾泌尿", "risk": "土水相克→肾虚浮肿", "data_source": "bazi_result.json → day_master.element === '水' + dynamics.five_element_balance['土'] > dynamics.five_element_balance['水']"}
+    ]
+  }
+}

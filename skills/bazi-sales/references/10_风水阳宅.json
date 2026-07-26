@@ -1,0 +1,53 @@
+{
+  "domain": "风水阳宅",
+  "description": "八字与风水阳宅的对应知识库",
+  "core_logic": "八字五行属性与住宅风水相配合，根据日主五行选择阳宅方位、颜色、布局，实现八字和风水的同频共振，增强命局吉力。",
+  "section_1_five_elements_orientation": {
+    "title": "五行与方位对应",
+    "orientations": [
+      {"element": "木", "orientation": "东方", "color": "绿色", "meaning": "木属东方，宜朝东或卧室东方", "data_source": "bazi_result.json → day_master.element === '木'"},
+      {"element": "火", "orientation": "南方", "color": "红色", "meaning": "火属南方，宜朝南或采光南方", "data_source": "bazi_result.json → day_master.element === '火'"},
+      {"element": "土", "orientation": "中央", "color": "黄色", "meaning": "土属中央，宜中心布局均衡", "data_source": "bazi_result.json → day_master.element === '土'"},
+      {"element": "金", "orientation": "西方", "color": "白色/金色", "meaning": "金属西方，宜朝西或西方布局", "data_source": "bazi_result.json → day_master.element === '金'"},
+      {"element": "水", "orientation": "北方", "color": "蓝色/黑色", "meaning": "水属北方，宜朝北或北方有水", "data_source": "bazi_result.json → day_master.element === '水'"}
+    ]
+  },
+  "section_2_house_selection_principle": {
+    "title": "选房原则",
+    "principle_1": {
+      "rule": "根据日主五行选择房屋朝向",
+      "meaning": "日主五行喜什么，房屋朝向就选什么方位",
+      "data_source": "bazi_result.json → day_master.element + dynamics.body_strength"
+    },
+    "principle_2": {
+      "rule": "避开与命局相克的方位",
+      "meaning": "日主所克的五行对应方位要避免主卧",
+      "data_source": "bazi_result.json → day_master.element (opposite element)"
+    },
+    "principle_3": {
+      "rule": "考虑采光和通风",
+      "meaning": "结合日主冷暖属性选择采光程度",
+      "data_source": "bazi_result.json → day_master.element"
+    }
+  },
+  "section_3_interior_layout": {
+    "title": "室内布局建议",
+    "living_room": "客厅宜明亮，选择中性色调搭配日主五行色",
+    "bedroom": "卧室颜色应匹配日主五行，促进睡眠",
+    "kitchen": "厨房属火，根据日主冷暖调整",
+    "bathroom": "卫生间属水，水旺过则需平衡",
+    "office_desk": "书桌朝向应根据日主五行和喜用方位安排",
+    "data_source": "bazi_result.json → day_master.element + dynamics.body_strength"
+  },
+  "section_4_decoration_color": {
+    "title": "装修配色建议",
+    "color_psychology": [
+      {"element": "木", "primary": "绿色", "secondary": "蓝色", "avoid": "白色/灰色过多"},
+      {"element": "火", "primary": "红色", "secondary": "紫色", "avoid": "黑色/蓝色过多"},
+      {"element": "土", "primary": "黄色", "secondary": "红色", "avoid": "绿色/蓝色过多"},
+      {"element": "金", "primary": "白色", "secondary": "黄色", "avoid": "红色/绿色过多"},
+      {"element": "水", "primary": "蓝色", "secondary": "黑色", "avoid": "红色/黄色过多"}
+    ],
+    "data_source": "bazi_result.json → day_master.element"
+  }
+}

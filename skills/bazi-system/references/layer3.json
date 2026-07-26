@@ -1,0 +1,162 @@
+{
+  "layer": 3,
+  "name": "先天禀赋层",
+  "skills_used": [
+    "bazi-xingge",
+    "bazi-zhi",
+    "bazi-xiongbu",
+    "bazi-xinglengdan",
+    "bazi-haose",
+    "bazi-shencai",
+    "bazi-daogui",
+    "bazi-lanyin"
+  ],
+  "content": {
+    "personality": {
+      "core_trait": {
+        "day_master": "甲木（参天大树）",
+        "positive": "正直公正、领导力强、进取心旺、责任感强、仁慈善良",
+        "negative": "过于固执、主观意识强、过于直率、清高自负",
+        "commentary": "宁折不弯，天生老板型，不喜被领导。看得上才说话，看不上连说都不说"
+      },
+      "temperament": {
+        "day_branch": "子水（偏印）",
+        "type": "慢脾气",
+        "description": "拖延症：出门踩点甚至迟到，不会提前很早去。做事节奏偏慢，需要外力推动"
+      },
+      "liangtou_gua": {
+        "year_stem": "丁火（伤官）",
+        "hour_stem": "丁火（伤官）",
+        "result": "伤官两头挂",
+        "phrase": "伤官两头挂，亲情剩不下（男命通用版）",
+        "meaning": "表里如一的伤官特质，才华横溢但与亲人缘分薄，对外表达与内心想法高度一致"
+      },
+      "four_pillar_mentality": {
+        "year": {
+          "pillar": "丁卯",
+        "ten_god": "伤官",
+          "meaning": "公众人设：对外展示有才华、有表达力、个性鲜明，别人第一眼看到的是一个有灵气的人"
+        },
+        "month": {
+          "pillar": "己酉",
+        "ten_god": "正财",
+          "meaning": "社交性格：在他人眼中务实、注重实际利益，善于经营人际关系"
+        },
+        "day": {
+          "pillar": "甲子",
+        "ten_god": "比肩",
+          "meaning": "真实本我：独处时独立自主，核心价值观强调自我主张，不甘人后"
+        },
+        "hour": {
+          "pillar": "丁卯",
+        "ten_god": "伤官",
+          "meaning": "深层隐秘：内心有强烈的创造欲望和表达冲动，深层想法活跃，对美好事物有追求"
+        }
+      },
+      "social_approach": {
+        "method": "示弱",
+        "description": "甲木为木，与之相处应适当示弱，激发其恻隐之心和保护欲"
+      }
+    },
+    "zhi": {
+      "tian_gan_method": {
+        "diagnosis": "甲木日主→背上必有痣",
+        "location": "背部"
+      },
+      "di_zhi_method": {
+        "diagnosis": "日支子水→子午卯酉痣在胸，子午正中",
+        "location": "胸部正中"
+      },
+      "ding_huo_method": {
+        "diagnosis": "时柱丁卯，丁火坐卯木（阴木）→丁火有生",
+        "location": "背部必定有痣、痘子、小硬粒、小黑点等标记",
+        "note": "天干法与丁火阴木法均指向背部，交叉验证确认背部有痣"
+      },
+      "summary": "背部有明显标记（天干法+丁火阴木法双重确认），胸部正中亦有小印记"
+    },
+    "xiongbu": {
+      "shi_shang": {
+        "status": "丁火（伤官）透干且旺，年干时干双透",
+        "assessment": "食伤透干且旺→胸部有一定发育基础，向外生长能量充足"
+      },
+      "yue_zhu": {
+        "pillar": "己酉",
+        "element": "土金旺",
+        "assessment": "月柱土金旺→男命以月干和火土看胸肌。己土月干有肉感基础，酉金增加骨架线条感"
+      },
+      "ri_zhu_status": "甲木身强→生命力旺盛，胸部有基础发育条件",
+      "wu_xing": "木旺主身高修长，火有丁火两个→体型紧凑不松散，土弱→不过分壮实",
+      "summary": "男命胸肌有一定基础但不特别发达，骨架清晰、体型偏修长，不会显得特别壮硕"
+    },
+    "xinglengdan": {
+      "is_cold": false,
+      "analysis": {
+        "water": "日支子水有水但不极端，酉金生水有一定肾水基础",
+        "shi_shang": "丁火双透（伤官），食伤有力量→欲望表达渠道通畅",
+        "yin_star": "仅日支偏印一个，印星不算过旺，不克食伤太过",
+        "yang_yin_balance": "金水有但木火亦有，寒暖尚可，非极寒八字"
+      },
+      "conclusion": "不属于性冷淡格局。食伤有力、水火适中，情欲表达通道正常"
+    },
+    "haose": {
+      "is_haose": true,
+      "level": "中等偏上",
+      "analysis": {
+        "shen_wang_shi_shang_sheng_cai": {
+          "exists": true,
+          "description": "甲木身强，丁火（伤官）透干生己土（正财）→身旺伤官生财",
+          "effect": "精力旺盛、主动撩拨，擅长甜言蜜语。伤官生财比食神生财更大胆直接"
+        },
+        "ri_zhi_peach_blossom": {
+          "exists": true,
+          "description": "日支子水，子午卯酉为桃花星→日支坐桃花",
+          "effect": "内心极度看重情欲，婚后需注意"
+        },
+        "jin_shui": "酉金+子水，有一定金水组合但未达金水两旺标准",
+        "cai_star": "正财己土透出，无偏财混杂→对配偶有一定忠诚度，但伤官生财格局主动性强"
+      },
+      "conclusion": "身旺伤官生财+日支桃花，情欲旺盛、主动追求型，伤官特质使其大胆直接"
+    },
+    "shencai": {
+      "height": {
+        "factor": "甲木日主身强，木旺（甲木+两个卯木）",
+        "assessment": "身高偏高，四肢修长（男175+可能）"
+      },
+      "build": {
+        "factor": "土弱（仅己土月干），火有丁火两个",
+        "assessment": "体型偏瘦修长，骨架清晰（酉金增加挺拔度），不会壮实"
+      },
+      "compactness": {
+        "factor": "丁火两个，火主紧凑",
+        "assessment": "体型紧凑不松散"
+      },
+      "overall": "身材偏高偏瘦，修长挺拔，骨架清晰，木火通明有气质，体型匀称不臃肿"
+    },
+    "daogui": {
+      "is_likely": true,
+      "analysis": {
+        "bi_jie": "甲木日主+两个卯木（比肩），比劫有力",
+        "shi_shang": "丁火双透（伤官），食伤有力",
+        "guan_sha": "月支酉中藏辛金（正官），官杀在地支",
+        "combo": "比劫+食伤+官杀三者同时存在→满足核心组合",
+        "pattern": "正官格，天干透伤官、地支藏官杀，理性与感性兼备"
+      },
+      "summary": "有一定被倒追倾向。伤官的感性表达+官杀的理性担当，对异性有一定吸引力"
+    },
+    "lanyin": {
+      "is_lazy": false,
+      "level": "轻微",
+      "analysis": {
+        "yin_count": "偏印仅子水中癸水一个，未超过2个",
+        "shi_shang_status": "丁火双透未被严重克制，行动力尚可",
+        "type": "若有懒意，属偏印型选择性懒惰——对不感兴趣的事懒得搭理"
+      },
+      "conclusion": "印星不过旺，不属于懒的格局。但偏印在日支可能偶尔有精神上的安逸倾向"
+    },
+    "dinghuo": {
+      "status": "skill_not_found",
+      "note": "bazi-dinghuo skill不存在于bazi-system目录中，跳过此项分析"
+    }
+  },
+  "summary": "甲木身强正官格，伤官双透表里如一，有才华有表达力但与亲人缘薄；身旺伤官生财+日支桃花，情欲旺盛且主动大胆；身材修长挺拔有气质；痣相集中在背部和胸前；不易被倒追但异性缘不差；非懒非冷淡格局。"
+}

@@ -1,0 +1,43 @@
+{
+  "domain": "神煞特煞",
+  "description": "八字神煞与特殊煞气的完整知识库",
+  "core_logic": "神煞为八字中的特殊标记，分为吉神（文昌、天乙等）和凶煞（羊刃、孤辰等），吉神入命增强各方面运势，凶煞入命需制化，两者结合可精准判断各领域的特殊倾向。",
+  "section_1_auspicious_deities": {
+    "title": "常见吉神",
+    "deities": [
+      {"name": "天乙贵人", "meaning": "人生贵人，逢凶化吉，贵人运强", "search_method": "以月支查天乙贵人", "data_source": "bazi_result.json → pillars[3].shen_sha (filter: contains '天乙贵人')"},
+      {"name": "文昌贵人", "meaning": "学业考试助力，读书聪慧，逢考必过", "search_method": "以日干查：甲见巳、乙见午等", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '文昌')"},
+      {"name": "学堂星", "meaning": "天生喜欢读书，学业天赋高", "search_method": "以年干查", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '学堂')"},
+      {"name": "天德贵人", "meaning": "福寿加持，逢灾化吉", "search_method": "以月支查", "data_source": "bazi_result.json → pillars[3].shen_sha (filter: contains '天德贵人')"},
+      {"name": "月德贵人", "meaning": "月份贵人，学业顺利，人缘佳", "search_method": "以月支查", "data_source": "bazi_result.json → pillars[3].shen_sha (filter: contains '月德贵人')"},
+      {"name": "驿马", "meaning": "出行运强，适合流动性工作", "search_method": "查地支驿马", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '驿马')"},
+      {"name": "华盖", "meaning": "气质高雅，艺术天赋，有神秘感", "search_method": "查地支华盖", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '华盖')"}
+    ]
+  },
+  "section_2_malevolent_煞": {
+    "title": "常见凶煞",
+    "煞": [
+      {"name": "羊刃", "meaning": "双刃剑，力量强大但需制化，否则易伤人伤己", "risk": "无制化则血光、冲突", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '羊刃')"},
+      {"name": "孤辰寡宿", "meaning": "人际关系孤独，感情不顺，需主动破解", "risk": "感情婚姻受阻，人缘冷淡", "data_source": "bazi_result.json → dynamics.features[] (filter: contains ['孤辰','寡宿'])"},
+      {"name": "空亡", "meaning": "有名无实，虽然出现但力量不足", "risk": "机遇丧失，梦想难成", "data_source": "bazi_result.json → pillars[].kong_wang"},
+      {"name": "刑煞", "meaning": "地支刑害，易产生冲突与不和", "risk": "六亲不和，事业受阻", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '刑')"},
+      {"name": "冲煞", "meaning": "地支冲克，易产生变动与波折", "risk": "人生多变，不稳定", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '冲')"}
+    ]
+  },
+  "section_3_특ial_combinations": {
+    "title": "特殊煞气组合",
+    "combinations": [
+      {"combination": "天克地冲", "meaning": "天干克地支，形成直接冲突，凶性最强", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '天克地冲')"},
+      {"combination": "将军箭（男命）", "meaning": "特定时辰出生的男命，易有血光或意外", "search": "酉戌辰时春不旺，未卯子时夏中亡等", "data_source": "bazi_result.json → pillars[6,7] (check special times)"},
+      {"combination": "阎罗关（女命）", "meaning": "特定配置易有生死婚灾，需特别注意", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '阎罗关')"},
+      {"combination": "倒食", "meaning": "伤官见官/枭神夺食，主事业不顺、口舌是非", "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官') + 克official"}
+    ]
+  },
+  "section_4_neutralization_principles": {
+    "title": "凶煞化解原则",
+    "principle_1": {"rule": "用神制化", "meaning": "用凶煞本身被克制的五行来制约它", "example": "羊刃属金，用火或木来制"},
+    {"rule": "贵人化解", "meaning": "吉神入命可化解凶煞的部分影响"},
+    {"rule": "后天调理", "meaning": "通过积德行善、调整行为来减轻凶煞伤害"},
+    {"rule": "大运流年规避", "meaning": "知道凶煞应期后，在该年月提前预防"}
+  ]
+}

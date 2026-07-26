@@ -1,0 +1,801 @@
+{
+  "domain": "财运",
+  "description": "八字看财运的完整知识库",
+  "core_logic": "八字看财运以日主强弱 + 财星状态 + 财库动静 + 食伤生财 + 岁运引动为五大支柱，高应验率集中在身财平衡、财库冲开、食伤生财、岁运财旺等组合。",
+
+  "section_1_basic_concepts": {
+    "title": "财星基础概念",
+
+    "subsection_1_zhenxing_peixing": {
+      "title": "正财与偏财（第17-23行）",
+      "items": [
+        {
+          "line": 18,
+          "element_name": "正财",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正财')",
+          "definition": "日主所克的异性五行（如甲木克己土）",
+          "meaning": "稳定收入、工资薪水、固定资产、正当职业",
+          "interpretation": "正财主稳定，为日主所掌控之物的核心体现",
+          "accuracy": "95%"
+        },
+        {
+          "line": 19,
+          "element_name": "偏财",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财')",
+          "definition": "日主所克的同性五行（如甲木克戊土）",
+          "meaning": "意外之财、投资收益、奖金红利、副业收入",
+          "interpretation": "偏财主变动，为日主所掌控之物的动态体现",
+          "accuracy": "95%"
+        }
+      ]
+    },
+
+    "subsection_2_shuzhu_caixin_guanxi": {
+      "title": "日主与财星的关系（第25-40行）",
+      "items": [
+        {
+          "line": 25,
+          "relationship": "身强财旺",
+          "data_source": "bazi_result.json → dynamics.body_strength + ten_gods[] (filter: name in ['正财','偏财']).is_wang",
+          "possible_values": {
+            "body_strength": "身强",
+            "wealth_stars": "旺"
+          },
+          "interpretation": "日主能量充足，能承受大量财富，容易富贵",
+          "accuracy": "95%"
+        },
+        {
+          "line": 26,
+          "relationship": "身弱财多",
+          "data_source": "bazi_result.json → dynamics.body_strength + ten_gods[] (filter: name in ['正财','偏财'])",
+          "possible_values": {
+            "body_strength": "身弱",
+            "wealth_count": "> 1"
+          },
+          "interpretation": "日主能量不足，承受不了太多财富，看似富有实则贫困",
+          "accuracy": "90%"
+        },
+        {
+          "line": 27,
+          "relationship": "身财两停",
+          "data_source": "bazi_result.json → dynamics.body_strength + dynamics.five_element_balance",
+          "interpretation": "日主与财星能量平衡，财富与能力匹配，一生富足",
+          "accuracy": "95%"
+        },
+        {
+          "line": 28,
+          "relationship": "财星无根",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).strength",
+          "possible_values": {
+            "benQi": 0,
+            "zhongQi": 0
+          },
+          "interpretation": "财星没有地支根基，财富来得快去得也快，难积累",
+          "accuracy": "90%"
+        },
+        {
+          "line": 29,
+          "relationship": "财星有根",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).strength",
+          "condition": "benQi > 0 OR zhongQi > 0",
+          "interpretation": "财星有地支本气或余气，财富来源稳定，容易积累",
+          "accuracy": "95%"
+        }
+      ]
+    },
+
+    "subsection_3_caiku_storage": {
+      "title": "财库（蓄财关键）（第42-50行）",
+      "items": [
+        {
+          "line": 42,
+          "concept": "四大财库",
+          "data_source": "bazi_result.json → pillars[].zhi (filter: in ['辰','戌','丑','未'])",
+          "treasury_map": {
+            "辰": "水库",
+            "戌": "火库",
+            "丑": "金库",
+            "未": "木库"
+          },
+          "meaning": "为财星的储存容器，命带财库能留住财富",
+          "accuracy": "95%"
+        },
+        {
+          "line": 43,
+          "core_rule": "财有库，发则能存",
+          "data_source": "bazi_result.json → pillars[] (check for treasury zhi) + ten_gods[] (filter: name in ['正财','偏财'])",
+          "data_check": "财星存在 AND 四柱中有辰戌丑未",
+          "interpretation": "八字中有财库，一旦发财就能存住钱，不会轻易挥霍",
+          "accuracy": "95%"
+        },
+        {
+          "line": 44,
+          "core_rule": "财库冲开，大发其财",
+          "data_source": "bazi_result.json → dynamics.interactions + dayun_and_liunian",
+          "condition": "冲突关系发生在财库与岁运之间",
+          "interpretation": "命带财库，岁运冲开财库时会爆发财富",
+          "accuracy": "95%"
+        },
+        {
+          "line": 45,
+          "core_rule": "财库重叠，富可敌国",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未'])",
+          "data_check": "count(treasury_zhi) >= 2",
+          "interpretation": "八字中有两个或以上财库，容易成为巨富",
+          "accuracy": "90%"
+        }
+      ]
+    }
+  },
+
+  "section_2_analysis_steps": {
+    "title": "财运分析步骤",
+
+    "step_1_arrange_and_locate_wealth": {
+      "title": "第一步：排盘定财星（应验率 100%）（第56-72行）",
+      "items": [
+        {
+          "line": 56,
+          "step": "排出八字命盘，确定日主",
+          "data_source": "bazi_result.json → day_master.name",
+          "meaning": "日主为出生日天干，是财运分析的基准点"
+        },
+        {
+          "line": 57,
+          "step": "找出正财、偏财",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财'])",
+          "meaning": "日主所克的五行，共同构成财富体系"
+        },
+        {
+          "line": 58,
+          "step": "标注财星位置",
+          "data_source": "bazi_result.json → ten_gods[].occurrences[].pillar",
+          "pillar_positions": {
+            "0": "年干",
+            "1": "年支",
+            "2": "月干",
+            "3": "月支",
+            "4": "日干（自己）",
+            "5": "日支",
+            "6": "时干",
+            "7": "时支"
+          },
+          "meaning": "财星在不同柱位的含义不同"
+        },
+        {
+          "line": 60,
+          "wealth_position": "年柱财星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] | filter: pillar in [0,1]",
+          "meaning": "祖上有财，少年得财"
+        },
+        {
+          "line": 61,
+          "wealth_position": "月柱财星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] | filter: pillar in [2,3]",
+          "meaning": "青年得财，事业顺利"
+        },
+        {
+          "line": 62,
+          "wealth_position": "日柱财星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] | filter: pillar in [4,5]",
+          "meaning": "中年得财，婚姻带财"
+        },
+        {
+          "line": 63,
+          "wealth_position": "时柱财星",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).occurrences[] | filter: pillar in [6,7]",
+          "meaning": "晚年得财，子女有财"
+        }
+      ]
+    },
+
+    "step_2_judge_body_strength": {
+      "title": "第二步：判断日主强弱（应验率 95%）（第74-92行）",
+      "items": [
+        {
+          "line": 74,
+          "step": "看日主得令（月令是否为日主旺地）",
+          "data_source": "bazi_result.json → pillars[1] (month_zhi) + day_master.element"
+        },
+        {
+          "line": 75,
+          "step": "看日主得地（地支是否有日主本气）",
+          "data_source": "bazi_result.json → pillars[] (filter: role === '本气' AND gan matches day_master)"
+        },
+        {
+          "line": 76,
+          "step": "看日主得势（天干是否有比肩劫财帮扶）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).presence.in_stems"
+        },
+        {
+          "line": 77,
+          "conclusion": "身强身弱判断",
+          "data_source": "bazi_result.json → dynamics.body_strength",
+          "possible_values": ["身强", "身弱"],
+          "interpretation": "日主强弱决定担财能力，身强能担财，身弱难担财",
+          "accuracy": "95%"
+        }
+      ]
+    },
+
+    "step_3_analyze_wealth_condition": {
+      "title": "第三步：分析财星状态（应验率 90%）（第94-110行）",
+      "items": [
+        {
+          "line": 94,
+          "analysis": "看财星旺衰（是否得令得地得势）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang"
+        },
+        {
+          "line": 95,
+          "analysis": "看财星是否被克（比劫夺财、枭神夺食）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财','偏印']).presence + ten_gods[] (filter: name in ['正财','偏财']).presence",
+          "judgment": "检查克制关系"
+        },
+        {
+          "line": 96,
+          "analysis": "看财星是否被合（财星被合走，难聚财）",
+          "data_source": "bazi_result.json → dynamics.interactions (filter: contains '合')"
+        },
+        {
+          "line": 97,
+          "analysis": "看财星是否透干藏支（透干主外露，藏支主丰厚）",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).presence.in_stems + .presence.in_branches",
+          "interpretations": {
+            "in_stems_only": "透干主外露",
+            "in_branches_only": "藏支主丰厚",
+            "both": "内外兼有"
+          }
+        },
+        {
+          "line": 99,
+          "core_rule": "财宜藏，藏则丰厚；财宜透，透则慷慨",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).presence"
+        }
+      ]
+    },
+
+    "step_4_check_treasury_and_food_injury": {
+      "title": "第四步：查看财库与食伤（应验率 90%）（第112-131行）",
+      "items": [
+        {
+          "line": 112,
+          "check": "看是否有财库（辰戌丑未），财库是否被冲开",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未']) + dynamics.interactions"
+        },
+        {
+          "line": 113,
+          "check": "看食伤（食神伤官）是否旺相，能否生财",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).is_wang",
+          "meaning": "食伤为财源，是财富的生成器"
+        },
+        {
+          "line": 115,
+          "core_rule": "食伤生财，富贵自天来",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).presence + ten_gods[] (filter: name in ['正财','偏财']).presence",
+          "condition": "food_injury_present AND wealth_star_present",
+          "interpretation": "有食伤且旺相，财源广阔"
+        },
+        {
+          "line": 116,
+          "core_rule": "无食无财，一生贫寒",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官','正财','偏财'])",
+          "data_check": "count(food_injury) === 0 AND count(wealth) === 0"
+        }
+      ]
+    },
+
+    "step_5_combine_dayun_liunian": {
+      "title": "第五步：结合岁运判断应期（应验率 95%）（第133-151行）",
+      "items": [
+        {
+          "line": 133,
+          "check": "看大运是否走财旺之地",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].five_elements + day_master.element",
+          "example": "如日主为木，走土运为财旺"
+        },
+        {
+          "line": 134,
+          "check": "看流年是否引动财星或财库",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[] + dynamics.interactions",
+          "example": "如流年冲财库，当年发财"
+        },
+        {
+          "line": 135,
+          "check": "看岁运是否有比劫夺财",
+          "data_source": "bazi_result.json → dayun_and_liunian + ten_gods[] (filter: name in ['比肩','劫财'])"
+        },
+        {
+          "line": 137,
+          "core_rule": "大运走财地，十年大发",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[]",
+          "condition": "大运地支五行生日主所克（财乡）"
+        },
+        {
+          "line": 138,
+          "core_rule": "流年冲财库，当年暴富",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[]",
+          "condition": "流年与命盘财库产生冲突"
+        }
+      ]
+    }
+  },
+
+  "section_3_high_accuracy_statements": {
+    "title": "高应验率财运断语",
+
+    "subsection_1_body_wealth_balance": {
+      "title": "身财平衡类（应验率 90%+）（第154-160行）",
+      "items": [
+        {
+          "line": 156,
+          "statement": "身强财旺，富贵自来",
+          "data_source": "bazi_result.json → dynamics.body_strength + ten_gods[] (filter: name in ['正财','偏财']).is_wang",
+          "data_check": "body_strength === '身强' AND wealth_is_wang === true",
+          "interpretation": "日主能量充足，财星也旺，不用太努力就能富贵",
+          "accuracy": "95%"
+        },
+        {
+          "line": 157,
+          "statement": "身财两停，一生富足",
+          "data_source": "bazi_result.json → dynamics.body_strength + dynamics.five_element_balance",
+          "interpretation": "日主与财星能量完全平衡，一生财富稳定，生活富足",
+          "accuracy": "95%"
+        },
+        {
+          "line": 158,
+          "statement": "月令建禄，一见财官，自然发富",
+          "data_source": "bazi_result.json → pillars[1] (month_zhi) + ten_gods[] (filter: name in ['正财','偏财','正官','七杀'])",
+          "data_check": "month_zhi matches day_master禄地 AND has_wealth AND has_official",
+          "interpretation": "月令为日主建禄之地，只要有财星和官星，就会自然发富",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_2_treasury_class": {
+      "title": "财库类（应验率 90%+）（第162-175行）",
+      "items": [
+        {
+          "line": 164,
+          "statement": "财有库，发则能存",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未']) + ten_gods[] (filter: name in ['正财','偏财'])",
+          "data_check": "treasury_exists AND wealth_star_exists",
+          "interpretation": "八字中有财库，一旦发财就能存住钱，不会轻易挥霍",
+          "accuracy": "95%"
+        },
+        {
+          "line": 165,
+          "statement": "财星入墓，逢冲破，富有千仓",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_tomb + dynamics.interactions",
+          "data_check": "wealth_is_sitting_on_tomb AND (冲关系 OR 破关系)",
+          "interpretation": "财星入墓库，遇到岁运冲开时，变得非常富有",
+          "accuracy": "95%"
+        },
+        {
+          "line": 166,
+          "statement": "财库重叠，富可敌国",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未'])",
+          "data_check": "count(treasury_zhi) >= 2",
+          "interpretation": "八字中有两个或以上财库，容易成为巨富",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_3_food_injury_generation": {
+      "title": "食伤生财类（应验率 90%+）（第177-190行）",
+      "items": [
+        {
+          "line": 179,
+          "statement": "食神生财，富贵自天来",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神').presence + ten_gods[] (filter: name in ['正财','偏财']).presence",
+          "data_check": "food_god_present AND wealth_present AND food_god_is_wang",
+          "interpretation": "食神旺相能生财星，靠才华、技能、智慧赚钱，轻松致富",
+          "accuracy": "95%"
+        },
+        {
+          "line": 180,
+          "statement": "伤官生财，富贵险中求",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').presence + ten_gods[] (filter: name in ['正财','偏财']).presence",
+          "data_check": "wound_officer_present AND wealth_present AND wound_officer_is_wang",
+          "interpretation": "伤官旺相能生财星，靠创新、冒险、口才赚钱",
+          "accuracy": "90%"
+        },
+        {
+          "line": 181,
+          "statement": "食伤旺透，财源滚滚",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).is_wang + .presence.in_stems",
+          "data_check": "food_injury_is_wang AND food_injury_in_stems",
+          "interpretation": "食神伤官旺相且透干，赚钱机会多，财富增长快",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_4_special_patterns": {
+      "title": "特殊格局类（应验率 85%+）（第192-208行）",
+      "items": [
+        {
+          "line": 194,
+          "pattern": "从财格",
+          "data_source": "bazi_result.json → dynamics.geshi (filter: contains '从财') + dynamics.body_strength",
+          "data_check": "body_strength === '身弱' AND wealth_star_旺 AND (wealth_appears_in_multiple_pillars)",
+          "interpretation": "日主极弱完全顺从财星，容易成为巨富，既有财富又有地位",
+          "accuracy": "90%"
+        },
+        {
+          "line": 195,
+          "pattern": "财官双美",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang + ten_gods[] (filter: name in ['正官','七杀']).is_wang",
+          "data_check": "wealth_is_wang AND official_is_wang AND (adjacent OR both_present)",
+          "interpretation": "财星和官星都旺相且平衡，既有财富又有官职",
+          "accuracy": "90%"
+        },
+        {
+          "line": 196,
+          "pattern": "偏财格",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财').is_wang + ten_gods[] (filter: name === '正财')",
+          "data_check": "partial_wealth_is_wang AND partial_wealth_strength > regular_wealth_strength",
+          "interpretation": "偏财旺于正财，有商业头脑，容易获得意外之财",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_5_wealth_breaking_warnings": {
+      "title": "破财警示类（应验率 90%+）（第210-227行）",
+      "items": [
+        {
+          "line": 212,
+          "warning": "比劫夺财，破财难免",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).is_wang + ten_gods[] (filter: name in ['正财','偏财']).is_wang",
+          "data_check": "siblings_or_robbery_是旺 AND wealth_is_weak",
+          "interpretation": "比劫旺相财星弱，容易因为朋友、兄弟、合作而破财",
+          "accuracy": "95%"
+        },
+        {
+          "line": 213,
+          "warning": "财星被合，赚钱辛苦",
+          "data_source": "bazi_result.json → dynamics.interactions (filter: contains '合')",
+          "data_check": "wealth_star_in_he关系",
+          "interpretation": "财星被其他干支合住，赚钱格外辛苦",
+          "accuracy": "90%"
+        },
+        {
+          "line": 214,
+          "warning": "枭神夺食，财源断绝",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏印').presence + ten_gods[] (filter: name === '食神').presence",
+          "data_check": "offset_印克食神",
+          "interpretation": "偏印克食神，财源断绝，赚钱机会减少",
+          "accuracy": "90%"
+        }
+      ]
+    }
+  },
+
+  "section_4_industry_and_wealth_direction": {
+    "title": "适合行业与求财方向",
+
+    "subsection_1_by_wealth_type": {
+      "title": "按财星类型选择（第230-245行）",
+      "items": [
+        {
+          "line": 233,
+          "wealth_type": "正财旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正财').is_wang === true",
+          "suitable_occupations": ["公务员", "教师", "国企员工", "固定职业"],
+          "wealth_seeking_direction": "稳定工作、长期投资、固定资产",
+          "accuracy": "90%"
+        },
+        {
+          "line": 234,
+          "wealth_type": "偏财旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财').is_wang === true",
+          "suitable_occupations": ["商人", "投资者", "创业者", "副业"],
+          "wealth_seeking_direction": "股票、基金、房地产、风险投资",
+          "accuracy": "90%"
+        },
+        {
+          "line": 235,
+          "wealth_type": "正偏财平衡",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '正财').is_wang AND ten_gods[] (filter: name === '偏财').is_wang",
+          "suitable_occupations": ["复合型职业（主业+副业）"],
+          "wealth_seeking_direction": "稳定收入+投资收益",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_2_by_food_injury_type": {
+      "title": "按食伤类型选择（第247-262行）",
+      "items": [
+        {
+          "line": 249,
+          "food_injury_type": "食神旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神').is_wang === true",
+          "suitable_occupations": ["厨师", "艺术家", "医生", "咨询师"],
+          "wealth_seeking_direction": "技术服务、创意产业、健康产业",
+          "accuracy": "90%"
+        },
+        {
+          "line": 250,
+          "food_injury_type": "伤官旺",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '伤官').is_wang === true",
+          "suitable_occupations": ["作家", "演员", "设计师", "企业家"],
+          "wealth_seeking_direction": "文化产业、娱乐行业、自主创业",
+          "accuracy": "90%"
+        },
+        {
+          "line": 251,
+          "food_injury_type": "食伤平衡",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name === '食神').presence AND ten_gods[] (filter: name === '伤官').presence",
+          "suitable_occupations": ["教育", "培训", "文化传媒"],
+          "wealth_seeking_direction": "知识付费、教育培训、文化传播",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_3_four_major_treasuries": {
+      "title": "四大财库详解（第264-287行）",
+      "items": [
+        {
+          "line": 267,
+          "treasury": "辰（土水库）",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi === '辰') + day_master (filter: element in ['土','水'])",
+          "suitable_occupations": ["数字科技", "互联网", "金融服务", "物流运输"],
+          "best_timing": "辰月、子年、申年、辰戌冲年",
+          "accuracy": "90%"
+        },
+        {
+          "line": 268,
+          "treasury": "戌（火库）",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi === '戌') + day_master (filter: element in ['火'])",
+          "suitable_occupations": ["新能源", "文化创意", "餐饮连锁", "美妆护肤"],
+          "best_timing": "戌月、午年、寅年、辰戌冲年",
+          "accuracy": "90%"
+        },
+        {
+          "line": 269,
+          "treasury": "丑（金库）",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi === '丑') + day_master (filter: element in ['火'])",
+          "suitable_occupations": ["金融投资", "高端制造", "矿产资源", "珠宝收藏"],
+          "best_timing": "丑月、酉年、巳年、丑未冲年",
+          "accuracy": "90%"
+        },
+        {
+          "line": 270,
+          "treasury": "未（木库）",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi === '未') + day_master (filter: element in ['金'])",
+          "suitable_occupations": ["绿色农业", "教育培训", "房地产", "生物医药"],
+          "best_timing": "未月、卯年、亥年、丑未冲年",
+          "accuracy": "90%"
+        }
+      ]
+    },
+
+    "subsection_4_special_treasury_types": {
+      "title": "特殊财库类型（第289-303行）",
+      "items": [
+        {
+          "line": 291,
+          "type": "多财库（≥2个）",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未'])",
+          "data_check": "count(treasury_zhi) >= 2",
+          "suitable_occupations": ["金融控股", "产业投资", "生态平台"],
+          "wealth_seeking_direction": "跨领域投资、平台创业",
+          "accuracy": "70-80%"
+        },
+        {
+          "line": 292,
+          "type": "日坐财库",
+          "data_source": "bazi_result.json → pillars[5] (day_zhi filter: in ['辰','戌','丑','未'])",
+          "suitable_occupations": ["个人IP", "私域流量", "专家咨询"],
+          "wealth_seeking_direction": "知识付费、技能培训、品牌代言",
+          "accuracy": "80-90%"
+        },
+        {
+          "line": 293,
+          "type": "空亡财库",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未']) + dynamics.features[] (filter: contains '空亡')",
+          "suitable_occupations": ["轻资产创业", "虚拟经济", "咨询服务"],
+          "wealth_seeking_direction": "项目孵化、资源对接、信息中介",
+          "accuracy": "50-60%"
+        }
+      ]
+    }
+  },
+
+  "section_5_wealth_timing_judgement": {
+    "title": "发财时间判断（应期）",
+
+    "subsection_1_dayun_signals": {
+      "title": "大运发财信号（应验率 95%）（第306-315行）",
+      "items": [
+        {
+          "line": 309,
+          "signal": "走财旺大运",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[] (filter: five_element matches wealth_direction)",
+          "meaning": "十年内财富增长快，适合投资和创业"
+        },
+        {
+          "line": 310,
+          "signal": "走食伤大运",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[] (filter: contains_food_injury_energy)",
+          "meaning": "财源滚滚，赚钱机会多，适合发挥才华"
+        },
+        {
+          "line": 311,
+          "signal": "走财库大运",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[] (filter: zhi in ['辰','戌','丑','未'])",
+          "meaning": "财库冲开，财富爆发，适合扩大规模"
+        },
+        {
+          "line": 312,
+          "signal": "走官杀大运",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[] (filter: contains_official_element)",
+          "meaning": "财生官，官护财，适合职场晋升和事业发展"
+        }
+      ]
+    },
+
+    "subsection_2_liunian_signals": {
+      "title": "流年发财信号（应验率 90%）（第317-327行）",
+      "items": [
+        {
+          "line": 320,
+          "signal": "流年冲财库",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[] (filter: impacts_treasury)",
+          "meaning": "当年财富爆发，容易获得意外之财"
+        },
+        {
+          "line": 321,
+          "signal": "流年财星旺",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[] (filter: five_element_matches_wealth)",
+          "meaning": "当年财运好，赚钱容易，适合积极求财"
+        },
+        {
+          "line": 322,
+          "signal": "流年食伤生财",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[] (filter: has_food_injury_generating_wealth)",
+          "meaning": "当年靠才华赚钱，适合开展新项目"
+        },
+        {
+          "line": 323,
+          "signal": "流年财官双美",
+          "data_source": "bazi_result.json → dayun_and_liunian.dayun_list[].liuNian[] (filter: has_wealth AND has_official)",
+          "meaning": "当年既有财富又有地位，事业财运双丰收"
+        }
+      ]
+    },
+
+    "subsection_3_timing_judgment_techniques": {
+      "title": "应期判断技巧（第329-337行）",
+      "items": [
+        {
+          "line": 330,
+          "technique": "原局有财库 → 岁运冲开为应期",
+          "data_source": "bazi_result.json → pillars[] (filter: zhi in ['辰','戌','丑','未']) + dayun_and_liunian"
+        },
+        {
+          "line": 331,
+          "technique": "原局食伤弱 → 岁运食伤旺为应期",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).is_wang + dayun_and_liunian"
+        },
+        {
+          "line": 332,
+          "technique": "原局身弱 → 岁运比劫帮身为应期",
+          "data_source": "bazi_result.json → dynamics.body_strength + dayun_and_liunian (filter: contains比肩劫财)"
+        },
+        {
+          "line": 333,
+          "technique": "原局财星弱 → 岁运财星旺为应期",
+          "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang + dayun_and_liunian"
+        },
+        {
+          "line": 335,
+          "core_rule": "原局有信号，岁运引动为应期",
+          "meaning": "时机判断的核心规则"
+        }
+      ]
+    }
+  },
+
+  "section_6_pitfall_avoidance_guide": {
+    "title": "避坑指南",
+    "items": [
+      {
+        "line": 340,
+        "question": "八字无财星就一定贫穷吗？",
+        "answer": "不一定！如果有食伤（财源）且旺相，依然能通过才华赚钱；如果无财无食伤，才容易贫穷。",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官','正财','偏财'])",
+        "accuracy": "90%"
+      },
+      {
+        "line": 343,
+        "question": "财库冲开就一定发财吗？",
+        "answer": "不一定！需满足：①日主身强能担财；②财库中有财星。如果身弱或财库空亡，冲开也难发财。",
+        "data_source": "bazi_result.json → dynamics.body_strength + ten_gods[] (filter: name in ['正财','偏财']) + pillars[] (filter: zhi in ['辰','戌','丑','未'])",
+        "accuracy": "90%"
+      },
+      {
+        "line": 346,
+        "question": "比劫旺就一定破财吗？",
+        "answer": "不一定！如果有官星制比劫，则能化解比劫夺财的风险；如果无官星制比劫，才容易破财。",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).is_wang + ten_gods[] (filter: name in ['正官','七杀'])",
+        "accuracy": "95%"
+      },
+      {
+        "line": 349,
+        "question": "偏财旺就一定适合经商吗？",
+        "answer": "不一定！偏财旺且为喜用神，适合经商；如果偏财旺为忌神且无制化，容易因为投机而破财。",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name === '偏财').is_wang + .utility",
+        "accuracy": "90%"
+      },
+      {
+        "line": 352,
+        "question": "大运走财地就一定发财吗？",
+        "answer": "不一定！需结合原局和流年：①原局身强能担财；②流年引动财星或财库；③无可比劫夺财或财星被合。",
+        "data_source": "bazi_result.json → dynamics.body_strength + dayun_and_liunian + ten_gods",
+        "accuracy": "90%"
+      },
+      {
+        "line": 355,
+        "question": "如何判断财富层级？",
+        "answer": "看三点：①财星旺衰（旺则财富多）；②财库数量（多则储存能力强）；③食伤生财力度（强则财源广）。三者皆强则为巨富，一强两弱则为小富，三者皆弱则为贫穷。",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).is_wang + pillars[] (filter: zhi in ['辰','戌','丑','未']) + ten_gods[] (filter: name in ['食神','伤官']).is_wang",
+        "accuracy": "90%"
+      }
+    ]
+  },
+
+  "section_7_financial_management_advice": {
+    "title": "理财建议",
+    "items": [
+      {
+        "line": 360,
+        "type": "财星为用，旺相透干",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).utility === '用' + .is_wang + .presence.in_stems",
+        "advice": "理财观念好，宜稳扎稳打积累，适合长期投资"
+      },
+      {
+        "line": 361,
+        "type": "比劫旺而无制",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).is_wang + NOT(ten_gods filter: name in ['正官','七杀']).present",
+        "advice": "不宜冒险投资，守成为主，避免与他人合伙"
+      },
+      {
+        "line": 362,
+        "type": "财星虚浮无根",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']).strength.benQi === 0 AND .zhongQi === 0",
+        "advice": "非爆发型，宜长期定投，不宜追求快钱"
+      },
+      {
+        "line": 363,
+        "type": "食伤生财格",
+        "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']).presence + ten_gods[] (filter: name in ['正财','偏财']).presence",
+        "advice": "适合靠技艺、创意赚钱，宜发展副业或自由职业"
+      },
+      {
+        "line": 364,
+        "type": "从财格",
+        "data_source": "bazi_result.json → dynamics.body_strength === '身弱' + ten_gods[] (filter: name in ['正财','偏财']).presence",
+        "advice": "适合商业投资，宜把握运势扩张规模"
+      }
+    ]
+  },
+
+  "section_8_core_incantations": {
+    "title": "核心口诀（第367-375行）",
+    "incantations": [
+      "身强财旺富贵来，身弱财多反为灾",
+      "财有库，发则能存，财库冲开富贵来",
+      "食伤生财财源广，比劫夺财破财快",
+      "正财稳定偏财动，经商投资看偏财",
+      "大运财旺十年富，流年冲库当年发",
+      "八字无财看食伤，食伤旺相也发财"
+    ],
+    "purpose": "将核心财运理论浓缩为易记的口诀，便于快速判断"
+  }
+}

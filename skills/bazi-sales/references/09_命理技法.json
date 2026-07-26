@@ -1,0 +1,55 @@
+{
+  "domain": "命理技法",
+  "description": "八字命理技法与计算方法的完整知识库",
+  "core_logic": "命理技法涵盖旺衰判断、五行生克、十神关系、天干地支配合、刑冲合会、神煞应用等基础理论，为八字分析提供理论工具和计算方法。",
+  "section_1_body_strength_judgment": {
+    "title": "身强身弱判断（月令为主）",
+    "core_principles": [
+      {"principle": "得令", "meaning": "月令为日主旺地，日主身强概率大", "data_source": "bazi_result.json → pillars[3].zhi (matches day_master旺地)"},
+      {"principle": "得地", "meaning": "地支有日主本气，日主有根基", "data_source": "bazi_result.json → pillars[] (filter: 本气matches day_master)"},
+      {"principle": "得势", "meaning": "天干有比肩劫财帮扶，日主身强", "data_source": "bazi_result.json → ten_gods[] (filter: name in ['比肩','劫财']).presence.in_stems"}
+    ],
+    "result": "得令得地得势为身强，反之为身弱",
+    "data_source": "bazi_result.json → dynamics.body_strength"
+  },
+  "section_2_five_elements_generation_restriction": {
+    "title": "五行生克关系",
+    "generation_cycle": "木生火，火生土，土生金，金生水，水生木",
+    "restriction_cycle": "木克土，土克水，水克火，火克金，金克木",
+    "application": "判断十神之间的助力与制约关系",
+    "data_source": "bazi_result.json → dynamics.five_element_balance"
+  },
+  "section_3_ten_god_relationships": {
+    "title": "十神之间的关系",
+    "relationships": [
+      {"pair": "官印相生", "meaning": "官星生印，印星生日主，形成通关流通", "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官') + ten_gods[] (filter: name in ['正印','偏印'])"},
+      {"pair": "财生官", "meaning": "财星生官星，官星生印星，形成良性循环", "data_source": "bazi_result.json → ten_gods[] (filter: name in ['正财','偏财']) + ten_gods[] (filter: name === '正官')"},
+      {"pair": "食伤生财", "meaning": "食伤泄身，生出财星，形成良性互动", "data_source": "bazi_result.json → ten_gods[] (filter: name in ['食神','伤官']) + 生财"},
+      {"pair": "官杀混杂", "meaning": "官杀都出现且不制化，形成混乱", "data_source": "bazi_result.json → ten_gods[] (filter: name === '正官') + ten_gods[] (filter: name === '七杀')"}
+    ]
+  },
+  "section_4_stem_branch_pairing": {
+    "title": "天干地支配合",
+    "configurations": [
+      {"type": "纳音五行", "meaning": "60甲子各有纳音五行属性，反映深层五行属性", "data_source": "bazi_result.json → pillars[].nayyin"},
+      {"type": "干支同五行", "meaning": "天干地支五行相同，形成专旺格", "data_source": "bazi_result.json → pillars[] (filter: gan五行 === zhi五行)"},
+      {"type": "天克地冲", "meaning": "天干克地支或地支冲克，形成冲突", "data_source": "bazi_result.json → dynamics.interactions"}
+    ]
+  },
+  "section_5_刑冲合会": {
+    "title": "刑冲合会应用",
+    "刑": {"definition": "地支间的刑害关系，如寅刑巳、丑刑未", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '刑')"},
+    "冲": {"definition": "地支相冲，如子午冲、卯酉冲", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '冲')"},
+    "合": {"definition": "天干五合（甲己、乙庚等）、地支六合（子丑、寅亥等）", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '合')"},
+    "会": {"definition": "三个地支相会，如寅卯辰会木局", "data_source": "bazi_result.json → dynamics.interactions (filter: contains '会')"}
+  },
+  "section_6_shensha_application": {
+    "title": "神煞应用",
+    "common_deities": [
+      {"deity": "文昌贵人", "meaning": "学业考试助力，逢考必过", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '文昌')"},
+      {"deity": "天乙贵人", "meaning": "人生贵人，逢凶化吉", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '天乙贵人')"},
+      {"deity": "羊刃", "meaning": "双刃剑，力量强大但需制化", "data_source": "bazi_result.json → dynamics.features[] (filter: contains '羊刃')"},
+      {"deity": "孤辰寡宿", "meaning": "人际关系孤独，需化解", "data_source": "bazi_result.json → dynamics.features[] (filter: contains ['孤辰','寡宿'])"}
+    ]
+  }
+}
