@@ -92,7 +92,7 @@ triggers:
 |----|--------------|--------------|
 | 第1层 | bazi-paipan, bazi-sizhu | bazi-kongwang |
 | 第2层 | bazi-geju, bazi-shishen | bazi-dizhi（如有三会/三合） |
-| 第3层 | bazi-xingge, bazi-shishen | bazi-zhi, bazi-xiongbu, bazi-xinglengdan, bazi-haose, bazi-shencai, bazi-daogui, bazi-lanyin, bazi-dinghuo |
+| 第3层 | bazi-xingge, bazi-shishen-tiangan, bazi-shishen | bazi-shishen-*（命局中突出的十神，见下方规则）、bazi-zhi, bazi-xiongbu, bazi-xinglengdan, bazi-haose, bazi-shencai, bazi-daogui, bazi-lanyin, bazi-dinghuo |
 | 第4层 | bazi-sizhu, bazi-shishen, bazi-peiou, bazi-duanpeifu, bazi-gongchuan, bazi-hunyin-cishu | bazi-muku（如有墓库）、bazi-hunyin-tongwuxing（仅日柱同五行时）、bazi-fukeshengyu（gender=F） |
 | 第5层 | - | 按专项加载对应skill |
 | 第6层 | bazi-dayun | bazi-dizhi（流年地支关系） |
@@ -100,6 +100,26 @@ triggers:
 | 第8层 | bazi-tiaoli | - |
 
 **⚠️ 协调器必须确保所有skill在1-5层中都被加载过一次**
+
+### 第3层十神子skill加载规则
+
+协调器在执行第3层（性格/先天禀赋）时，需根据排盘结果（bazi.json）判断命局中哪些十神突出，加载对应子skill：
+
+| 判断条件 | 加载skill | 原因 |
+|----------|----------|------|
+| 日坐比肩（日支本气=比肩） | bazi-shishen-bijian | 日坐十神性格核心 |
+| 日坐劫财（日支本气=劫财） | bazi-shishen-jiecai | 日坐十神性格核心 |
+| 日坐食神（日支本气=食神） | bazi-shishen-shishen | 日坐十神性格核心 |
+| 日坐伤官（日支本气=伤官） | bazi-shishen-shangguan | 日坐十神性格核心 |
+| 日坐偏财（日支本气=偏财） | bazi-shishen-piancai | 日坐十神性格核心 |
+| 日坐正财（日支本气=正财） | bazi-shishen-zhengcai | 日坐十神性格核心 |
+| 日坐七杀（日支本气=七杀） | bazi-shishen-qisha | 日坐十神性格核心 |
+| 日坐正官（日支本气=正官） | bazi-shishen-zhengguan | 日坐十神性格核心 |
+| 日坐偏印（日支本气=偏印） | bazi-shishen-pianyin | 日坐十神性格核心 |
+| 日坐正印（日支本气=正印） | bazi-shishen-zhengyin | 日坐十神性格核心 |
+| 命局中某十神出现≥3次 | 对应bazi-shishen-* | 该十神性格影响显著 |
+
+**串联逻辑**：`bazi-xingge`（综合5维度）→ `bazi-shishen-tiangan`（日元底色）→ `bazi-shishen`（十神性格总纲）→ `bazi-shishen-*`（具体十神语录断语）
 
 ---
 

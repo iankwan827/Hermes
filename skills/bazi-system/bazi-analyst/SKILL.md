@@ -117,10 +117,19 @@ layer8.json  # 调理建议层
 ### 第3层：先天禀赋
 
 执行内容：
-- 加载bazi-xingge skill
+- 加载bazi-xingge skill（综合5维度性格分析）
+- 加载bazi-shishen-tiangan skill（十天干日元性格底色）
+- 加载bazi-shishen skill（十神性格总纲）
+- 根据命局加载对应bazi-shishen-*子skill（日坐十神或突出十神）
 - 分析性格特质
 - 判断天赋能力与职业倾向
 - 分析思维模式
+
+**串联逻辑**：
+1. `bazi-xingge` → 综合5维度（日元/日坐/两头挂/四柱心性/相处方式）
+2. `bazi-shishen-tiangan` → 日元天干的核心性格底色
+3. `bazi-shishen` → 日坐十神性格特征
+4. `bazi-shishen-*` → 具体十神的语录断语补充
 
 ### 第4层：六亲关系
 
@@ -175,18 +184,20 @@ layer8.json  # 调理建议层
 | 0 | bazi-geju | 始终 | 格局判定、用神忌神 |
 | 1 | bazi-wuxing | 始终 | 五行生克、旺衰 |
 | 2 | bazi-shishen | 始终 | 十神性质、组合 |
-| 3 | bazi-liuqin | 问六亲 | 六亲递推 |
-| 4 | bazi-hunyin | 问婚姻 | 婚姻分析 |
-| 5 | bazi-peifu | 问配偶 | 配偶画像 |
-| 6 | bazi-shiye | 问事业 | 事业方向 |
-| 7 | bazi-caiyun | 问财运 | 财运层次 |
-| 8 | bazi-jiankang | 问健康 | 健康/寿元 |
-| 9 | bazi-dayun | 问运势 | 大运流年 |
-| 10 | bazi-muku | 辰戌丑未 | 墓库 |
-| 11 | bazi-kongwang | 始终检查 | 空亡 |
-| 12 | bazi-fukeshengyu | gender=F | 女命生育 |
-| 13 | bazi-zhiduan | 过三关 | 直断速查 |
-| 14 | bazi-xingge | 问性格 | 性格分析 |
+| 3 | bazi-shishen-tiangan | 始终 | 十天干日元性格底色 |
+| 4 | bazi-liuqin | 问六亲 | 六亲递推 |
+| 5 | bazi-hunyin | 问婚姻 | 婚姻分析 |
+| 6 | bazi-peifu | 问配偶 | 配偶画像 |
+| 7 | bazi-shiye | 问事业 | 事业方向 |
+| 8 | bazi-caiyun | 问财运 | 财运层次 |
+| 9 | bazi-jiankang | 问健康 | 健康/寿元 |
+| 10 | bazi-dayun | 问运势 | 大运流年 |
+| 11 | bazi-muku | 辰戌丑未 | 墓库 |
+| 12 | bazi-kongwang | 始终检查 | 空亡 |
+| 13 | bazi-fukeshengyu | gender=F | 女命生育 |
+| 14 | bazi-zhiduan | 过三关 | 直断速查 |
+| 15 | bazi-xingge | 问性格 | 性格分析（5维度） |
+| 16 | bazi-shishen-* | 命局突出十神 | 各十神语录断语 |
 
 ---
 

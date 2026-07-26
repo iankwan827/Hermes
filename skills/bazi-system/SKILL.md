@@ -152,7 +152,7 @@ bazi-system/
 | 排盘后 | bazi-trigger | 自动检测6项条件，输出trigger.json |
 | 1 | bazi-paipan, bazi-sizhu | — |
 | 2 | bazi-geju, bazi-xiyong, bazi-shishen | bazi-dizhi（如有三会/三合局） |
-| 3 | bazi-xingge, bazi-shishen | bazi-zhi, bazi-xiongbu, bazi-xinglengdan, bazi-haose, bazi-shencai, bazi-daogui, bazi-lanyin, bazi-dinghuo |
+| 3 | bazi-xingge, bazi-shishen-tiangan, bazi-shishen | bazi-shishen-*（日坐十神或突出十神）、bazi-zhi, bazi-xiongbu, bazi-xinglengdan, bazi-haose, bazi-shencai, bazi-daogui, bazi-lanyin, bazi-dinghuo |
 | 4 | bazi-sizhu, bazi-shishen, bazi-peiou, bazi-duanpeifu, bazi-hunyin-cishu | bazi-gongchuan（夫妻宫六害时） |
 | 5 | - | 按问题类型加载专项skill |
 | 6 | bazi-dayun（待创建） | bazi-dizhi（流年地支关系） |
@@ -169,7 +169,7 @@ bazi-system/
 | 同五行二婚（条件触发） | bazi-hunyin-tongwuxing | 已有（仅日柱同五行时加载） |
 | 事业/财运 | bazi-shiye | 待创建 |
 | 健康/寿元 | bazi-weibing, bazi-feibu, bazi-shenbing, bazi-ganbing, bazi-xinzangbing | 已有 |
-| 性格/天赋 | bazi-xingge | 已有 |
+| 性格/天赋 | bazi-xingge, bazi-shishen-tiangan, bazi-shishen-* | 已有 |
 | 痣相 | bazi-zhi | 已有 |
 | 性冷淡 | bazi-xinglengdan | 已有 |
 | 胸部大小 | bazi-xiongbu | 已有 |

@@ -149,6 +149,12 @@ description: "十神基础知识：十神分类、详解、实战应用、核心
 | `bazi-shishen-piancai` | 偏财 | 50条 |
 | `bazi-shishen-tiangan` | 十天干日元 | 51条 |
 
+**串联加载顺序**（第3层性格分析时）：
+1. `bazi-xingge` → 综合5维度性格框架
+2. `bazi-shishen-tiangan` → 日元天干的核心性格底色
+3. `bazi-shishen` → 日坐十神性格特征 + 十神组合断语
+4. `bazi-shishen-*` → 具体十神的语录补充（根据命局突出十神加载）
+
 **配合使用**：加载十神skill获取断语 → 按 `bazi-analysis-writing` 的框架组织成完整分析
 
 语录分类JSON：`~/Pictures/八字课/语录/语录分类.json`
