@@ -27,7 +27,7 @@
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-01T16:16:27.049963+08:00",
-      "next_run_at": "2026-07-26T22:00:00+08:00",
+      "next_run_at": "2026-07-27T22:00:00+08:00",
       "last_run_at": "2026-07-25T22:02:06.397650+08:00",
       "last_status": "ok",
       "last_error": null,
@@ -191,5 +191,5 @@
       "profile": null
     }
   ],
-  "updated_at": "2026-07-26T11:34:54.224388+08:00"
+  "updated_at": "2026-07-26T22:00:37.509336+08:00"
 }

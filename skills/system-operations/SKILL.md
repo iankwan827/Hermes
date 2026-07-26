@@ -42,6 +42,44 @@ git log --oneline -5
 
 **核心原则**：当两端都有独立改动导致 push 被拒绝时，**优先使用 `git merge`**（更简单），但 `git rebase` 也能用（需要系统化冲突解决）。
 
+#### 场景A：本地有未提交改动时拉取远程
+
+当本地有未暂存/未提交的修改（如cron自动更新了数据文件），直接 `git pull` 会失败。用 stash 中转：
+
+```bash
+# 1. 暂存本地改动
+git stash
+
+# 2. 拉取远程
+git pull origin main
+
+# 3. 恢复本地改动（可能产生冲突）
+git stash pop
+
+# 4. 解决冲突后提交
+git add <冲突文件>
+git commit -m "resolve merge conflict: <说明>"
+git push origin main
+```
+
+**判断保留哪边数据**：看时间戳和数据新鲜度。cron自动更新的数据文件（如发展日志），本地stashed版本通常比远程更新（因为cron刚跑过）。审核记录等累积性内容，取条目更多的版本。
+
+**批量解决冲突**：如果终端Python有环境问题（如SRE module mismatch），用 `execute_code` + `hermes_tools` 批量处理：
+```python
+from hermes_tools import read_file, write_file
+import re
+result = read_file('conflict-file.md', limit=2000)
+content = result['content']
+# 去掉行号（read_file格式是 "     N|content"）
+lines = content.split('\n')
+clean = [l.split('|',1)[1] if '|' in l and l.split('|',1)[0].strip().isdigit() else l for l in lines]
+content = '\n'.join(clean)
+# 用正则保留stashed版本
+pattern = r'<<<<<<< Updated upstream\n.*?=======\n(.*?)>>>>>>> Stashed changes\n'
+resolved = re.sub(pattern, r'\1', content, flags=re.DOTALL)
+write_file('conflict-file.md', resolved)
+```
+
 #### 推荐路径：merge（简单自动合并）
 ```bash
 # ✅ merge 更宽容，大多数冲突自动合并
@@ -336,6 +374,7 @@ console.log('Final depth:', d);
 - ⚠️ 自动重启的进程：杀了子进程会重生，必须找到父进程
 - ⚠️ Windows 下不要用 `kill` 命令（那是 MSYS/Git Bash 的），用 `taskkill` 或 `wmic`
 - ⚠️ Git 同步时 merge 优于 rebase（自动合并更多）；但如果 cron 指定了 --rebase，可用按文件类型策略手动解决冲突
+- ⚠️ `git stash pop` 后冲突：用正则保留stashed版本（`<<<<<<< Updated upstream\n.*?=======\n(.*?)>>>>>>> Stashed changes`），终端Python有环境问题时用 `execute_code` + `hermes_tools` 批量处理
 - ⚠️ GitHub HTTPS 被墙时：git 默认不走系统代理，必须手动 `git config http.proxy http://127.0.0.1:7897` 设代理才能 push/pull。报 Connection reset/timeout 先查代理端口
 - ⚠️ Vercel 拖拽部署后自定义域名可能仍指向旧 deployment → 用 `vercel promote` 更新别名
 - ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404

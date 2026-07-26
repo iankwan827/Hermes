@@ -306,6 +306,60 @@ If you catch yourself thinking:
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
 | "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question the pattern, don't fix again. |
 
+## "c=a+b" Pattern — Use Computed Results Directly
+
+**Pitfall:** Computing a result in one function, then recalculating it in another function that displays it. The display function should just read the already-computed variable, not recalculate.
+
+**Example of wrong approach:**
+```javascript
+// Function A: computes result
+function compute() { result = a + b; }
+
+// Function B: displays result — WRONG: recalculates instead of using result
+function display() { show(a + b); }
+```
+
+**Correct approach:**
+```javascript
+// Function A: computes result
+function compute() { result = a + b; }
+
+// Function B: displays result — CORRECT: uses already-computed variable
+function display() { show(result); }
+```
+
+**Real-world trigger:** User says "上面算出来了但下面显示错了" — means the calculation is correct but the display is reading from the wrong variable.
+
+## Variable Scope in JS — Global for Cross-Function Data
+
+**Pitfall:** Declaring variables with `let` inside a function makes them inaccessible to other functions. When multiple functions need the same data, declare at global scope.
+
+**Wrong:**
+```javascript
+function renderTab2() {
+  let medicine = computeMedicine(); // local — other functions can't see it
+}
+
+function renderSummary() {
+  show(medicine); // ERROR: medicine is not defined
+}
+```
+
+**Correct:**
+```javascript
+let medicine = ''; // global — all functions can access
+
+function renderTab2() {
+  medicine = computeMedicine();
+}
+
+function renderSummary() {
+  show(medicine); // works
+}
+```
+
+**Real-world trigger:** "ReferenceError: X is not defined" when calling a function that needs data set by another function.
+
 ## Quick Reference
 
 | Phase | Key Activities | Success Criteria |
