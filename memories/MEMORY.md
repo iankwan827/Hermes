@@ -1,7 +1,7 @@
 抖音：查全量视频用「内容管理→作品管理」，别用「近期作品」（只显示7天）。小号评论触发二次推流（1条≈1500播放）。视频1.5分钟内。口播提示（）嵌正文，标题15-20字标签≤5个。⚠️查视频数据必须先读发展日志再查创作者中心，用户有12+视频不要以为只有5个。
 Chrome CDP：config用`ws://127.0.0.1:9222`。不要指定`--user-data-dir`（用户在E盘），否则丢失登录态。快捷方式已加CDP参数。
 §
-八字软件：D:\test\bazi-app\。变量字典必维护。坑：pi.hidden用h.stem；WX_WANGXIANG按月支五行查；CHANG_SHENG按天干查。病药=三得法判五行（3/3=病，药=强所生不强的）。喜用神：药=用神，次优=喜神，克身=忌神，病=仇神。空亡：日柱空亡看年月时旬首，年月时空亡看日柱旬首。空亡=弱。改HTML和skill要同步，不确定先问。
+八字软件：D:\test\bazi-app\。坑：pi.hidden用h.stem；WX_WANGXIANG按月支五行查。空亡skill只做判断不断语，断语由各专题skill下。代码计算只用一次，结果存变量复用。格局取格：多藏干月令不透干→不成格，只有卯酉子午可取本气虚格。子午卯酉本气不透但同五行天干透也可取格。imge_v2和imge_v3有十神组合判定手册等参考资料。
 §
 写完文案必须自动跑video-content-audit审核，不等用户提醒（用户原话"你没跑skill啊"）。引用热搜事件必须确认时间线（几月、第几轮、谁赢谁输），不能凭印象写。审核是内建流程不是可选步骤。
 §
@@ -35,4 +35,4 @@ Vercel：CLI用VERCEL_TOKEN env var。⚠️部署后域名不自动更新需`ve
 §
 Whisper转录中文专有名词经常出错（如闾山→驴山），转录完必须校对关键术语再用，不能直接信任输出。
 §
-用户说"看看skill"时，必须检查完整目录结构（SKILL.md + 所有子目录 + references/），不能只读主文件。教训：bazi-system有40+子skill含11个bazi-shishen-*十神子skill，我只读主SKILL.md就以为看完了。
+文件读取规则：文本文档(.md/.txt/.json/.js/.html)用read_file，Excel(.xlsx)用openpyxl/XLSX库，图片(.png/.jpg)才用vision_analyze。不要把文本或Excel当图片识图。用户明确批评过。

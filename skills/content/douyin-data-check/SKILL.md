@@ -245,7 +245,7 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 opencli browser douyin eval "document.body.innerText"
 ```
 
-**🔴 评论/分享互换：14次审计遗留的根因（2026-06-30总结）**
+**🔴 评论/分享互换：21次审计遗留的根因（2026-07-26更新）**
 
 这个错误已经连续14次审计被发现但从未在数据采集阶段修复。根因：**表格数据正确，但诊断文本写反了。**
 
@@ -1533,7 +1533,17 @@ opencli daemon status
 
 ## ⚠️ cron job 环境限制
 
-**`execute_code` 在 cron job 中被禁止**（无用户审批模式）。如果需要用 Python 处理数据（如格式化报告、计算比率），改用 `terminal` 执行 Python 脚本，或直接在 final response 中手写 markdown 表格。
+**`execute_code` 在 cron job 中被禁止**（无用户审批模式，会返回 `BLOCKED` 错误）。必须用 `terminal` 执行 Python 脚本：
+
+```bash
+# ✅ 正确：用 terminal 执行 Python
+terminal(command='python -c "plays = [368,503,...]; print(sum(plays)/len(plays))"')
+
+# ❌ 错误：execute_code 在 cron 中被禁
+# execute_code(code="from hermes_tools import terminal; ...")
+```
+
+**注意**：`terminal` 中的 Python 不支持 `from hermes_tools import ...`，只能用标准库。如果需要复杂数据处理，把数据硬编码在命令字符串中。
 
 ### ⚠️ Python 执行方式（2026-06-23更新）
 

@@ -403,3 +403,39 @@ pi.hidden.forEach(h => {
 **用户还要求：** "变量老不对" — JS变量作用域问题需要特别注意，全局变量要在使用前声明，函数间传递数据要用全局变量或参数。
 
 **用户还要求：** "你能不能解决这个问题，好几次了。变量老不对" — 每次修改后必须验证变量是否正确传递，不能只改一个地方就认为修好了。
+
+---
+
+## 十九、代码重复：计算只用一次
+
+**用户原话：** "我们的计算只用一次，比如c=a+b为2，那么你在其他地方，不管有多少个地方，都只需要直接用变量c就可以了。"
+
+**核心原则：** 任何计算只做一次，结果存变量，其他地方直接用变量。
+
+**错误做法（到处重复计算）：**
+```javascript
+function renderGeju(r) {
+  const geju = calculateGeju(...); // 算一遍
+}
+function renderYongShen(r) {
+  const geju = calculateGeju(...); // 又算一遍 ❌
+}
+```
+
+**正确做法（公共函数，调用一次）：**
+```javascript
+// 定义公共函数
+function determineGeju(dayGan, monthZhi, tiangan) { ... }
+
+// 所有地方调用它
+function renderGeju(r) {
+  const result = determineGeju(dayGan, monthZhi, tiangan);
+}
+function renderYongShen(r) {
+  const result = determineGeju(dayGan, monthZhi, tiangan); // 同一个函数
+}
+```
+
+**好处：** 改一处全生效，不会出现A处改了B处没改的bug。
+
+**案例：** 本次session中renderGeju和renderYongShen都各自实现了取格逻辑，导致一个改了另一个没改，格局显示不一致。修复方法：提取公共函数determineGeju()，两处都调用它。
