@@ -223,6 +223,33 @@ git push origin main
 **预防**：新建含部署信息的 reference 文件时，不要写入实际 token，只写环境变量名或「见 .env」。在 `git add` 之前用 `git diff --cached` 检查是否有敏感内容。
 - **GitHub 连接超时**：可能是防火墙阻断 443 端口 → 用 `ghfast.top` 代理绕过（见上方）
 
+### Cron 模式专用策略：`-X theirs`
+
+当作为 cron 任务运行时（无人值守、无交互终端），手动解决冲突不可行。**推荐路径**：
+
+```bash
+# 1. 如果 rebase 失败，先 abort
+git rebase --abort
+
+# 2. 用 merge + theirs 自动解决冲突（优先取远程版本）
+git merge origin/main -X theirs -m "sync: 合并远程更新 $(date +%Y-%m-%d)"
+
+# 3. 如果远程又有新提交（push 被拒），再 pull 一次
+git pull origin main --rebase  # 或再次 merge -X theirs
+git push origin main
+```
+
+**`-X theirs` 的含义**：冲突时自动采用远程（"theirs"）的版本。适用于：
+- 语录文件（yulu.md）：远程通常有更完整的结构化内容
+- jobs.json：远程计数器通常更新
+- 发展日志等累积文件：远程内容通常是最新编辑
+
+**⚠️ cron 模式限制**：`execute_code`（Python 脚本）在 cron 模式下被阻止，不能用 Python 正则批量解决冲突。必须依赖终端命令或 `git merge -X theirs` 自动解决。
+
+**多轮同步竞态**：同步过程中 Mac 端可能也在推送，导致 pull 后 push 被拒。这是正常的——再次 pull + merge + push 即可，通常 2-3 轮完成。
+
+---
+
 ### 冲突解决实例
 
 **2026-07-03 场景（merge 成功）：**
@@ -385,3 +412,5 @@ console.log('Final depth:', d);
 - ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查
 - ⚠️ GitHub Secret Scanning：密钥可能泄露在 skills references/部署文档中（不只是 .env） → push 前检查 `git diff --cached`，发现后 amend + 脱敏重推
 - ⚠️ rebase --continue 在非交互式终端（cron）中会失败：nano 无法打开编辑器 → 先 `git commit -m "..."` 手动提交，再 `git rebase --continue`
+- ⚠️ `execute_code` 在 cron 模式下被阻止（安全策略）→ 不能用 Python 脚本批量解决冲突，只能用 `git merge -X theirs` 自动合并或终端命令
+- ⚠️ 同步过程中远程可能有新 push → merge 后 push 被拒是正常的，再 pull + merge + push 即可，通常 2-3 轮收敛

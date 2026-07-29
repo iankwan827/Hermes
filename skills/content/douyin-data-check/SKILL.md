@@ -238,7 +238,15 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 **如果行数不足（仍受虚拟滚动限制）**：
 1. 对于cron job（只关注新视频+近期变化）：前10-20行足够——新视频在最前面
 2. 如果需要全部视频数据：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动
-3. **滚动加载 workaround（2026-07-17验证，2026-07-19不可靠）**：尝试滚动表格父容器 `container.scrollTop = container.scrollHeight` + `sleep 2`，再次提取——页面可能渲染更多行。**⚠️ 此方法不可靠**：2026-07-17实测可加载全部26行，但2026-07-19实测仅显示11行（10视频+1空行），滚动后行数不变。行为随页面版本变化，不要依赖此方法
+3. **滚动加载方案（2026-07-27验证有效）**：用 `window.scrollTo` 滚动页面触发懒加载，每次滚动后等待2-3秒再提取行数。实测：11行→21行→26行（全部加载）。注意：需要多次滚动才能加载全部行。
+
+```bash
+# 滚动页面加载更多行（每次滚动后检查行数）
+opencli browser douyin eval "(function(){ window.scrollTo(0, document.body.scrollHeight); return 'scrolled to ' + document.body.scrollHeight; })()"
+sleep 3
+opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('table tbody tr'); var count = 0; for (var i = 0; i < rows.length; i++) { if (rows[i].querySelectorAll('td').length >= 5) count++; } return 'Video rows: ' + count; })()"
+# 如果行数不够，再滚动一次
+```
 
 ```bash
 # Step 4：提取视频列表数据
@@ -306,7 +314,7 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 
 **2026-07-14教训（回归式修复，2026-07-15发现）**：即使有上述文档，agent仍然在batch更新时把V23/V21的评论和分享搞反了。根因：写patch时凭直觉认为"评论应该在分享前面"，没有逐条对照页面数据。**每次写入前必须用上述方法逐条验证。**
 
-**⚠️ 表格列顺序映射（防止评论/分享互换，2026-07-06更新）**：数据中心投稿列表的表格有**15列**（不是16列），列顺序与发展日志**不同**，必须按以下映射转换：
+**⚠️ 表格列顺序映射（防止任意两列互换，2026-07-29更新）**：数据中心投稿列表的表格有**15列**（不是16列），列顺序与发展日志**不同**，必须按以下映射转换。**不仅是评论/分享互换，评论/收藏、分享/收藏等任意两列都可能被混淆**——07-29发现V4评论=0/收藏=3实际应为评论=3/收藏=0：
 
 **⚠️ 实际列索引（2026-07-06实测验证）**：
 ```
@@ -1545,56 +1553,42 @@ terminal(command='python -c "plays = [368,503,...]; print(sum(plays)/len(plays))
 
 **注意**：`terminal` 中的 Python 不支持 `from hermes_tools import ...`，只能用标准库。如果需要复杂数据处理，把数据硬编码在命令字符串中。
 
-### ⚠️ Python 执行方式（2026-06-23更新）
+### ⚠️ Python 在本机环境已不可用（2026-07-27确认，升级为永久禁用）
 
-**`python3` 命令在本机返回 exit code 49（Windows Store stub），必须用 `python` 代替。**
+**Python 在本机环境下因 SRE 模块冲突已完全不可用于文件操作。不要尝试任何 Python 方案。**
 
 ```bash
 # ❌ python3 返回 exit code 49（Windows Store stub）
 python3 script.py  # exit code 49
-python3 -c "print(1)"  # exit code 49
 
-# ❌ uv run python 有 SRE 模块 mismatch 问题（反复出现），不要使用
-# uv run python script.py
-# uv run python -c "print(1)"
+# ❌ uv run python 有 SRE 模块 mismatch
+uv run python script.py  # AssertionError: SRE module mismatch
 
-# ✅ 用 python（不带3，不带uv）— 唯一可靠方式
-python script.py
-python -c "print(1)"
+# ❌ /e/Python/python（系统Python）也不行！
+# uv Python 在 PATH 中优先级更高，re 模块仍被 uv 版本覆盖
+/e/Python/python script.py  # 同样 SRE module mismatch
+
+# ❌ /e/Users/Administrator/AppData/Local/Programs/Python/Python312/python.exe 也不行
+# 即使指定完整路径，uv 的 re 模块仍会污染
 ```
 
-**terminal中直接用 `python -c "..."` 最简单**，无需写脚本文件。
-⚠️ **绝对不要用 `uv run python`**，本机的 uv Python 版本与系统 Python 存在 SRE 模块版本冲突，每次都会报 `AssertionError: SRE module mismatch`。
+**唯一可靠的文件操作方式：shell 命令（head/tail/cp + patch 工具）**
 
-**⚠️ 批量更新发展日志：Python脚本 vs 多次patch**
+**⚠️ 批量更新发展日志：直接用 patch 工具或 shell 命令（不要用 Python）**
 
-**当需要同时更新多个数据行（如新视频+多个已有视频数据微调）时，有两种方法：**
+**当需要同时更新多个数据行时：**
 
-**方法A（推荐用于10+行更新）：Python脚本，用实际中文字符串**
-```python
-# ✅ 正确：Python脚本 + 实际中文字符串（不是Unicode转义）
-updates = [
-    ('| V28 | 我们们对... | 06-30 17:08 | 360 |', 
-     '| V28 | 我们们对... | 06-30 17:08 | 362 |'),
-    # ... 更多替换
-]
-for old, new in updates:
-    content = content.replace(old, new, 1)
+**方法A（推荐用于10+行更新）：多次 patch 调用**```bash
+patch(path="发展日志.md", old_string="| V21 | 脱碳甲醛...", new_string="| V21 | 脱碳甲醛... | 1,991 |")
+# 逐行替换，每次替换一个视频
 ```
-- ✅ 14行更新只需1次Python调用，比14次patch快10倍
-- ✅ 实际中文字符串匹配可靠（2026-07-08验证：14/14行全部成功）
-- ❌ **绝对不要用Unicode转义序列**（`\uXXXX`）——MSYS环境下匹配中文会失败
 
-**方法B（适用于<10行更新）：多次patch调用**
+**方法B（适用于插入新行）：head/tail + echo**
 ```bash
-patch(path="发展日志.md", old_string="| V21 | 脱碳甲醛...", new_string="| V22 | HR...")
+cd "path/to/references" && head -N 发展日志.md > /tmp/new_log.md && echo '新条目' >> /tmp/new_log.md && tail -n +N+1 发展日志.md >> /tmp/new_log.md && cp /tmp/new_log.md 发展日志.md
 ```
 
-**⚠️ Python脚本的坑（2026-07-08发现，2026-07-16更新）**：
-1. `uv run python`（3.11）有SRE模块mismatch，**绝对不要用**
-2. 系统`python`（3.10）也可能有SRE模块mismatch——如果uv Python在PATH中，即使调用`/e/Python/python.exe`，`re`模块也会被uv的版本覆盖
-3. **如果Python失败，改用shell命令**：`head/tail` 操作文件行（插入/删除），`patch` 工具做单行替换
-4. 批量修正评论/分享互换时，**必须逐条对照页面数据**验证每个视频的shares/comments值是否正确，不能只依赖列映射——因为有些视频在日志中已经是正确的，盲目swap会反而搞错
+**⚠️ 不要用 Python 脚本做批量更新**：Python 在本机因 SRE 模块冲突已完全不可用。即使之前成功过，也可能因 PATH 变化而失败。patch 工具是唯一可靠的单行替换方式。
 
 **✅ Python失败时的shell替代方案**：
 ```bash
