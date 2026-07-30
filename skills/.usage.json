@@ -406,14 +406,14 @@
     "archived_at": null,
     "created_at": "2026-07-03T14:16:51.822464+00:00",
     "created_by": null,
-    "last_patched_at": "2026-07-15T08:11:42.525854+00:00",
-    "last_used_at": "2026-07-23T03:00:48.834472+00:00",
-    "last_viewed_at": "2026-07-23T03:00:48.814984+00:00",
-    "patch_count": 12,
+    "last_patched_at": "2026-07-30T03:22:31.955205+00:00",
+    "last_used_at": "2026-07-30T03:22:14.319323+00:00",
+    "last_viewed_at": "2026-07-30T03:22:14.144784+00:00",
+    "patch_count": 13,
     "pinned": false,
     "state": "active",
-    "use_count": 4,
-    "view_count": 4
+    "use_count": 6,
+    "view_count": 6
   },
   "camofox-auto-start": {
     "archived_at": null,
@@ -485,13 +485,13 @@
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
     "last_patched_at": "2026-07-29T03:05:33.063943+00:00",
-    "last_used_at": "2026-07-29T03:05:49.326853+00:00",
-    "last_viewed_at": "2026-07-29T03:05:49.309580+00:00",
+    "last_used_at": "2026-07-30T03:22:39.076514+00:00",
+    "last_viewed_at": "2026-07-30T03:22:39.059915+00:00",
     "patch_count": 238,
     "pinned": false,
     "state": "active",
-    "use_count": 383,
-    "view_count": 383
+    "use_count": 386,
+    "view_count": 386
   },
   "douyin-download": {
     "archived_at": null,
@@ -662,18 +662,31 @@
     "use_count": 24,
     "view_count": 24
   },
+  "python-gui-packaging": {
+    "archived_at": null,
+    "created_at": "2026-07-29T17:06:18.221392+00:00",
+    "created_by": "agent",
+    "last_patched_at": "2026-07-29T17:13:58.574050+00:00",
+    "last_used_at": "2026-07-29T17:19:37.511347+00:00",
+    "last_viewed_at": "2026-07-29T17:19:37.496904+00:00",
+    "patch_count": 5,
+    "pinned": false,
+    "state": "active",
+    "use_count": 4,
+    "view_count": 4
+  },
   "skill-creator": {
     "archived_at": null,
     "created_at": "2026-06-20T08:03:04.089909+00:00",
     "created_by": null,
     "last_patched_at": null,
-    "last_used_at": "2026-07-26T09:04:52.268652+00:00",
-    "last_viewed_at": "2026-07-26T09:04:52.252640+00:00",
+    "last_used_at": "2026-07-29T17:05:31.184190+00:00",
+    "last_viewed_at": "2026-07-29T17:05:31.171184+00:00",
     "patch_count": 0,
     "pinned": false,
     "state": "active",
-    "use_count": 8,
-    "view_count": 8
+    "use_count": 9,
+    "view_count": 9
   },
   "system-operations": {
     "archived_at": null,
