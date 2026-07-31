@@ -61,26 +61,64 @@ let currentResult = null;   // 排盘结果对象
 
 ---
 
-## 三、常见坑
+## 三、工作流程坑
 
-### 3.1 变量作用域
+### 3.0 ⚠️ 讨论架构时必须先听再做（2026-07-31 教训）
+**用户原话**："你没看这个系统的规划书吗"、"不对，不是这些，你的脑子有毛病"、"你在干嘛，我在和你讨论这个系统架构，你干嘛每次我说完你就去读人家文件呢"
+
+**核心教训：用户在讨论架构时，先听完、讨论清楚，不要立刻去读文件或写代码。**
+
+当用户让我看一个项目的架构时：
+1. **先听用户说完意图**，确认理解后再行动
+2. **读完所有架构文件**，总结已有模块和缺失模块
+3. **讨论方案**，用户确认后再动手
+
+**错误做法**：
+- 用户说"看看架构" → 我没读完就开始提方案
+- 用户说"缺了AI执行层" → 我理解成"缺了skill调度器"（抽象概念）
+- 用户说"不是这些" → 我继续猜，不回去读架构文件
+- 用户在讨论 → 我每次他说完就跑去读文件/跑命令
+
+**正确做法**：
+- 用户说"看看架构" → 读完所有架构文件，总结已有模块和缺失模块
+- 用户说"缺了XX" → 在架构文件中找到XX的位置，理解它在整个系统中的角色
+- 用户说"不是这些" → 回去重新读架构文件，不要猜
+- 用户在讨论 → 先听完，确认理解，再行动
+
+**关键认知：八字性格分析系统的AI执行层**
+- 用户的比喻："Claude软件=躯体，AI的key=大脑"
+- 系统需要的不是自定义skill调度器，而是**内嵌Claude Code的核心能力**
+- Claude Code本身就是为skill执行设计的系统（读SKILL.md、执行skill、调用API）
+- 需要把Claude Code的skill执行能力 + 缓存命中能力内嵌到八字系统中
+- 这样用户的API Key才有"躯体"来执行skill
+
+**架构文件位置**：
+- `D:\tmp\八字性格分析系统_v1.0.0\ARCHITECTURE.md` - 系统架构
+- `D:\tmp\八字性格分析系统_v1.0.0\APP_ARCHITECTURE.md` - UI应用架构
+- `D:\tmp\八字性格分析系统_v1.0.0\AI_INTEGRATION_GUIDE.md` - AI集成指南
+
+---
+
+## 四、技术实现坑
+
+### 4.1 变量作用域
 函数内定义的变量，其他函数访问不到 → 必须用全局变量
 
-### 3.2 重复定义
+### 4.2 重复定义
 同一个变量在多处定义 → 只在全局定义一次，函数内不要重复`let`
 
-### 3.3 pi.hidden格式
+### 4.3 pi.hidden格式
 排盘脚本的`pi.hidden`是对象数组`[{stem:"戊", god:"正财", type:"Main"}]`，不是字符串数组。访问时用`h.stem`不是`h`。
 
-### 3.4 CHANG_SHENG表
+### 4.4 CHANG_SHENG表
 十二长生表按天干查（甲乙丙丁...），不是按五行查（金木水火土）。
 用`CHANG_SHENG[dayGan][zhi]`查状态。
 
-### 3.5 WX_WANGXIANG表
+### 4.5 WX_WANGXIANG表
 旺相休囚死表按**月支五行**查，不是按**月支**查。
 用`WX_WANGXIANG[monthWx][wx]`查状态。
 
-### 3.6 格局取格（必须看透干，不能只看本气）⚠️ 重要
+### 4.6 格局取格（必须看透干，不能只看本气）⚠️ 重要
 index.html中的`renderGeju`和`renderYongShen`函数必须检查**哪个藏干透干**，不能只取月令本气。
 
 **取格优先级**：本气透干 > 中气透干 > 余气透干 > 本气虚格（仅限子午卯酉午）
@@ -130,7 +168,7 @@ function determineGeju(dayGan, monthZhi, tiangan) {
 - 壬水透干（月干和时干都是壬水）
 - 壬水对乙木=正印 → 应该是**正印格**，不是正官格
 
-### 3.7 代码重复原则（计算只用一次）⚠️ 重要
+### 4.7 代码重复原则（计算只用一次）⚠️ 重要
 **核心原则：任何计算只做一次，结果存变量，其他地方直接用变量。**
 
 **错误做法**（到处重复计算）：
@@ -161,7 +199,7 @@ function renderYongShen(r) {
 
 **好处**：改一处全生效，不会出现A处改了B处没改的bug。
 
-### 3.8 空亡逻辑（容易搞错）
+### 4.8 空亡逻辑（容易搞错）
 **日柱空亡** = 检查**日支**是否出现在年柱/月柱/时柱的空亡里（基于各自旬首）。
 **年月时空亡** = 检查年支/月支/时支是否出现在**日柱的空亡里**（基于日柱的旬首）。
 
@@ -172,7 +210,7 @@ function renderYongShen(r) {
 
 注意：空亡skill只做判断，不做断语。断语由各专题skill（婚姻、十神等）自行下。
 
-### 3.8 参考资料位置
+### 4.9 参考资料位置
 课程笔记和参考资料在两个目录：
 - `D:\hermes-agent\imge_v2\` — 案例课、十神组合判定手册、格局.docx
 - `D:\hermes-agent\imge_v3\` — 课程录音转写、图片提取、新增内容清单
@@ -183,7 +221,7 @@ function renderYongShen(r) {
 
 读取时用read_file，不要用vision_analyze。
 
-### 3.9 十神分析输出规范 ⚠️ 重要
+### 4.10 十神分析输出规范 ⚠️ 重要
 
 **核心原则：十神分析必须输出10个子skill的完整内容，不是摘要表格！**
 
@@ -284,7 +322,7 @@ significantShishen.forEach(ss => {
 - 错误：用神=木 → 直接把比肩加入用神集合（即使比肩count=0）
 - 正确：用神=木 → 只有当比肩count > 0时才加入
 
-### 3.10 文件读取规则（必须遵守）
+### 4.11 文件读取规则（必须遵守）
 **文本文档（.md/.txt/.json/.js/.html）→ 用 read_file**
 **Excel文件（.xlsx）→ 用 openpyxl 或 XLSX 库**
 **图片文件（.png/.jpg）→ 才用 vision_analyze**
@@ -341,14 +379,84 @@ vision_analyze("D:/test/bazi-system/bazi-kongwang/SKILL.md")  # ❌ 绝对不要
 5. 三个标签页都能正常显示
 
 ### 4.3 验收报告
-输出到`D:\test\bazi-app\review-report.md`，包含：
+输出到`D:\\test\\bazi-app\\review-report.md`，包含：
 - 每个模块的验收结果
 - 发现的问题清单
 - 修改建议
 
 ---
 
-## 五、喜用神计算规则（软件实现）
+## 五、AI执行层设计模式（适用于需要加载skill的系统）
+
+### 5.1 核心认知：Claude Code = 躯体，API Key = 大脑
+
+**用户原话**："Claude软件等于躯体，你这种ai的key等于大脑，现在只有大脑是不能执行skill的。还得有躯体，就是Hermes或者Claude"
+
+系统需要的不是自定义skill调度器，而是**内嵌Claude Code的核心能力**：
+- Claude Code本身就是为skill执行设计的系统（读SKILL.md、执行skill、调用API）
+- 需要把Claude Code的skill执行能力 + 缓存命中能力内嵌到八字系统中
+- 这样用户的API Key才有"躯体"来执行skill
+
+### 5.2 Claude Code泄露的源码参考
+
+基于Claude Code泄露的源码（fattail4477/claw-decode仓库），关键发现：
+
+**43个工具（包括SkillTool）**：
+- SkillTool: 执行skills
+- DiscoverSkillsTool: AI-powered skill搜索（内部版）
+- ToolSearchTool: 动态搜索可用工具
+- FileRead/FileWrite/FileEdit: 文件操作
+- Agent: 生成子agent
+- TeamCreate: 创建多agent团队
+- TaskCreate/TaskList/TaskUpdate: 任务管理
+
+**Skill系统架构**：
+- Skill = SKILL.md（YAML frontmatter + 使用说明）+ references/（知识库）
+- AI通过SkillTool读取和执行skill
+- 支持full/meta/core三种加载深度
+
+**缓存优化**：
+- 静态/动态prompt分割，静态部分加cache_control
+- CACHED_MICROCOMPACT: 上下文压缩（内部版）
+- TOKEN_BUDGET: token预算管理（内部版）
+
+**记忆系统（memdir）**：
+- 纯Markdown文件，无向量数据库
+- 索引文件必须<25KB
+- Dream Mode自动维护（4阶段：Orient→Gather→Consolidate→Prune）
+
+### 5.3 自定义AI执行层（当无法内嵌Claude Code时）
+
+当系统需要让AI读取和执行skills/目录里的skill文件，且无法直接内嵌Claude Code时：
+
+```
+用户问题 → SkillRegistry(扫描目录) → SkillDispatcher(匹配skill)
+→ SkillLoader(读取文件) → PromptAssembler(组装prompt) → AI API
+```
+
+**核心模块**：
+- `SkillRegistry`：启动时扫描skills/目录，解析YAML frontmatter，建立索引
+- `SkillDispatcher`：根据用户问题关键词匹配skill，决定加载深度（full/meta/core）
+- `SkillLoader`：读取SKILL.md + references/*.md，按token预算裁剪
+- `PromptAssembler`：组装静态prompt（身份、规则）+ 动态部分（skill内容、排盘数据、用户画像）
+- `AIExecutor`：调用Claude/GPT/Gemini API，支持缓存优化
+
+**Prompt缓存优化**（Claude）：
+- 静态部分（~2K tokens）加`cache_control: {"type": "ephemeral"}` → 省90%
+- 动态部分（skill内容、排盘数据、对话历史）不缓存
+- 静态/动态分割点用`__CACHE_BOUNDARY__`标记
+
+**Token预算管理**：
+- 简单问题（"你好"）：~8K tokens
+- 一般问题（"我的性格"）：~15K tokens
+- 复杂问题（"详细分析"）：~25K tokens
+- 每个skill有加载上限，超了自动裁剪
+
+详细设计见：`D:\tmp\八字性格分析系统_v1.0.0\docs\AI_EXECUTION_LAYER.md`
+
+---
+
+## 六、喜用神计算规则（软件实现）
 
 **用神优先级：** 通关 > 病药 > 默认（格局/旺衰）
 

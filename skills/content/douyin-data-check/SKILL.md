@@ -199,13 +199,19 @@ opencli browser douyin eval "document.body.innerText"
 
 **方式A：直接导航到内容分析页（2026-06-15验证可用，更简洁）**
 ```bash
-# 一步到位：直接打开内容分析页（会自动加载投稿列表）
+# 直接打开内容分析页（默认加载"投稿分析"tab，需手动切换到"投稿列表"）
 opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
 sleep 8
+
+# 切换到"投稿列表"radio button（⚠️ 默认是"投稿分析"tab，不切换则看不到表格！）
+opencli browser douyin eval "var el = Array.from(document.querySelectorAll('label')).find(e => e.textContent.trim() === '投稿列表' && e.offsetParent !== null); el?.click(); el ? 'clicked' : 'not found'"
+sleep 5
 
 # 提取全部视频数据（一次eval获取所有视频的所有指标！）
 opencli browser douyin eval "document.body.innerText"
 ```
+
+**⚠️ 必须点击"投稿列表"**（2026-07-31验证）：数据中心内容分析页默认加载"投稿分析"tab（显示投稿概览和图表），不显示视频表格。必须手动点击"投稿列表"radio button才能看到视频数据表。不要跳过这一步直接eval innerText——那样只能拿到概览数据，拿不到视频列表。
 
 **方式B：通过侧边栏导航（备用，步骤多但更稳健）**
 ```bash

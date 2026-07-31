@@ -276,6 +276,15 @@ opencli browser douyin eval "document.body.innerText"
 - mimo-v2.5拒绝tool message中的图片格式
 - **绝对不要用截图+vision_analyze方案**，直接用eval提取文本
 
+### GitHub API Rate Limit → 用 raw.githubusercontent.com 绕过
+- **症状**：`curl "https://api.github.com/repos/..."` 返回 `API rate limit exceeded`
+- **原因**：未认证的GitHub API调用有严格限制（60次/小时）
+- **解决**：改用 `curl "https://raw.githubusercontent.com/{owner}/{repo}/main/{path}"` 直接获取文件内容
+- **优势**：无速率限制、无需认证、更快
+- **获取文件列表**：`curl -s "https://github.com/{owner}/{repo}" | grep -o 'href="/{owner}/{repo}/blob/main/[^"]*"'`
+- **适用场景**：调查GitHub仓库内容、获取代码文件、读取README等
+- **⚠️ 注意**：raw.githubusercontent.com 需要正确的分支名（通常是 main 或 master）
+
 ### PWA/Manifest路径问题（子路径部署）
 - **症状**：浏览器报 `icon.png 404` + `Error while trying to use the following icon from the Manifest`
 - **原因**：站点部署在子路径（如 `/bazi/`）时，manifest.json 里的 icon src 写成了 `/assets/icon.png` 而不是 `/bazi/assets/icon.png`

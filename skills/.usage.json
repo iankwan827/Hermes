@@ -315,14 +315,14 @@
     "archived_at": null,
     "created_at": "2026-07-26T13:23:36.374653+00:00",
     "created_by": "agent",
-    "last_patched_at": "2026-07-26T16:35:42.554666+00:00",
-    "last_used_at": "2026-07-26T16:42:59.719214+00:00",
-    "last_viewed_at": "2026-07-26T16:42:59.708672+00:00",
-    "patch_count": 29,
+    "last_patched_at": "2026-07-31T10:27:37.771130+00:00",
+    "last_used_at": "2026-07-31T10:34:50.521989+00:00",
+    "last_viewed_at": "2026-07-31T10:34:50.509476+00:00",
+    "patch_count": 44,
     "pinned": false,
     "state": "active",
-    "use_count": 29,
-    "view_count": 29
+    "use_count": 34,
+    "view_count": 34
   },
   "bazi-system": {
     "archived_at": null,
@@ -406,14 +406,14 @@
     "archived_at": null,
     "created_at": "2026-07-03T14:16:51.822464+00:00",
     "created_by": null,
-    "last_patched_at": "2026-07-30T03:22:31.955205+00:00",
-    "last_used_at": "2026-07-30T03:22:14.319323+00:00",
-    "last_viewed_at": "2026-07-30T03:22:14.144784+00:00",
-    "patch_count": 13,
+    "last_patched_at": "2026-07-31T09:06:44.933536+00:00",
+    "last_used_at": "2026-07-31T09:31:23.641117+00:00",
+    "last_viewed_at": "2026-07-31T09:31:23.623071+00:00",
+    "patch_count": 14,
     "pinned": false,
     "state": "active",
-    "use_count": 6,
-    "view_count": 6
+    "use_count": 11,
+    "view_count": 11
   },
   "camofox-auto-start": {
     "archived_at": null,
@@ -484,14 +484,14 @@
     "archived_at": null,
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
-    "last_patched_at": "2026-07-29T03:05:33.063943+00:00",
-    "last_used_at": "2026-07-30T03:22:39.076514+00:00",
-    "last_viewed_at": "2026-07-30T03:22:39.059915+00:00",
-    "patch_count": 238,
+    "last_patched_at": "2026-07-31T03:11:10.376582+00:00",
+    "last_used_at": "2026-07-31T03:11:46.242946+00:00",
+    "last_viewed_at": "2026-07-31T03:11:46.224652+00:00",
+    "patch_count": 239,
     "pinned": false,
     "state": "active",
-    "use_count": 386,
-    "view_count": 386
+    "use_count": 391,
+    "view_count": 391
   },
   "douyin-download": {
     "archived_at": null,
