@@ -1,19 +1,16 @@
-抖音：查全量视频用「内容管理→作品管理」，别用「近期作品」（只显示7天）。小号评论触发二次推流（1条≈1500播放）。视频1.5分钟内。口播提示（）嵌正文，标题15-20字标签≤5个。⚠️查视频数据必须先读发展日志再查创作者中心，用户有12+视频不要以为只有5个。
-Chrome CDP：config用`ws://127.0.0.1:9222`。不要指定`--user-data-dir`（用户在E盘），否则丢失登录态。快捷方式已加CDP参数。
-§
-八字软件(旧)：D:\test\bazi-app\。坑：pi.hidden用h.stem；WX_WANGXIANG按月支五行查。格局取格规则等。
+语录：源文件`语录/理华老师语录.md`（Day1-99，549条），分类JSON`语录/语录分类.json`（十神10个+日元+主题）。写skill前先读skill-creator。
 §
 写完文案必须自动跑video-content-audit审核，不等用户提醒（用户原话"你没跑skill啊"）。引用热搜事件必须确认时间线（几月、第几轮、谁赢谁输），不能凭印象写。审核是内建流程不是可选步骤。
+§
+粤语金句不要直接写，用剧情/对话体现。文案时间线必须符合现实逻辑。质检需检查每个叙事转折点前是否有钩子。粤语用词：叛逆→反骨（"反骨"才是粤语词）。标签中热搜话题必须原样保留（吃搜索流量），不能替换成内容关键词。
 §
 栋笃笑文案：用户用"阿强"（朋友角色）做叙事载体——铺垫→反转→吐槽→引出主题。经典黄子华对话体。开头第一句必须是选题（"开头第一句肯定是我们选的那句选题啊"），阿强故事紧跟着展开。可系列化（金价暴跌→A股大跌，阿强连续亏钱）。
 §
 用户喜欢"争议性开头"（"99%的人都理解错了"）。中间太平时加钩子：1)共鸣"你系唔系都试过？" 2)反面案例（笑点）3)冲突对比型（"迟到一次记一世，帮十次忘光"比权威佐证更有力）。开头要埋伏笔（"99%的人都是会这样"），不说结论。
 §
-八字：23点后算次日子时。generate_bazi_analysis.js已自动处理。
-§
 用户痛点：文案简洁；视频50秒-1分30秒。⚠️用户改完文案就是终版。
 §
-⚠️写skill前必须先加载skill-creator（用户原话"你写skill没有看那个写skill的skill吧"）。规范：SKILL.md精简（流程+引用references/），详细内容放references/，写法用祈使句不用第二人称。改完文件推GitHub：先设代理`git config http.proxy http://127.0.0.1:7897`，再add/commit/push，用完unset。仓库：E:/Users/Administrator/AppData/Local/hermes。
+⚠️写skill前先加载skill-creator。推GitHub：**先清proxy**（`git config --unset http.proxy && git config --unset https.proxy`），否则socks5h干扰SSL。仓库：E:/Users/Administrator/AppData/Local/hermes。Mac端：/Users/guanmian/Hermes。
 §
 ⚠️用户发的素材/库必须当次session保存成文件（D:/hermes-agent/文案/），不能只在对话里用。发了3-4次爆款开头库都丢了，用户frustrated。"从库里选"→先搜文件是否存在。
 §
@@ -23,12 +20,8 @@ dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2用模板库。
 §
 文案写作：用户给的比喻/故事是用来教我理解角度的，不是写进文案的。要区分"解释给我听"和"写进脚本"。用户说"我用XX故事讲解给你听，不是让你写出来"时，只取角度不取内容。
 §
-Vercel：CLI用VERCEL_TOKEN env var。⚠️部署后域名不自动更新需`vercel promote`。bazi项目:E:\SD\bazi\bazi_new_web，域名www.shiyibazi.top。
+Whisper转录专有名词常出错需校对。课件长图必须逐片vision_analyze看完（tesseract中文质量极差），不能只看顶部就编内容。被指出一个错误后必须核查同类所有内容。
 §
-用户问"这是什么错误"时直接给答案，不要先搜项目文件再总结。简洁诊断 > 完整调查（除非用户明确要求调查）。
+八字系统：23点后算次子时。**必须先跑排盘脚本，绝对不能手算十神。** 脚本：`~/.hermes/profiles/main/skills/bazi-system/bazi-paipan/scripts/generate_bazi_analysis.js`，用法：`node generate_bazi_analysis.js <年> <月> <日> <时> <性别(M/F)>`。用户评价：核心特征准确比技术细节重要。空亡以日柱查旬首。课程录音：`/Users/guanmian/Pictures/录音/八字课/`。**十神skill语录必须精选（5-20条），不能全量塞入。用户原话"不是多就是好的"。** 2026-07-30已用Claude版替换12个skill，旧版备份在cache/backup_my_skills_202607300110/。**讨论八字前先加载对应skill，不要凭记忆空聊；不要轻易说skill有错——用户花大量token打磨过，先假设skill是对的。** 空亡两套方法独立：方法一用日柱的旬看年月时柱谁空亡，方法二用年月时柱各自的旬看日柱是不是空亡（bazi-kongwang skill已更新）。
 §
-Whisper转录中文专有名词经常出错（如闾山→驴山），转录完必须校对关键术语再用，不能直接信任输出。
-§
-文件读取规则：文本文档(.md/.txt/.json/.js/.html)用read_file，Excel(.xlsx)用openpyxl/XLSX库，图片(.png/.jpg)才用vision_analyze。不要把文本或Excel当图片识图。用户明确批评过。
-§
-八字性格分析系统v1(D:\tmp\八字性格分析系统_v1.0.0\)：Electron桌面应用。需内嵌Claude Code精简版作"躯体"(skill执行引擎)+用户API Key作"大脑"。系统是持续对话AI助手，初始化调用skill初始化性格参数，对话基于skill回答，需prompt caching。已有排盘引擎(JS)+12个skill(182KB)。⚠️讨论架构时不要反复读文件，直接回答问题。
+画像驱动模式：排盘+格局→画像（必做）→后续层读portrait.json推演。强关联：事业/财运/官非/运势。弱关联：六亲（独立分析，画像只影响相处模式）。同一命理特征不同性格的人做出不同选择。新增skill：bazi-portrait、bazi-portrait-orchestrator、bazi-liuqin。六亲铁律：父亲=月干，母亲=月令，看落宫五行对六亲星的生克。月令力量最大克了就是克了。画像必须真正加载skill断语。
