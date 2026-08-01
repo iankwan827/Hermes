@@ -97,13 +97,18 @@ git pull origin main --rebase
 # 查看冲突文件
 git diff --name-only --diff-filter=U
 
-# 解决冲突后，先 git add 再 commit（不要直接 rebase --continue）
+# 解决冲突后，先 git add
 git add <冲突文件>
-git commit -m "auto-sync: $(date +%Y-%m-%d) <设备名>更新 (merged)"
-git rebase --continue
+
+# 继续 rebase（cron/非交互式环境必须跳过编辑器）
+GIT_EDITOR=true git rebase --continue
+# 或手动提交：git commit -m "auto-sync: ..." && git rebase --continue
 ```
 
-**⚠️ rebase --continue 的编辑器陷阱**：`git rebase --continue` 会尝试打开编辑器（通常是 nano）让你编辑 commit message。在 cron / 非交互式终端中 nano 无法启动，报 `Standard input is not a terminal`。**解决方法**：在 `git rebase --continue` 之前先用 `git commit -m "..."` 手动提交，这样 rebase --continue 发现 commit 已存在就会直接继续，不再弹编辑器。
+**⚠️ rebase --continue 的编辑器陷阱**：`git rebase --continue` 会尝试打开编辑器（通常是 nano）让你编辑 commit message。在 cron / 非交互式终端中 nano 无法启动，报 `Standard input is not a terminal`。两种解决方法：
+
+- **方法A（推荐，更简洁）**：设置环境变量跳过编辑器：`GIT_EDITOR=true git rebase --continue`
+- **方法B（备选）**：先手动提交再 rebase：`git commit -m "..."` 然后 `git rebase --continue`（rebase --continue 发现 commit 已存在就会直接继续）
 
 #### 冲突解决策略（按文件类型）
 
@@ -411,6 +416,6 @@ console.log('Final depth:', d);
 - ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404
 - ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查
 - ⚠️ GitHub Secret Scanning：密钥可能泄露在 skills references/部署文档中（不只是 .env） → push 前检查 `git diff --cached`，发现后 amend + 脱敏重推
-- ⚠️ rebase --continue 在非交互式终端（cron）中会失败：nano 无法打开编辑器 → 先 `git commit -m "..."` 手动提交，再 `git rebase --continue`
+- ⚠️ rebase --continue 在非交互式终端（cron）中会失败：nano 无法打开编辑器 → 设置 `GIT_EDITOR=true git rebase --continue` 跳过编辑器，或先 `git commit -m "..."` 手动提交再 rebase --continue
 - ⚠️ `execute_code` 在 cron 模式下被阻止（安全策略）→ 不能用 Python 脚本批量解决冲突，只能用 `git merge -X theirs` 自动合并或终端命令
 - ⚠️ 同步过程中远程可能有新 push → merge 后 push 被拒是正常的，再 pull + merge + push 即可，通常 2-3 轮收敛
