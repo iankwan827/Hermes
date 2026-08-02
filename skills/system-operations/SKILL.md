@@ -118,7 +118,7 @@ GIT_EDITOR=true git rebase --continue
 | 内存文件（MEMORY.md） | 合并双方内容 | 两边的 tip 都有价值 |
 | SKILL.md | 合并双方内容 | 两边的改动都保留 |
 | config.yaml | 合并双方配置 | 保留所有配置项 |
-| JSON 状态（jobs.json） | 取较新版本 | 时间戳和计数更新 |
+| JSON 状态（jobs.json） | 取较新版本 | `completed` 计数和 `last_run_at` 时间戳取较新值；冲突字段均为运行时状态，无语义冲突 |
 | 重命名/删除冲突 | 保留重命名版本 | 保留新结构 |
 
 #### rename/delete 冲突专项处理
@@ -412,6 +412,7 @@ console.log('Final depth:', d);
 - ⚠️ Git 同步时 merge 优于 rebase（自动合并更多）；但如果 cron 指定了 --rebase，可用按文件类型策略手动解决冲突
 - ⚠️ `git stash pop` 后冲突：用正则保留stashed版本（`<<<<<<< Updated upstream\n.*?=======\n(.*?)>>>>>>> Stashed changes`），终端Python有环境问题时用 `execute_code` + `hermes_tools` 批量处理
 - ⚠️ GitHub HTTPS 被墙时：git 默认不走系统代理，必须手动 `git config http.proxy http://127.0.0.1:7897` 设代理才能 push/pull。报 Connection reset/timeout 先查代理端口
+- ⚠️ Windows Credential Manager (`credential.helper=manager`) 在 cron/后台上下文中会弹出 GUI 对话框，导致 git push 挂起直到超时。症状：push 卡住无输出，`GIT_CURL_VERBOSE=1` 显示 401 后无后续。修复：`git config credential.helper store` 切换到文件存储凭据，或在 push 前设置 `GIT_TERMINAL_PROMPT=0` 避免交互式提示
 - ⚠️ Vercel 拖拽部署后自定义域名可能仍指向旧 deployment → 用 `vercel promote` 更新别名
 - ⚠️ Vite PWA manifest icon 路径必须用绝对路径（`/bazi/assets/icon.png`），相对路径在子路径部署时会 404
 - ⚠️ JS 文件中孤立的 `*/` 或缺失的函数关闭 `}` 会导致语法错误 → 后续所有变量报 "not defined" → `node --check` 快速定位，深度诊断用括号匹配检查
