@@ -244,7 +244,13 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 **如果行数不足（仍受虚拟滚动限制）**：
 1. 对于cron job（只关注新视频+近期变化）：前10-20行足够——新视频在最前面
 2. 如果需要全部视频数据：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动
-3. **滚动加载方案（2026-07-27验证有效）**：用 `window.scrollTo` 滚动页面触发懒加载，每次滚动后等待2-3秒再提取行数。实测：11行→21行→26行（全部加载）。注意：需要多次滚动才能加载全部行。
+3. **滚动加载方案（2026-07-27验证有效，2026-08-02实测）**：用 `window.scrollTo` 滚动页面触发懒加载，每次滚动后等待2-3秒再提取行数。实测：11行→21行→26行（全部加载）。注意：需要多次滚动才能加载全部行。
+
+**⚠️ 滚动容器选择器（2026-08-02实测）**：`window.scrollTo` 可能不起作用，因为滚动发生在内部容器。实际可滚动的容器是 `[class*=douyin-creator-pc-table-wrapper]`。用以下代码滚动：
+```bash
+opencli browser douyin eval "(function(){ var el = document.querySelector('[class*=douyin-creator-pc-table-wrapper]'); if(el) { el.scrollTop = el.scrollHeight; return 'scrolled'; } return 'not found'; })()"
+```
+如果 `scrollHeight == clientHeight`，说明内容已全部加载，无需继续滚动。
 
 ```bash
 # 滚动页面加载更多行（每次滚动后检查行数）
@@ -351,6 +357,8 @@ cells[14]: 操作（"分析详情"）
 | 收藏量 (cells[11]) | 收藏 |
 
 **⚠️ 关键**：数据中心是"点赞→分享→评论→收藏"，发展日志是"点赞→评论→分享→收藏"。评论和分享的顺序是**反的**！这是12次审核都发现评论/分享互换的根本原因。
+
+**🔴 收藏值也会漂移（2026-08-02发现）**：不仅评论/分享会互换，收藏值也可能在多次更新中积累误差。案例：V21发展日志写收藏=2，但页面显示收藏=1（cells[11]=1）。**规则**：每次更新时，收藏列也必须逐字对照页面数据，不能凭记忆或沿用旧值。
 
 ```javascript
 // ✅ 正确的eval提取代码（已验证2026-07-06）
@@ -1498,6 +1506,12 @@ opencli daemon status
 - **工作目录版本**（`./references/发展日志.md`）→ 可能是旧版本，数据不完整
 - **规则**：必须用 `skill_view` 读取发展日志，不要用 `read_file` 读取本地副本。两个文件会不同步，本地副本可能缺少最新的视频数据（如视频10-13）
 
+**⚠️ 审核记录行前缀是 `|||`（3个管道符），不是 `||||`（4个管道符）**（2026-08-02发现）：
+- 发展日志中，视频数据记录表的行用 `|` 分隔
+- 审核记录章节的行用 `|||` 开头（3个管道符）
+- 用node/Python做字符串匹配时，如果搜索 `|||| 08-02` 会找不到，因为实际是 `||| 08-02`
+- **验证方法**：先用 `read_file` 读取目标行，确认实际前缀再做匹配
+
 **⚠️ 数据异常监控（2026-07-16新增）**：
 - **点赞减少**：如果页面显示的点赞数比发展日志少（如V26从7→6），可能是用户取消点赞或数据波动。记录变化但不修改历史数据
 - **播放量停滞**：如果连续2次定时更新播放量无变化，标记视频为"已停止增长"
@@ -1604,6 +1618,45 @@ cd "path/to/references" && head -440 发展日志.md > /tmp/new_log.md && echo '
 # 单行替换用 patch 工具（更可靠）
 patch(path="发展日志.md", old_string="旧内容", new_string="新内容")
 ```
+
+**✅ Node.js回退方案（2026-08-02验证，当patch的escape-drift和Python都不可用时最可靠）**：
+```bash
+# 用node -e做字符串替换（不受escape-drift影响）
+cd "path/to/references" && node -e "
+const fs = require('fs');
+let c = fs.readFileSync('文件.md', 'utf-8');
+const old = '要替换的文本（原样写，不用转义引号）';
+const rep = '替换后的文本';
+if (c.includes(old)) {
+  c = c.replace(old, rep);
+  fs.writeFileSync('文件.md', c, 'utf-8');
+  console.log('OK');
+} else {
+  console.log('NOT FOUND');
+}
+"
+
+# 用node -e插入新行（在匹配行之前插入）
+cd "path/to/references" && node -e "
+const fs = require('fs');
+let c = fs.readFileSync('文件.md', 'utf-8');
+const anchor = '匹配到的行前缀文本';
+const newLine = '要插入的新行内容\n';
+if (c.includes(anchor)) {
+  c = c.replace(anchor, newLine + anchor);
+  fs.writeFileSync('文件.md', c, 'utf-8');
+  console.log('OK');
+} else {
+  console.log('NOT FOUND');
+}
+"
+```
+
+**⚠️ Node.js回退的优势**：
+- 不受`patch`的escape-drift影响（node直接操作字符串，不经过tool序列化）
+- Python在本机因SRE模块冲突不可用时，node是唯一可靠的脚本环境
+- 支持精确的字符串匹配和替换，比head/tail更灵活
+- 注意：node中写中文字符串不需要特殊处理（UTF-8原生支持）
 
 **⚠️ 2026-07-14教训**：batch更新时没有逐条对照页面数据，导致V23/V21的评论和分享被错误交换。**每次batch更新后，必须用read_file重新读取相关行，逐条验证每个视频的评论/分享值是否与页面数据一致。**
 
