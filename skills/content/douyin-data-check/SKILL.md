@@ -246,19 +246,22 @@ opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('
 2. 如果需要全部视频数据：使用侧边栏→作品管理（方法A），该页面不使用虚拟滚动
 3. **滚动加载方案（2026-07-27验证有效，2026-08-02实测）**：用 `window.scrollTo` 滚动页面触发懒加载，每次滚动后等待2-3秒再提取行数。实测：11行→21行→26行（全部加载）。注意：需要多次滚动才能加载全部行。
 
-**⚠️ 滚动容器选择器（2026-08-02实测）**：`window.scrollTo` 可能不起作用，因为滚动发生在内部容器。实际可滚动的容器是 `[class*=douyin-creator-pc-table-wrapper]`。用以下代码滚动：
-```bash
-opencli browser douyin eval "(function(){ var el = document.querySelector('[class*=douyin-creator-pc-table-wrapper]'); if(el) { el.scrollTop = el.scrollHeight; return 'scrolled'; } return 'not found'; })()"
-```
-如果 `scrollHeight == clientHeight`，说明内容已全部加载，无需继续滚动。
+**⚠️ 滚动容器选择器（2026-08-03实测更新）**：滚动行为随页面版本变化，两种方法都可能有效或失效。**推荐先试 `window.scrollTo`，失败再试内部容器**：
 
 ```bash
-# 滚动页面加载更多行（每次滚动后检查行数）
+# 方法1（推荐，2026-08-03验证有效）：window.scrollTo
 opencli browser douyin eval "(function(){ window.scrollTo(0, document.body.scrollHeight); return 'scrolled to ' + document.body.scrollHeight; })()"
 sleep 3
 opencli browser douyin eval "(function(){ var rows = document.querySelectorAll('table tbody tr'); var count = 0; for (var i = 0; i < rows.length; i++) { if (rows[i].querySelectorAll('td').length >= 5) count++; } return 'Video rows: ' + count; })()"
-# 如果行数不够，再滚动一次
+# 如果行数不够（<26），再滚动一次：window.scrollTo(0, document.body.scrollHeight + 2000)
 ```
+
+```bash
+# 方法2（备用）：内部容器滚动
+opencli browser douyin eval "(function(){ var el = document.querySelector('[class*=douyin-creator-pc-table-wrapper]'); if(el) { el.scrollTop = el.scrollHeight; return 'scrolled'; } return 'not found'; })()"
+```
+
+**判断标准**：如果 `scrollHeight == clientHeight`，说明该容器内容已全部加载，换用另一种方法。实测2026-08-03：方法1有效（10→21→26行），方法2无效（scrollHeight==clientHeight）。
 
 ```bash
 # Step 4：提取视频列表数据
@@ -1706,6 +1709,47 @@ patch(path="发展日志.md", old_string="...", new_string="...")
 # 4. grep验证每条修改
 grep "V21" 发展日志.md | head -1
 ```
+
+### ⚠️ patch 工具重复行匹配（2026-08-04发现）
+
+**当发展日志包含大量重复模式的行（如多条 `| 08-XX HH:MM |` 格式的定时更新条目），`patch` 的 `old_string` 可能匹配到多个位置，导致 "Found N matches" 错误。** 这在大型发展日志（400+行）中非常常见。
+
+**症状**：
+```
+Found 2 matches for old_string. Provide more context to make it unique.
+Found 3 matches for old_string. Provide more context to make it unique.
+```
+
+**根因**：日志中多条更新记录使用相同的时间戳格式（如 `08-03 11:00`、`08-04 17:00`），两行组合的 old_string 可能在文件中出现多次。
+
+**解决方案（按优先级）**：
+
+1. **增加上下文使其唯一**：用更长的 old_string，包含该行独有的内容（如具体播放量变化 `V13点赞8→7`）
+2. **用 `replace_all=true`**（仅当所有匹配都需要替换时）
+3. **用 Node.js 回退**（最可靠，见下方）
+4. **用 `head/tail` 行号操作**：`head -N > tmp && echo '新行' >> tmp && tail -n +N+1 >> tmp && cp tmp 原文件`
+
+**⚠️ 连续3次patch失败必须切换策略**：如果 patch 连续失败3次（任何原因），立即切换到 Node.js 或 head/tail 方案，不要继续尝试 patch。继续重试只是浪费工具调用次数。
+
+**⚠️ Node.js 回退方案（2026-08-02验证，对重复行和escape-drift都有效）**：
+```bash
+# 插入新行（在匹配行之后追加）
+cd "path/to/references" && node -e "
+const fs = require('fs');
+let c = fs.readFileSync('发展日志.md', 'utf-8');
+const anchor = '匹配到的行文本（精确复制文件中的内容）';
+const newLine = '\n要插入的新行内容';
+if (c.includes(anchor)) {
+  c = c.replace(anchor, anchor + newLine);
+  fs.writeFileSync('发展日志.md', c, 'utf-8');
+  console.log('OK');
+} else {
+  console.log('NOT FOUND');
+}
+"
+```
+
+**Node.js 优势**：不受 escape-drift 和重复行匹配影响（直接操作字符串），且 node 在 Windows MSYS 环境下可靠运行。
 
 ### ⚠️ patch 工具 escape drift（2026-07-15发现）
 
