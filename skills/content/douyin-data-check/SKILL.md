@@ -185,6 +185,14 @@ opencli browser douyin eval "document.body.innerText"
 
 **✅ 方法0（投稿列表）获取列表数据 + 方法B（仪表盘）获取最新视频详情 = 完整方案**
 
+### ⚡ 数据校验自动化（2026-08-04新增）
+
+用 `scripts/verify_data.js` 自动对比页面数据与日志表格：
+1. 从eval提取数据后，填入脚本的 `pageData` 对象
+2. 运行 `node scripts/verify_data.js`
+3. 输出所有差异（播放量、点赞、评论、分享、收藏）
+4. 用 `patch` 工具逐个修正差异
+
 ---
 
 ## 查看视频数据流程
@@ -1454,7 +1462,20 @@ opencli browser douyin open "https://creator.douyin.com/creator-micro/data-cente
 opencli browser douyin open "https://creator.douyin.com/creator-micro/data-center/content"
 ```
 
-### ⚠️ `opencli doctor` 经常挂起/超时（2026-06-25验证）
+**⚠️ 仪表盘账号信息解析陷阱（2026-08-04发现）**：仪表盘（`/home`）显示的关注/粉丝/获赞数字排列为：
+```
+关注
+177
+粉丝
+87
+获赞
+184
+```
+第一个数字（177）是**关注数**，不是粉丝数！日志曾长期误将关注数当作粉丝数（粉丝写177实际应为87），获赞数也严重偏低（写88实际184）。正确提取方法：用 `text.indexOf('粉丝')` 定位后取上下文，确认数字对应关系。**规则：每次更新账号信息时，必须逐字确认"关注/粉丝/获赞"三个标签与数字的对应关系。**
+
+**⚠️ 自动化数据校验脚本（2026-08-04新增）**：`scripts/verify_data.js` 可自动对比页面数据与发展日志表格，列出所有差异。使用方法：填入pageData对象后运行 `node verify_data.js`。
+
+**⚠️ `opencli doctor` 经常挂起/超时（2026-06-25验证）**
 
 **`opencli doctor` 命令可能挂起30秒以上无响应。** 替代方案：
 
@@ -1576,9 +1597,9 @@ terminal(command='python -c "plays = [368,503,...]; print(sum(plays)/len(plays))
 
 **注意**：`terminal` 中的 Python 不支持 `from hermes_tools import ...`，只能用标准库。如果需要复杂数据处理，把数据硬编码在命令字符串中。
 
-### ⚠️ Python 在本机环境已不可用（2026-07-27确认，升级为永久禁用）
+### ⚠️ Python 在本机环境部分可用（2026-08-05更新）
 
-**Python 在本机环境下因 SRE 模块冲突已完全不可用于文件操作。不要尝试任何 Python 方案。**
+**`python -c` 通过 `terminal` 执行简单计算和文件读写仍然可用**（如 `python -c "print(sum([1,2,3]))"` 和文件 `open()`/`read()`/`write()` 操作）。但 `uv run python` 和复杂 import（如 `from hermes_tools import ...`）因 SRE 模块冲突不可用。**`execute_code` 在 cron job 中被禁止**（无用户审批模式）。
 
 ```bash
 # ❌ python3 返回 exit code 49（Windows Store stub）
@@ -1728,6 +1749,23 @@ Found 3 matches for old_string. Provide more context to make it unique.
 2. **用 `replace_all=true`**（仅当所有匹配都需要替换时）
 3. **用 Node.js 回退**（最可靠，见下方）
 4. **用 `head/tail` 行号操作**：`head -N > tmp && echo '新行' >> tmp && tail -n +N+1 >> tmp && cp tmp 原文件`
+
+**⚠️ Markdown表格管道符导致patch匹配失败（2026-08-05发现）**：当发展日志的审核记录行以 `|||`（三个管道符）开头时，`patch` 的 fuzzy matching 会将 `|||` 与 `||` 混淆，导致即使 old_string 包含唯一文本也无法匹配。症状：patch 报 "Could not find a match" 但 `read_file` 确认文本确实存在。
+
+**解决方案**：用 Python 的 `str.find()` + 文件读写直接插入：
+```bash
+python -c "
+with open('发展日志.md', 'r', encoding='utf-8') as f:
+    content = f.read()
+anchor = '锚点文本（精确复制文件内容）'
+idx = content.find(anchor)
+line_start = content.rfind('\n', 0, idx) + 1
+new_record = '新行内容\n'
+new_content = content[:line_start] + new_record + content[line_start:]
+with open('发展日志.md', 'w', encoding='utf-8') as f:
+    f.write(new_content)
+"
+```
 
 **⚠️ 连续3次patch失败必须切换策略**：如果 patch 连续失败3次（任何原因），立即切换到 Node.js 或 head/tail 方案，不要继续尝试 patch。继续重试只是浪费工具调用次数。
 
