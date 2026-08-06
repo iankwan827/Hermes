@@ -146,6 +146,70 @@ opencli browser douyin eval "document.body.innerText"
 
 **定时任务（cron job）没有用户交互，时间有限。必须用最可靠的方法。**
 
+### ⚡ Cron Job 浏览器预检（5秒完成，必须最先执行）
+
+**在执行任何数据采集之前，必须先用以下命令检查浏览器工具链是否就绪。** 如果跳过此步骤直接尝试 `open`/`eval`，会浪费15+轮工具调用后才发现连接失败。
+
+```bash
+# Step 1: 检查Chrome是否在运行（<1秒）
+tasklist | grep -i chrome | head -1
+
+# Step 2: 检查OpenCLI连接（<2秒）——这是最快的诊断方式
+opencli browser douyin state
+# ✅ 成功: 返回 {"url":"...","viewport":{...}} → 浏览器就绪，直接开始数据采集
+# ❌ 失败: 超时或报错 → 继续Step 3
+
+# Step 3: 检查daemon和扩展状态（<2秒）
+opencli daemon status
+# ✅ Extension: connected → 重启daemon试试
+# ❌ Extension: disconnected → 浏览器扩展未安装或断连，见下方修复
+# ❌ Daemon不是running → 需要启动Chrome
+```
+
+**预检结果决策树：**
+
+| Chrome运行? | daemon状态 | 扩展状态 | 诊断 | 修复动作 |
+|-------------|-----------|---------|------|---------|
+| ✅ 运行 | running | **disconnected** | **Browser Bridge扩展未安装或断连** | 见下方"扩展修复" |
+| ✅ 运行 | running | connected | OpenCLI连接正常 | `opencli browser douyin open <url>` |
+| ❌ 未运行 | - | - | Chrome未启动 | 启动Chrome（见下方） |
+| ✅ 运行 | 超时/无响应 | - | daemon卡住 | `opencli daemon restart` → 等5秒 → 重试 |
+| ✅ 运行 | running | connected | 但open仍超时 | 检查Chrome是否在锁文件状态（默认user-data-dir） |
+
+### 🔴 扩展修复：Browser Bridge未安装（最常见的cron job失败原因）
+
+**症状**：`opencli daemon status` 显示 `Extension: disconnected`，`opencli browser douyin open` 超时。
+
+**快速修复（2026-08-06验证）**：
+```bash
+# 1. 重启daemon（有时扩展只是断连）
+opencli daemon restart
+sleep 8
+opencli daemon status
+
+# 2. 如果仍然disconnected，检查Chrome扩展目录
+ls "E:/Users/Administrator/AppData/Local/Google/Chrome/User Data/Default/Extensions/"
+# 如果只有2-3个扩展（没有Browser Bridge），需要手动安装
+
+# 3. 手动安装扩展（参考skill底部"扩展完全未安装时的手动安装"章节）
+# 注意：GitHub API下载可能失败，需要备用方案
+```
+
+**⚠️ 关键发现（2026-08-06）**：如果扩展未安装，`opencli daemon restart` 无法自动修复——daemon只是启动Chrome，但扩展需要Chrome扩展商店或手动加载。**当扩展未安装时，直接报错并停止，不要继续尝试其他浏览器连接方式。**
+
+### ⚠️ 默认user-data-dir的lockfile陷阱
+
+**手动启动Chrome带 `--remote-debugging-port=9222` 在Windows上几乎必然失败。** 原因：默认用户数据目录有lockfile，Chrome静默忽略调试端口参数。
+
+**验证方法**：
+```bash
+# Chrome进程在跑，参数有 --remote-debugging-port=9222
+# 但端口不监听：
+netstat -an | grep 9222  # 空输出 = 端口没开
+```
+
+**这是Windows特有问题**，不要浪费时间尝试"杀Chrome重启+port参数"——它不会工作。正确路径是：用OpenCLI daemon管理Chrome，或者接受扩展未安装的事实并修复。
+
 **两步走方案（2026-06-16验证）：**
 
 ```bash
