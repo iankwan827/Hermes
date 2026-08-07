@@ -20,15 +20,15 @@
       "schedule_display": "0 22 * * *",
       "repeat": {
         "times": null,
-        "completed": 65
+        "completed": 66
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-01T16:16:27.049963+08:00",
-      "next_run_at": "2026-08-07T22:00:00+08:00",
-      "last_run_at": "2026-08-05T22:02:34.523210+08:00",
+      "next_run_at": "2026-08-08T22:00:00+08:00",
+      "last_run_at": "2026-08-06T22:01:58.734048+08:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -58,17 +58,17 @@
       "schedule_display": "0 11 * * *",
       "repeat": {
         "times": null,
-        "completed": 67
+        "completed": 68
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-04T00:25:42.898647+08:00",
-      "next_run_at": "2026-08-07T11:00:00+08:00",
-      "last_run_at": "2026-08-06T11:27:28.789450+08:00",
-      "last_status": "error",
-      "last_error": "RuntimeError: ## \u6296\u97f3\u6570\u636e\u68c0\u67e5\u62a5\u544a - 2026-08-06\n\n### \u274c \u65e0\u6cd5\u5b8c\u6210\u6570\u636e\u91c7\u96c6\n\n**\u95ee\u9898\u539f\u56e0\uff1a\u6d4f\u89c8\u5668\u8fde\u63a5\u5931\u8d25**\n\n\u7ecf\u8fc7\u591a\u8f6e\u5c1d\u8bd5\uff0c\u65e0\u6cd5\u5efa\u7acb\u53ef\u7528\u7684\u6d4f\u89c8\u5668\u8fde\u63a5\u6765\u8bbf\u95ee\u6296\u97f3\u521b\u4f5c\u8005\u4e2d\u5fc3\uff1a\n\n1. **OpenCLI Browser Bridge \u672a\u5b89\u88c5**\uff1aChrome\u4e2d\u6ca1\u6709\u5b89\u88c5Browser Bridge\u6269\u5c55\uff0c\u5bfc\u81f4OpenCLI daemon\u65e0\u6cd5\u8fde\u63a5\u6d4f\u89c8\u5668\u3002`daemon status` \u663e\u793a `Extension: disconnected`\u3002\n\n2. **Chrome CDP\u7aef\u53e3\u9501\u6b7b**\uff1a\u5373\u4f7f\u4ee5 `--remote-debugging-port=9222` \u542f\u52a8Chrome\uff0c\u7531\u4e8e\u9ed8\u8ba4\u7528\u6237\u6570\u636e\u76ee\u5f55\u7684lockfile\u95ee\u9898\uff0c\u7aef\u53e39222\u4ece\u672a\u771f\u6b63\u76d1\u542c\u3002\u8fd9\u662fWindows\u4e0a\u7684\u5df2\u77e5\u95ee\u9898\u3002\n\n3. **\u5206\u79bb\u7528\u6237\u76ee\u5f55\u65e0\u767b\u5f55\u6001**\uff1a\u4f7f\u7528\u72ec\u7acb `--user-data-dir` \u65f6CDP\u53ef\u7528\uff0c\u4f46\u8be5\u76ee\u5f55\u6ca1\u6709\u6296\u97f3\u767b\u5f55Cookie\uff0c\u6253\u5f00\u521b\u4f5c\u8005\u4e2d\u5fc3\u663e\u793a\u767b\u5f55\u9875\u9762\u3002\n\n### \u5f53\u524d\u72b6\u6001\n\n| \u9879\u76ee | \u72b6\u6001 |\n|------|------|\n| Chrome\u8fdb\u7a0b | \u2705 \u8fd0\u884c\u4e2d\uff088\u4e2a\u8fdb\u7a0b\uff09 |\n| OpenCLI daemon | \u2705 \u8fd0\u884c\u4e2d\uff08\u7aef\u53e319825\uff09 |\n| Browser Bridge\u6269\u5c55 | \u274c \u672a\u5b89\u88c5 |\n| CDP\u7aef\u53e39222 | \u274c \u672a\u76d1\u542c |\n| \u6296\u97f3\u767b\u5f55\u6001 | \u274c \u65e0\u6cd5\u8bbf\u95ee |\n\n### \u5efa\u8bae\u4fee\u590d\u65b9\u6848\n\n1. **\u5b89\u88c5Browser Bridge\u6269\u5c55**\uff1a\u4ece GitHub \u4e0b\u8f7d\u6269\u5c55\u5e76\u52a0\u8f7d\u5230Chrome\u4e2d\n   ```bash\n   # \u9700\u8981\u624b\u52a8\u4e0b\u8f7d\u6269\u5c55zip\u5e76\u89e3\u538b\n   # \u7136\u540e\u5728 chrome://extensions/ \u4e2d\u52a0\u8f7d\n   ```\n\n2. **\u6216\u8005\u4f7f\u7528OpenCLI\u81ea\u5e26\u7684\u6269\u5c55\u5b89\u88c5\u6d41\u7a0b**\uff08\u5982\u679c\u6709\u7684\u8bdd\uff09\n\n3. **\u4fee\u590d\u540e\u9a8c\u8bc1**\uff1a\n   ```bash\n   opencli daemon restart\n   opencli daemon status  # \u5e94\u663e\u793a Extension: connected\n   opencli browser douyin open \"https://creator.douyin.com/creator-micro/home\"\n   ```\n\n### \u9700\u8981\u7528\u6237\u534f\u52a9\n\n\u7531\u4e8e\u8fd9\u662f\u5b9a\u65f6\u4efb\u52a1\uff08cron job\uff09\uff0c\u65e0\u6cd5\u81ea\u52a8\u5b89\u88c5Chrome\u6269\u5c55\u3002**\u9700\u8981\u7528\u6237\u624b\u52a8\u5b89\u88c5Browser Bridge\u6269\u5c55\u540e\uff0c\u4e0b\u6b21\u5b9a\u65f6\u4efb\u52a1\u624d\u80fd\u6b63\u5e38\u8fd0\u884c\u3002**\n\n---\n\n**\u7ed3\u8bba**\uff1a\u672c\u6b21\u6570\u636e\u68c0\u67e5\u56e0\u6d4f\u89c8\u5668\u5de5\u5177\u94fe\u672a\u5c31\u7eea\u800c\u5931\u8d25\uff0c\u65e0\u6570\u636e\u53ef\u62a5\u544a\u3002",
+      "next_run_at": "2026-08-08T11:00:00+08:00",
+      "last_run_at": "2026-08-07T11:09:08.340514+08:00",
+      "last_status": "ok",
+      "last_error": null,
       "last_delivery_error": null,
       "deliver": "local",
       "origin": null,
@@ -96,15 +96,15 @@
       "schedule_display": "0 23 * * *",
       "repeat": {
         "times": null,
-        "completed": 64
+        "completed": 65
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-04T00:25:50.110609+08:00",
-      "next_run_at": "2026-08-06T23:00:00+08:00",
-      "last_run_at": "2026-08-05T23:10:22.526282+08:00",
+      "next_run_at": "2026-08-07T23:00:00+08:00",
+      "last_run_at": "2026-08-06T23:14:12.732249+08:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -134,15 +134,15 @@
       "schedule_display": "30 11 * * *",
       "repeat": {
         "times": null,
-        "completed": 58
+        "completed": 59
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-09T11:45:44.696585+08:00",
-      "next_run_at": "2026-08-07T11:30:00+08:00",
-      "last_run_at": "2026-08-06T11:39:01.167027+08:00",
+      "next_run_at": "2026-08-08T11:30:00+08:00",
+      "last_run_at": "2026-08-07T11:41:50.460118+08:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -172,15 +172,15 @@
       "schedule_display": "30 23 * * *",
       "repeat": {
         "times": null,
-        "completed": 57
+        "completed": 58
       },
       "enabled": true,
       "state": "scheduled",
       "paused_at": null,
       "paused_reason": null,
       "created_at": "2026-06-09T11:45:51.005525+08:00",
-      "next_run_at": "2026-08-06T23:30:00+08:00",
-      "last_run_at": "2026-08-05T23:35:39.916552+08:00",
+      "next_run_at": "2026-08-07T23:30:00+08:00",
+      "last_run_at": "2026-08-06T23:43:10.238990+08:00",
       "last_status": "ok",
       "last_error": null,
       "last_delivery_error": null,
@@ -191,5 +191,5 @@
       "profile": null
     }
   ],
-  "updated_at": "2026-08-06T22:00:26.158557+08:00"
+  "updated_at": "2026-08-07T22:00:04.235217+08:00"
 }

@@ -115,6 +115,23 @@ sleep 10 && curl -s http://localhost:9222/json/version
 - ❌ 没验证端口就急着用browser工具
 - ❌ 忘了`/reset`导致config没生效，然后怪Chrome没开
 
+**🔴🔴🔴 Cron Job铁律：绝对不要杀Chrome（2026-08-06血的教训）**
+
+**在cron job（无用户在场）中杀Chrome = 任务彻底失败，无法恢复。**
+
+原因：Chrome进程携带抖音登录session。杀掉Chrome后：
+- 登录session cookie丢失
+- 新启动的Chrome显示登录页（需要扫码/验证码）
+- cron job中没有用户可以交互式登录
+- 结果：整个数据采集任务失败，只能等用户手动恢复
+
+**正确处理（cron job中OpenCLI bridge完全无响应时）：**
+1. ❌ **绝对不要** `taskkill //F //IM chrome.exe`
+2. ❌ **绝对不要** 重启Chrome（会丢失登录态）
+3. ✅ 记录失败原因（"OpenCLI bridge无响应，Chrome登录态可能已过期"）
+4. ✅ 输出状态报告，基于发展日志最后已知数据
+5. ✅ 等待用户下次手动启动Chrome并恢复登录
+
 **OpenCLI的用途远不止查抖音数据**：
 - 搜热点：打开头条/微博搜索页，eval提取文本
 - 查公司信息：打开企查查/天眼查
@@ -166,11 +183,10 @@ opencli daemon status
 # ❌ Daemon不是running → 需要启动Chrome
 ```
 
-**预检结果决策树：**
+**预检结果决策树（含扩展未安装处理，2026-08-07更新）：**
 
 | Chrome运行? | daemon状态 | 扩展状态 | 诊断 | 修复动作 |
-|-------------|-----------|---------|------|---------|
-| ✅ 运行 | running | **disconnected** | **Browser Bridge扩展未安装或断连** | 见下方"扩展修复" |
+|-------------|-----------|---------|------|---------|\n| ✅ 运行 | running | **disconnected** | **Browser Bridge扩展未安装或断连** | 先`opencli daemon restart`→等10s→再检查；仍disconnected则扩展未安装，**cron job无法恢复，输出失败报告** |
 | ✅ 运行 | running | connected | OpenCLI连接正常 | `opencli browser douyin open <url>` |
 | ❌ 未运行 | - | - | Chrome未启动 | 启动Chrome（见下方） |
 | ✅ 运行 | 超时/无响应 | - | daemon卡住 | `opencli daemon restart` → 等5秒 → 重试 |
@@ -1335,41 +1351,54 @@ sleep 8
 opencli browser douyin eval "document.body.innerText"
 ```
 
-### ⚠️ 扩展完全未安装时的手动安装（2026-06-10验证）
+**🔴🔴🔴 扩展未安装时的Cron Job死锁（2026-08-07验证）**
 
-如果Chrome中没有安装Browser Bridge扩展（`opencli doctor`显示`[MISSING] Extension: not connected`），需要手动下载并加载：
+当Browser Bridge扩展未安装时，cron job陷入**不可恢复的死锁**：
 
+```
+扩展未安装 → 必须kill Chrome + --load-extension重启
+  → kill Chrome丢失登录session
+    → 新Chrome显示登录页（扫码/验证码）
+      → cron job无法交互式登录
+        → 任务彻底失败
+```
+
+**根因**：`--load-extension`只能在Chrome启动时加载，无法热加载。而kill Chrome会清除登录session cookie。
+
+**在cron job中发现此情况时的正确处理**：
+1. ✅ 记录失败原因（"Browser Bridge扩展未安装，需用户手动安装"）
+2. ✅ 基于发展日志最后已知数据输出报告
+3. ✅ 明确告知用户需要手动操作
+4. ❌ **不要反复尝试重启Chrome/daemon**（只会浪费时间）
+
+**用户的正确修复流程**（非cron，需用户手动）：
 ```bash
-# Step 1: 下载最新扩展zip
+# 1. 下载扩展
 cd /tmp
 LATEST_URL=$(curl -sL "https://api.github.com/repos/jackwener/opencli/releases/latest" | grep -o '"browser_download_url": "[^"]*"' | grep -o 'https://[^"]*')
 curl -sL "$LATEST_URL" -o opencli-extension.zip
-
-# Step 2: 解压
 unzip -o opencli-extension.zip -d opencli-extension
 
-# Step 3: 杀掉已有Chrome进程（重要！否则--load-extension不生效）
-taskkill /F /IM chrome.exe 2>/dev/null; sleep 2
+# 2. 杀Chrome + 重启daemon
+powershell.exe -NoProfile -Command "Get-Process chrome -ErrorAction SilentlyContinue | Stop-Process -Force"
+sleep 3
+opencli daemon restart
+sleep 3
 
-# Step 4: 启动Chrome并加载扩展（用background模式）
-opencli browser douyin open "https://creator.douyin.com/creator-micro/home"
-# 或者如果daemon已连接但没有Chrome：
+# 3. 启动Chrome并加载扩展
 "/c/Program Files/Google/Chrome/Application/chrome.exe" \
   --load-extension="/tmp/opencli-extension" \
-  --no-first-run \
-  --no-default-browser-check \
-  --user-data-dir="/e/Users/Administrator/AppData/Local/Google/Chrome/User Data" \
+  --no-first-run --profile-directory="Default" --restore-last-session \
   "https://creator.douyin.com/creator-micro/home" &
 
-# Step 5: 等待扩展连接
-sleep 8
-opencli doctor
-# 应显示 [OK] Extension: connected
+# 4. 等待扩展连接（需用户手动登录抖音）
+sleep 15
+opencli daemon status  # 确认Extension: connected
 ```
 
 **⚠️ 关键注意事项**：
-- 必须先杀掉所有Chrome进程，再用`--load-extension`启动，否则扩展不会加载
-- `--user-data-dir`指向现有Chrome用户数据目录，保持登录态
+- `--load-extension`只能在Chrome启动时加载，不能热加载
+- kill Chrome后登录session丢失，必须用户手动扫码/验证码登录
 - 扩展zip从GitHub releases下载：`https://github.com/jackwener/OpenCLI/releases`
 - daemon需要在扩展连接前已运行（`opencli daemon restart`）
 
@@ -1594,11 +1623,18 @@ opencli daemon status
 - **工作目录版本**（`./references/发展日志.md`）→ 可能是旧版本，数据不完整
 - **规则**：必须用 `skill_view` 读取发展日志，不要用 `read_file` 读取本地副本。两个文件会不同步，本地副本可能缺少最新的视频数据（如视频10-13）
 
-**⚠️ 审核记录行前缀是 `|||`（3个管道符），不是 `||||`（4个管道符）**（2026-08-02发现）：
-- 发展日志中，视频数据记录表的行用 `|` 分隔
-- 审核记录章节的行用 `|||` 开头（3个管道符）
-- 用node/Python做字符串匹配时，如果搜索 `|||| 08-02` 会找不到，因为实际是 `||| 08-02`
+**⚠️ 审核记录行前缀不一致（2026-08-02发现，2026-08-07补充）**：
+- 发展日志中，视频数据记录表的行用 `||` 开头（双管道符）
+- 审核记录章节的行用 `|` 开头（单管道符，如 `| 08-06 17:00 cron审核`）
+- 部分审核记录用 `|||` 开头（三管道符，如 `||| 08-05 17:00 cron审核`）
+- **用node.js插入新审核记录时，anchor必须用 `|`（单管道符）匹配现有审核记录**，不能用 `||`（双管道符，那是数据表行的前缀）
 - **验证方法**：先用 `read_file` 读取目标行，确认实际前缀再做匹配
+- **已验证的node.js插入模式**：
+  ```javascript
+  const anchor = '| 08-06 17:00 cron审核';  // 单管道符！
+  const newRecord = '||| 08-07 11:00 cron审核 | ⚠️有疑点 | ... |\n';
+  c = c.replace(anchor, newRecord + anchor);
+  ```
 
 **⚠️ 数据异常监控（2026-07-16新增）**：
 - **点赞减少**：如果页面显示的点赞数比发展日志少（如V26从7→6），可能是用户取消点赞或数据波动。记录变化但不修改历史数据
