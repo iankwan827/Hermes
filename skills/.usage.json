@@ -30,13 +30,13 @@
     "created_at": "2026-06-03T03:39:28.691951+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-06-25T09:50:20.560478+00:00",
-    "last_used_at": "2026-08-01T03:56:31.363569+00:00",
-    "last_viewed_at": "2026-08-01T03:56:31.343034+00:00",
+    "last_used_at": "2026-08-08T04:24:33.740706+00:00",
+    "last_viewed_at": "2026-08-08T04:24:33.722044+00:00",
     "patch_count": 33,
     "pinned": false,
     "state": "active",
-    "use_count": 71,
-    "view_count": 56
+    "use_count": 72,
+    "view_count": 57
   },
   "bazi-analysis-writing": {
     "archived_at": null,
@@ -472,13 +472,13 @@
     "created_at": "2026-06-03T11:19:06.285567+00:00",
     "created_by": null,
     "last_patched_at": "2026-08-07T03:43:11.917538+00:00",
-    "last_used_at": "2026-08-07T03:42:20.270949+00:00",
-    "last_viewed_at": "2026-08-07T03:42:20.255326+00:00",
+    "last_used_at": "2026-08-08T03:01:21.772460+00:00",
+    "last_viewed_at": "2026-08-08T03:01:21.730714+00:00",
     "patch_count": 255,
     "pinned": false,
     "state": "active",
-    "use_count": 427,
-    "view_count": 427
+    "use_count": 430,
+    "view_count": 430
   },
   "douyin-download": {
     "archived_at": null,
@@ -498,13 +498,13 @@
     "created_at": "2026-06-01T03:35:09.512592+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-06-05T12:39:47.523693+00:00",
-    "last_used_at": "2026-08-01T03:56:33.633685+00:00",
-    "last_viewed_at": "2026-08-01T03:56:33.371671+00:00",
+    "last_used_at": "2026-08-08T04:24:34.764670+00:00",
+    "last_viewed_at": "2026-08-08T04:24:34.744909+00:00",
     "patch_count": 58,
     "pinned": false,
     "state": "active",
-    "use_count": 48,
-    "view_count": 48
+    "use_count": 49,
+    "view_count": 49
   },
   "feishu-integration": {
     "archived_at": null,
@@ -654,13 +654,13 @@
     "created_at": "2026-07-29T17:06:18.221392+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-07-29T17:13:58.574050+00:00",
-    "last_used_at": "2026-08-01T03:56:32.414756+00:00",
-    "last_viewed_at": "2026-08-01T03:56:32.399754+00:00",
+    "last_used_at": "2026-08-08T04:24:36.794447+00:00",
+    "last_viewed_at": "2026-08-08T04:24:36.779443+00:00",
     "patch_count": 5,
     "pinned": false,
     "state": "active",
-    "use_count": 5,
-    "view_count": 5
+    "use_count": 6,
+    "view_count": 6
   },
   "skill-creator": {
     "archived_at": null,
@@ -706,13 +706,13 @@
     "created_at": "2026-07-26T13:52:27.184018+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-07-26T13:52:39.240214+00:00",
-    "last_used_at": "2026-08-01T03:56:31.398573+00:00",
-    "last_viewed_at": "2026-08-01T03:56:31.382654+00:00",
+    "last_used_at": "2026-08-08T04:24:33.684992+00:00",
+    "last_viewed_at": "2026-08-08T04:24:33.664990+00:00",
     "patch_count": 1,
     "pinned": false,
     "state": "active",
-    "use_count": 2,
-    "view_count": 2
+    "use_count": 3,
+    "view_count": 3
   },
   "topic-ideas": {
     "archived_at": null,
@@ -745,13 +745,13 @@
     "created_at": "2026-07-15T08:32:07.049798+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-08-01T05:27:40.699358+00:00",
-    "last_used_at": "2026-08-01T05:27:57.598912+00:00",
-    "last_viewed_at": "2026-08-01T05:27:57.583761+00:00",
+    "last_used_at": "2026-08-08T04:24:35.785959+00:00",
+    "last_viewed_at": "2026-08-08T04:24:35.773954+00:00",
     "patch_count": 7,
     "pinned": false,
     "state": "active",
-    "use_count": 9,
-    "view_count": 9
+    "use_count": 10,
+    "view_count": 10
   },
   "windows-python-development": {
     "archived_at": null,
