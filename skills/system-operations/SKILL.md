@@ -420,3 +420,4 @@ console.log('Final depth:', d);
 - ⚠️ rebase --continue 在非交互式终端（cron）中会失败：nano 无法打开编辑器 → 设置 `GIT_EDITOR=true git rebase --continue` 跳过编辑器，或先 `git commit -m "..."` 手动提交再 rebase --continue
 - ⚠️ `execute_code` 在 cron 模式下被阻止（安全策略）→ 不能用 Python 脚本批量解决冲突，只能用 `git merge -X theirs` 自动合并或终端命令
 - ⚠️ 同步过程中远程可能有新 push → merge 后 push 被拒是正常的，再 pull + merge + push 即可，通常 2-3 轮收敛
+- ⚠️ git push 超时（非 credential 问题）：当仓库含大文件（如 skills.tar.gz >50MB）时，push 可能因传输慢而超时（默认 terminal 60s 不够）。诊断：检查 `git status` 是否 ahead of origin，以及 GitHub 是否有 large file warning。解决：用 `terminal(background=true, notify_on_complete=true)` 跑 push，或加大 timeout 到 300s。如果 push 报 `cannot lock ref` 但本地已是最新，说明推送期间远端有新提交 → 再 pull + push 即可

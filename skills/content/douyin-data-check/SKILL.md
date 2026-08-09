@@ -265,13 +265,15 @@ opencli browser douyin eval "document.body.innerText"
 
 **✅ 方法0（投稿列表）获取列表数据 + 方法B（仪表盘）获取最新视频详情 = 完整方案**
 
-### ⚡ 数据校验自动化（2026-08-04新增）
+### ⚡ 数据校验自动化（2026-08-04新增，2026-08-09增强）
 
-用 `scripts/verify_data.js` 自动对比页面数据与日志表格：
-1. 从eval提取数据后，填入脚本的 `pageData` 对象
-2. 运行 `node scripts/verify_data.js`
+用 `scripts/verify_data.js` 自动对比页面数据与日志表格：填入pageData后运行，输出所有差异。
+
+用 `scripts/verify_and_patch.js` 增强版：支持自动解析日志表格、逐字段对比、生成修复建议。用法：
+1. 从eval提取数据后，填入脚本顶部的 `pageData` 对象
+2. 运行 `node scripts/verify_and_patch.js`
 3. 输出所有差异（播放量、点赞、评论、分享、收藏）
-4. 用 `patch` 工具逐个修正差异
+4. 加 `--patch` 参数生成修复命令
 
 ---
 
