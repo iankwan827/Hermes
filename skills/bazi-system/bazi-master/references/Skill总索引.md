@@ -159,5 +159,9 @@
 | 必须调用skill清单.md | bazi-reviewer/references/ | 审核agent用的skill验证规则 |
 | 十神速查表.md | bazi-reviewer/references/ | 十天干×十神对照表 |
 | 常见错误.md | bazi-reviewer/references/ | 17条Pitfalls |
-| 分析步骤.md | bazi-master/references/ | Phase 2-9详细步骤 |
+| 分析步骤.md | bazi-master/references/ | Phase 2-9详细步骤 + 审核Prompt模板 |
 | 关键路径.md | bazi-master/references/ | 脚本位置、案例文件路径 |
+| JS脚本Bug修复记录.md | bazi-master/references/ | generate_bazi_analysis.js 6个Bug修复记录 |
+| 十神推物映射表.md | bazi-master/references/ | 十神推物映射 |
+| 排盘系统.md | bazi-master/references/ | Web排盘系统API和前端说明 |
+| 多Agent架构设计.md | bazi-master/references/ | 多Agent架构设计文档 |

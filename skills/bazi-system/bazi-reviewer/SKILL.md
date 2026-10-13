@@ -200,16 +200,84 @@ layer2.json中的用神忌神 → 对照格局判定检查 → 结果
 ```
 
 **各层必要skill速查**（详见 `references/必须调用skill清单.md`）：
+
 | 层 | 必要skill |
 |----|-----------|
 | 第1层 | bazi-paipan, bazi-sizhu |
 | 第2层 | bazi-geju, bazi-shishen |
-| 第3层 | bazi-xingge, bazi-shishen |
-| 第4层 | bazi-sizhu, bazi-shishen |
-| 第5层 | bazi-zhiduan（按专项加载） |
-| 第6层 | bazi-dayun |
-| 第7层 | bazi-zhiduan |
-| 第8层 | bazi-tiaoli |
+| 画像层 | bazi-xingge, bazi-shishen-tiangan, bazi-shishen, bazi-analysis-writing, bazi-portrait, bazi-shishen-*（命局突出十神） |
+| 第3层（六亲） | bazi-liuqin, bazi-sizhu |
+| 第4层（专项） | 按专项加载 |
+| 第5层（运势） | bazi-dayun |
+
+### 7.5️⃣ 画像层专项验证（画像层审核必做）
+
+**画像层是排盘+格局之后的必做步骤，必须验证以下内容：**
+
+```
+1. 检查skills_used是否包含bazi-analysis-writing
+   → 不包含 → 审核不通过（writing框架未加载）
+
+2. 检查skills_used是否包含bazi-xingge
+   → 不包含 → 审核不通过（性格5维度未加载）
+
+3. 检查skills_used是否包含bazi-shishen-tiangan
+   → 不包含 → 审核不通过（日元天干性格未加载）
+
+4. 检查skills_used是否包含bazi-shishen
+   → 不包含 → 审核不通过（十神总纲未加载）
+
+5. 检查skills_used是否包含bazi-portrait
+   → 不包含 → 审核不通过（画像skill未加载）
+
+6. 检查skills_used是否包含命局突出十神对应的bazi-shishen-*
+   → 日坐十神对应的skill未加载 → 审核不通过
+   → 命局中出现≥2次的十神对应skill未加载 → 审核不通过
+```
+
+**画像层审核输出必须包含：**
+```json
+{
+  "portrait_verification": {
+    "writing_loaded": true,
+    "xingge_loaded": true,
+    "tiangan_loaded": true,
+    "shishen_loaded": true,
+    "portrait_skill_loaded": true,
+    "shishen_sub_skills_loaded": ["bazi-shishen-pianyin", "bazi-shishen-zhengcai"],
+    "shishen_sub_skills_missing": [],
+    "status": "pass"
+  }
+}
+```
+
+### 7.6️⃣ 十神与JS脚本匹配验证（每层必做）
+
+**所有分析中的十神判断必须与bazi.json（JS脚本输出）一致，不能手算。**
+
+```
+检查layerX.json中提到的每个十神 → 对照bazi.json → 结果
+
+例1: 分析说"月干是正财"
+→ 对照bazi.json：月干十神=正财
+→ 通过
+
+例2: 分析说"日支坐偏印"
+→ 对照bazi.json：日支本气十神=正官
+→ 失败！正官不是偏印
+
+例3: 分析说"时干是正官"
+→ 对照bazi.json：时干十神=正官
+→ 通过
+```
+
+**验证范围：**
+- 天干十神（年干、月干、时干）必须与bazi.json完全一致
+- 地支本气十神（年支、月支、日支、时支）必须与bazi.json完全一致
+- 藏干十神必须与bazi.json完全一致
+- 任何手算的十神（没有bazi.json依据的）→ 审核不通过
+
+**⚠️ 这是最重要的验证项。十神错误是严重错误，会导致后续所有分析全错。**
 
 ### 8️⃣ 跨层一致性
 
@@ -276,43 +344,52 @@ layer2.json中的用神忌神 → 对照格局判定检查 → 结果
 - 有没有把正官格的食伤标为用神
 - 调候分析是否正确
 
-### 第3层：先天禀赋
+### 画像层：人物画像（排盘+格局之后必做）
 
 审核内容：
-- 性格分析是否与日元匹配
-- 两头挂判断是否正确
-- 天赋分析是否合理
+- **是否加载了bazi-analysis-writing**（writing框架）
+- **是否加载了bazi-xingge**（性格5维度）
+- **是否加载了bazi-shishen-tiangan**（日元天干性格）
+- **是否加载了bazi-shishen**（十神总纲）
+- **是否加载了bazi-portrait**（画像skill）
+- **是否加载了命局突出十神对应的bazi-shishen-***
+- **画像中提到的每个十神是否与bazi.json一致**（十神匹配验证）
+- 画像是否有血有肉，不是断语拼盘
+- 画像是否有内在矛盾分析
 
-### 第4层：六亲关系
+### 第3层：六亲关系
 
 审核内容：
 - 六亲星是否正确（男命偏财=父，女命正官=夫等）
-- 宫位判断是否正确
+- 宫位判断是否正确（父亲=月干，母亲=月令）
+- **宫位五行对六亲星的生克关系是否正确**
 - 配偶分析是否与日支匹配
 
-### 第5层：专项运势
+### 第4层：专项运势
 
 审核内容：
 - 专题分析是否与排盘匹配
 - 断语是否准确
+- **是否引用了画像做场景推演**（不是通用断语）
 
-### 第6层：运势推演
+### 第5层：运势推演
 
 审核内容：
 - 大运排布是否正确
 - 流年吉凶判断是否合理
 
-### 第7层：进阶深度
+### 第6层：进阶深度
 
 审核内容：
 - 特殊格局判断是否正确
 - 寿元分析是否合理
 
-### 第8层：调理建议
+### 第7层：调理建议
 
 审核内容：
 - 五行补泄是否与喜用神一致
 - 建议是否合理
+- **是否引用了画像做个性化建议**（不是泛泛的"补火穿红色"）
 
 ---
 

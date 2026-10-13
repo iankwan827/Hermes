@@ -138,6 +138,26 @@ grep -rn "关键词" ~/Pictures/录音/八字课/*/
 **Session验证对照表：** `references/session-day-mapping.md`（已验证的Day与session对应关系）。
 **语录分类系统：** `references/quotes-categorization.md`（按十神/主题分类的JSON结构和生成流程）。
 
+## 语录分类JSON与十神skill的关系
+
+`~/Pictures/八字课/语录/语录分类.json` 是语录的结构化版本，每条包含：
+- `day`: 课次
+- `content`: 语录内容
+- `shishen`: 相关十神列表（如 `["七杀", "正印"]`）
+- `topics`: 主题分类
+
+**十神skill的yulu.md文件从这个JSON生成**，不要手动编辑。
+
+**重新分配命令：**
+```bash
+python3 ~/.hermes/profiles/main/scripts/split_multi_shishen.py
+```
+
+**注意：** 如果用户发送新的语录，需要：
+1. 先追加到 `理华老师语录.md`（用本skill的流程）
+2. 然后运行分类脚本重新生成JSON（如果需要）
+3. 最后运行 `split_multi_shishen.py` 更新十神skill
+
 ## 转录稿搜索技巧
 
 用户经常问"老师在哪节课说了XXX"，需要在转录稿中搜索。转录稿是Whisper自动生成的，错误率高，搜索时注意：

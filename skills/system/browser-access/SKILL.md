@@ -240,22 +240,6 @@ opencli browser douyin eval "document.body.innerText"
 - **排查**：`curl -s http://localhost:9222/json/version`
 - **解决**：检查Chrome是否带`--remote-debugging-port=9222`启动
 
-### CDP端口标志存在但端口未绑定（2026-07-30 新增）
-- **症状**：Chrome进程在跑，`wmic`确认命令行包含`--remote-debugging-port=9222`，但`curl localhost:9222`仍然Connection refused
-- **排查步骤**：
-  1. `tasklist | grep chrome` — 确认Chrome在运行
-  2. `wmic process where "name='chrome.exe'" get ProcessId,CommandLine` — 确认flag存在
-  3. `curl -s http://localhost:9222/json/version` — 确认端口不通
-  4. `ls "$LOCALAPPDATA/Google/Chrome/User Data/DevToolsActivePort"` — 检查此文件是否存在
-  5. `netstat -ano | grep LISTEN | grep 9222` — 确认端口未监听
-- **可能原因**：
-  - Windows Defender或其他安全软件阻止Chrome绑定端口
-  - Chrome内部状态异常（扩展冲突、Profile损坏）
-  - 系统环境问题（端口被其他程序占用后未释放）
-- **诊断扩展冲突**：检查 `$LOCALAPPDATA/Google/Chrome/User Data/Default/Extensions/` 下的扩展，逐个禁用测试
-- **最终解决**：此问题通常需要用户手动介入 — 关闭所有Chrome窗口，重启电脑，再从开始菜单启动Chrome
-- **⚠️ 定时任务处理**：遇到此问题应直接报告失败，不要尝试用Node.js脚本自行启动Chrome（会创建无登录态的干净Profile）
-
 ### OpenCLI "Browser Bridge extension not connected"
 - **快速修复**：`opencli daemon restart` → `sleep 5` → `opencli daemon status`
 - **如果Chrome没开**：先启动Chrome，等10-15秒让扩展连接
@@ -275,15 +259,6 @@ opencli browser douyin eval "document.body.innerText"
 ### vision_analyze在Xiaomi上的问题
 - mimo-v2.5拒绝tool message中的图片格式
 - **绝对不要用截图+vision_analyze方案**，直接用eval提取文本
-
-### GitHub API Rate Limit → 用 raw.githubusercontent.com 绕过
-- **症状**：`curl "https://api.github.com/repos/..."` 返回 `API rate limit exceeded`
-- **原因**：未认证的GitHub API调用有严格限制（60次/小时）
-- **解决**：改用 `curl "https://raw.githubusercontent.com/{owner}/{repo}/main/{path}"` 直接获取文件内容
-- **优势**：无速率限制、无需认证、更快
-- **获取文件列表**：`curl -s "https://github.com/{owner}/{repo}" | grep -o 'href="/{owner}/{repo}/blob/main/[^"]*"'`
-- **适用场景**：调查GitHub仓库内容、获取代码文件、读取README等
-- **⚠️ 注意**：raw.githubusercontent.com 需要正确的分支名（通常是 main 或 master）
 
 ### PWA/Manifest路径问题（子路径部署）
 - **症状**：浏览器报 `icon.png 404` + `Error while trying to use the following icon from the Manifest`

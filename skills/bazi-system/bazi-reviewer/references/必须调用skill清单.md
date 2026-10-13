@@ -45,12 +45,12 @@
 |----|--------|--------------|--------------------------|
 | 1 | 基础排盘层 | bazi-paipan, bazi-sizhu | 同五行→bazi-hunyin-tongwuxing；女命→bazi-fukeshengyu；杂气月→动态格局；墓库→bazi-muku；日坐阳刃→bazi-fukeshengyu；夫妻宫六害→bazi-gongchuan |
 | 2 | 格局核心层 | bazi-geju, bazi-shishen | bazi-dizhi（如有三会/三合局） |
-| 3 | 先天禀赋层 | bazi-xingge, bazi-shishen | bazi-zhi, bazi-xiongbu, bazi-xinglengdan, bazi-haose, bazi-shencai, bazi-daogui, bazi-lanyin, bazi-dinghuo |
-| 4 | 六亲关系层 | bazi-sizhu, bazi-shishen, bazi-peiou, bazi-duanpeifu, bazi-hunyin-cishu | bazi-gongchuan（夫妻宫六害时） |
-| 5 | 专项运势层 | - | 按问题类型加载（见下方专项表） |
-| 6 | 运势推演层 | bazi-dayun（待创建） | bazi-dizhi（流年地支关系） |
-| 7 | 进阶深度层 | - | - |
-| 8 | 调理建议层 | bazi-tiaoli（待创建） | - |
+| portrait | 人物画像层 | bazi-xingge, bazi-shishen-tiangan, bazi-shishen, bazi-analysis-writing, bazi-portrait | bazi-shishen-*（日坐十神+命局出现≥2次的十神） |
+| 3 | 六亲关系层 | bazi-liuqin, bazi-sizhu | bazi-gongchuan（夫妻宫六害时）、bazi-peiou（问配偶）、bazi-duanpeifu（问配偶类型）、bazi-hunyin-cishu（问婚姻次数） |
+| 4 | 专项运势层 | - | 按问题类型加载（见下方专项表） |
+| 5 | 运势推演层 | bazi-dayun（待创建） | bazi-dizhi（流年地支关系） |
+| 6 | 进阶深度层 | - | - |
+| 7 | 调理建议层 | bazi-tiaoli（待创建） | - |
 
 ---
 
@@ -62,7 +62,11 @@
 | 印星懒 | bazi-lanyin | 已有（可选） |
 | 婚姻/配偶 | bazi-peiou, bazi-duanpeifu, bazi-gongchuan, bazi-hunyin-cishu | 已有 |
 | 同五行二婚（条件触发） | bazi-hunyin-tongwuxing | 已有（仅日柱同五行时加载） |
-| 事业/财运 | bazi-shiye | 待创建 |
+| 事业/职业 | bazi-shiye | 已有 |
+| 财运 | bazi-caiyun | 已有 |
+| 官非/诉讼 | bazi-guanfei | 已有 |
+| 运势/大运 | bazi-dayun-liunian | 已有 |
+| 调理/择时 | bazi-tiaoli | 已有 |
 | 健康/寿元 | bazi-weibing, bazi-feibu, bazi-shenbing, bazi-ganbing, bazi-xinzangbing | 已有 |
 | 性格/天赋 | bazi-xingge | 已有 |
 | 痣相 | bazi-zhi | 已有 |

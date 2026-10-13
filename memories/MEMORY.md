@@ -22,6 +22,8 @@ dbs-video-workflow：必须完整跑4阶段不能跳步。阶段2用模板库。
 §
 Whisper转录专有名词常出错需校对。课件长图必须逐片vision_analyze看完（tesseract中文质量极差），不能只看顶部就编内容。被指出一个错误后必须核查同类所有内容。
 §
-八字系统：23点后算次子时。**必须先跑排盘脚本，绝对不能手算十神。** 脚本：`~/.hermes/profiles/main/skills/bazi-system/bazi-paipan/scripts/generate_bazi_analysis.js`，用法：`node generate_bazi_analysis.js <年> <月> <日> <时> <性别(M/F)>`。用户评价：核心特征准确比技术细节重要。空亡以日柱查旬首。课程录音：`/Users/guanmian/Pictures/录音/八字课/`。**十神skill语录必须精选（5-20条），不能全量塞入。用户原话"不是多就是好的"。** 2026-07-30已用Claude版替换12个skill，旧版备份在cache/backup_my_skills_202607300110/。**讨论八字前先加载对应skill，不要凭记忆空聊；不要轻易说skill有错——用户花大量token打磨过，先假设skill是对的。** 空亡两套方法独立：方法一用日柱的旬看年月时柱谁空亡，方法二用年月时柱各自的旬看日柱是不是空亡（bazi-kongwang skill已更新）。
+八字系统：23点后算次子时。**必须先跑排盘脚本，绝对不能手算十神。** 脚本：`~/.hermes/profiles/main/skills/bazi-system/bazi-paipan/scripts/generate_bazi_analysis.js`，用法：`node generate_bazi_analysis.js <年> <月> <日> <时> <性别(M/F)>`。课程录音：`/Users/guanmian/Pictures/录音/八字课/`。**十神skill语录必须精选（5-20条），不能全量塞入。** 空亡两套方法独立（bazi-kongwang skill已更新）。**讨论八字前先加载对应skill，不要凭记忆空聊；不要轻易说skill有错。**
 §
 画像驱动模式：排盘+格局→画像（必做）→后续层读portrait.json推演。强关联：事业/财运/官非/运势。弱关联：六亲（独立分析，画像只影响相处模式）。同一命理特征不同性格的人做出不同选择。新增skill：bazi-portrait、bazi-portrait-orchestrator、bazi-liuqin。六亲铁律：父亲=月干，母亲=月令，看落宫五行对六亲星的生克。月令力量最大克了就是克了。画像必须真正加载skill断语。
+§
+课程笔记最终目的地是飞书，本地md是中间产物。用户flag的内容（录音中标注的重点、补充案例）必须同步到飞书文档。每次更新课程笔记后检查是否需要同步到飞书。

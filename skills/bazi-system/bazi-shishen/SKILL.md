@@ -131,45 +131,33 @@ description: "十神基础知识：十神分类、详解、实战应用、核心
 
 ---
 
-## 子Skill（按十神拆分的语录库）
+## 子Skill（按十神拆分的精选语录库）
 
-每个十神有独立的skill，包含该十神的详细语录和断语。分析八字时，根据命局中明显的十神加载对应skill：
+每个十神有独立的skill，包含该十神的精选语录和断语。分析八字时，根据命局中明显的十神加载对应skill：
 
-| Skill | 十神 | 语录数（过滤后） |
-|-------|------|----------------|
-| `bazi-shishen-shishen` | 食神 | 93条 |
-| `bazi-shishen-shangguan` | 伤官 | 58条 |
-| `bazi-shishen-zhengguan` | 正官 | 14条 |
-| `bazi-shishen-qisha` | 七杀 | 57条 |
-| `bazi-shishen-zhengyin` | 正印 | 10条 |
-| `bazi-shishen-pianyin` | 偏印 | 46条 |
-| `bazi-shishen-bijian` | 比肩 | 2条 |
-| `bazi-shishen-jiecai` | 劫财 | 13条 |
-| `bazi-shishen-zhengcai` | 正财 | 2条 |
-| `bazi-shishen-piancai` | 偏财 | 4条 |
-| `bazi-shishen-tiangan` | 十天干日元 | 51条 |
-
-**⚠️ 语录已按十神严格过滤**：每个skill的语录只包含与该十神相关的内容，不包含其他十神的断语。用户原话："正印的skill，应该不会出现其他十神的断语"。
+| Skill | 十神 | 内容 |
+|-------|------|------|
+| `bazi-shishen-shishen` | 食神 | 精选性格语录 + 断语 |
+| `bazi-shishen-shangguan` | 伤官 | 精选性格语录 + 断语 |
+| `bazi-shishen-zhengguan` | 正官 | 精选性格语录 + 断语 |
+| `bazi-shishen-qisha` | 七杀 | 精选性格语录 + 断语 |
+| `bazi-shishen-zhengyin` | 正印 | 精选性格语录 + 断语 |
+| `bazi-shishen-pianyin` | 偏印 | 精选性格语录 + 断语 |
+| `bazi-shishen-bijian` | 比肩 | 精选性格语录 + 断语 |
+| `bazi-shishen-jiecai` | 劫财 | 精选性格语录 + 断语 |
+| `bazi-shishen-zhengcai` | 正财 | 精选性格语录 + 断语 |
+| `bazi-shishen-piancai` | 偏财 | 精选性格语录 + 断语 |
+| `bazi-shishen-tiangan` | 十天干日元 | 日元性格详解 |
 
 **串联加载顺序**（第3层性格分析时）：
-1. `bazi-xingge` → 综合5维度性格框架
+1. `bazi-xingge` → 综合5维度性格框架 + personality-reference.md
 2. `bazi-shishen-tiangan` → 日元天干的核心性格底色
 3. `bazi-shishen` → 日坐十神性格特征 + 十神组合断语
-4. `bazi-shishen-*` → 具体十神的语录补充（根据命局突出十神加载）
+4. `bazi-shishen-*` → 具体十神的精选语录（根据命局突出十神加载）
 
-**配合使用**：加载十神skill获取断语 → 按 `bazi-analysis-writing` 的框架串写成完整分析（不是列表，是流畅文案）
-
-语录分类JSON：`~/Pictures/八字课/语录/语录分类.json`
+**配合使用**：加载十神skill获取断语 → 按 `bazi-analysis-writing` 的框架组织成完整分析
 
 分析写法指导：`bazi-analysis-writing`（所有十神skill都引用此指导）
-
-### 十神组合判定与断语
-
-详细的十神组合判定规则和断语见参考资料：
-- `D:\hermes-agent\imge_v2\十神组合判定手册.md` — 组合判定条件
-- `D:\hermes-agent\imge_v2\十神组合判定与断语手册.md` — 组合判定+断语+案例原话
-
-**核心原则**：先定格局，再看组合是否攻击/辅助格局核心。只有直接作用于格局核心的组合才算成立。
 
 ## Pitfalls
 
@@ -181,3 +169,5 @@ description: "十神基础知识：十神分类、详解、实战应用、核心
 - 伤官见官为祸百端（女命尤其注意）
 - 财多坏印影响学习（学生时代最怕）
 - **丁火不能当丙火用**：丁火是炉灶之火/蜡烛之火，贴身作用，不能暖土。三个丁火不会变成丙火，只是局部过热。详见 `references/丁火特性与三为过.md`
+- **⚠️ 精选语录 > 全量塞入（2026-07-30 教训）**：每个十神skill的quotes文件只放最能说明性格的精选语录（5-20条），不要从语录分类.json全量搬运。用户原话："有没有可能人家把语录精简好了，你是全部塞进去了，不是多就是好的"。判断标准：每条语录是否直接说明该十神的性格特征/行为表现。大运流年、格局用神、健康等非性格内容不放进来。比肩4条精选比24条堆砌有效得多。
+- **⚠️ yulu.md只放对应十神的断语**：每个十神skill的references/只能包含与该十神直接相关的语录。通用多十神内容要拆分——把属于该十神的那句话单独放到对应skill里，不能整段复制。例如"十神闹分手"拆成6条分别放到各十神skill。
